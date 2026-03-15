@@ -19,10 +19,18 @@ export default async function ResultPage({ params }: ResultPageProps) {
   if (!game) notFound();
 
   const wixUrl = getWixLandingUrl(slug);
-  const g = game as { endStoryLong?: string; endAudioUrl?: string; endImageUrl?: string };
+  const g = game as {
+    endStoryLong?: string;
+    endAudioUrl?: string;
+    endImageUrl?: string;
+    endGizemMalikanesiUrl?: string;
+    endGizemMalikanesiLabel?: string;
+  };
   const endStoryLong = g.endStoryLong;
   const endAudioUrl = g.endAudioUrl;
   const endImageUrl = g.endImageUrl;
+  const endGizemMalikanesiUrl = g.endGizemMalikanesiUrl;
+  const endGizemMalikanesiLabel = g.endGizemMalikanesiLabel;
 
   return (
     <ResultClient
@@ -34,6 +42,8 @@ export default async function ResultPage({ params }: ResultPageProps) {
       endStoryLong={endStoryLong}
       endAudioUrl={endAudioUrl}
       endImageUrl={endImageUrl}
+      gizemMalikanesiUrl={endGizemMalikanesiUrl}
+      gizemMalikanesiLabel={endGizemMalikanesiLabel}
     />
   );
 }

@@ -25,6 +25,8 @@ interface ResultClientProps {
   endStoryLong?: string;
   endAudioUrl?: string;
   endImageUrl?: string;
+  gizemMalikanesiUrl?: string;
+  gizemMalikanesiLabel?: string;
 }
 
 function formatTime(seconds: number): string {
@@ -56,6 +58,8 @@ export default function ResultClient({
   endStoryLong,
   endAudioUrl,
   endImageUrl,
+  gizemMalikanesiUrl,
+  gizemMalikanesiLabel,
 }: ResultClientProps) {
   const router = useRouter();
   const [escaped, setEscaped] = useState<boolean | null>(null);
@@ -209,7 +213,17 @@ export default function ResultClient({
               )}
             </section>
 
-            <div className="flex justify-center pt-2">
+            <div className="flex flex-col items-center gap-3 pt-2 sm:gap-4">
+              {gizemMalikanesiUrl && gizemMalikanesiLabel && (
+                <a
+                  href={gizemMalikanesiUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex min-h-[52px] min-w-[200px] items-center justify-center rounded-xl bg-emerald-600 px-8 py-3.5 text-lg font-semibold text-white transition-colors hover:bg-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:ring-offset-2 focus:ring-offset-zinc-900"
+                >
+                  {gizemMalikanesiLabel}
+                </a>
+              )}
               <a
                 href={wixUrl}
                 className="inline-flex min-h-[52px] min-w-[200px] items-center justify-center rounded-xl bg-amber-600 px-8 py-3.5 text-lg font-semibold text-white transition-colors hover:bg-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:ring-offset-2 focus:ring-offset-zinc-900"
@@ -224,7 +238,7 @@ export default function ResultClient({
             {endImageUrl && (
               <div className="overflow-hidden rounded-xl border border-zinc-700/50 bg-zinc-900/50">
                 <img
-                  src={endImageUrl}
+                  src={encodeURI(endImageUrl)}
                   alt=""
                   className="h-auto w-full object-cover"
                 />
