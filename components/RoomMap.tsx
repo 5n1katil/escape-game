@@ -73,9 +73,11 @@ export default function RoomMap({
         İlerleme
       </h3>
 
-      <div className="flex flex-col gap-0" role="list" aria-label="Oda durumları (navigasyon haritadan yapılır)">
+      <div className="flex flex-col gap-0" role="list" aria-label="Oda durumları">
         {rooms.map((room, index) => {
           const state = getRoomState(index, currentRoomIndex, maxSolved);
+          const canNavigate = state !== "locked";
+          const roomHref = `/game/${slug}/room/${room.id}`;
 
           const content = (
             <span className="flex flex-col items-center gap-0.5">
@@ -88,7 +90,7 @@ export default function RoomMap({
                       : state === "solved"
                         ? "border-emerald-700/60 bg-emerald-950/40 text-emerald-400"
                         : "border-amber-500/60 bg-amber-950/30 text-amber-400/90"
-                }`}
+                } ${canNavigate ? "cursor-pointer" : ""}`}
                 title={
                   state === "locked"
                     ? "Kilitli"
@@ -112,17 +114,30 @@ export default function RoomMap({
             </span>
           );
 
+          const itemClasses = `flex w-full flex-col items-center gap-0.5 px-2 py-2 ${
+            state === "current" ? "bg-amber-500/10 ring-1 ring-amber-500/30 rounded-lg" : ""
+          } ${canNavigate ? "transition-colors hover:bg-zinc-800/60 rounded-lg touch-manipulation" : ""}`;
+
           return (
             <div key={room.id} className="flex flex-col items-center">
-              <div
-                className={`flex w-full flex-col items-center gap-0.5 px-2 py-2 ${
-                  state === "current" ? "bg-amber-500/10 ring-1 ring-amber-500/30 rounded-lg" : ""
-                }`}
-                role="listitem"
-                aria-label={`${room.title}: ${state === "locked" ? "Kilitli" : state === "solved" ? "Çözüldü" : state === "current" ? "Mevcut oda" : "Açık"}`}
-              >
-                {content}
-              </div>
+              {canNavigate ? (
+                <Link
+                  href={roomHref}
+                  className={itemClasses}
+                  role="listitem"
+                  aria-label={`${room.title}: ${state === "solved" ? "Çözüldü" : state === "current" ? "Mevcut oda" : "Açık"} - Odaya git`}
+                >
+                  {content}
+                </Link>
+              ) : (
+                <div
+                  className={itemClasses}
+                  role="listitem"
+                  aria-label={`${room.title}: Kilitli`}
+                >
+                  {content}
+                </div>
+              )}
 
               {index < rooms.length - 1 && (
                 <div
