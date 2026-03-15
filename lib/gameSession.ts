@@ -114,6 +114,7 @@ export function hasSession(gameSlug: string): boolean {
   return getSession(gameSlug) !== null;
 }
 
+/** Creates game session and starts timer (startedAt = now). Call only when user clicks "Oyunu Başlat". */
 export function createSession(
   gameSlug: string,
   durationSeconds: number,
@@ -122,7 +123,7 @@ export function createSession(
   if (typeof window === "undefined") return;
   const session: GameSession = {
     gameSlug,
-    startedAt: Date.now(),
+    startedAt: Date.now(), // timer starts at this moment
     durationSeconds,
     currentRoomId: firstRoomId,
     solvedRoomIds: [],

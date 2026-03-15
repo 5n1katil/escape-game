@@ -30,6 +30,7 @@ export default function IntroStartButton({
     setMounted(true);
   }, [slug]);
 
+  /** Session and 60min timer start only here — not on intro page load. */
   function handleStart() {
     createSession(slug, durationSeconds, firstRoomId);
     router.push(`/game/${slug}/room/${firstRoomId}`);
