@@ -71,7 +71,7 @@ export default async function IntroPage({ params }: IntroPageProps) {
                     <p className="mb-2 text-sm font-medium text-amber-200/90">{t.intro.audio}</p>
                     <audio
                       controls
-                      src={introAudioUrl}
+                      src={encodeURI(introAudioUrl)}
                       className="h-10 w-full max-w-md"
                       preload="metadata"
                     />

@@ -520,12 +520,12 @@ export default function EscapeRoomGame({
       </div>
 
       {currentRoom.audioSrc && (
-        <div className="flex items-center gap-3 rounded-lg border border-zinc-700/50 bg-zinc-800/30 px-4 py-3">
-          <span className="text-2xl" aria-hidden>🔊</span>
+        <div className="flex items-center gap-3 rounded-lg border border-zinc-700/50 bg-zinc-800/30 px-4 py-3 sm:py-3.5">
+          <span className="text-2xl shrink-0" aria-hidden>🔊</span>
           <audio
             controls
-            src={currentRoom.audioSrc}
-            className="h-10 flex-1 max-w-full"
+            src={encodeURI(currentRoom.audioSrc)}
+            className="h-10 flex-1 min-w-0 max-w-full"
             preload="metadata"
           >
             {t.audioLabel}

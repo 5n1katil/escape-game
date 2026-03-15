@@ -242,22 +242,22 @@ export default function ResultClient({
           <h2 className="text-base font-semibold text-amber-500/90 sm:text-lg">
             {tResult.endStoryHeading}
           </h2>
-          <p className="mt-4 max-w-none whitespace-pre-line text-sm leading-relaxed text-zinc-300 sm:text-base">
-            {storyText}
-          </p>
           {endAudioUrl && (
-            <div className="mt-5 flex flex-col gap-2">
-              <span className="text-xs font-medium text-zinc-500">
+            <div className="mt-3 flex flex-col gap-2 sm:mt-4">
+              <span className="text-xs font-medium text-zinc-500 sm:text-sm">
                 {tResult.endStoryAudioLabel}
               </span>
               <audio
                 controls
-                src={endAudioUrl}
+                src={encodeURI(endAudioUrl)}
                 className="h-10 w-full max-w-md"
                 preload="metadata"
               />
             </div>
           )}
+          <p className="mt-4 max-w-none whitespace-pre-line text-sm leading-relaxed text-zinc-300 sm:text-base">
+            {storyText}
+          </p>
         </section>
 
         {/* Butonlar: hikayenin altında, tam genişlikte, görünür ve kolay tıklanabilir */}

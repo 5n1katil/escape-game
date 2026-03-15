@@ -28,19 +28,19 @@ export const games = [
     endStoryLong:
       "Terazinin taş kolları gıcırdayarak hareket etti... Denge sağlanmıştı. Sonsuzluğun Kapısı önümde yavaşça açılırken, güneş ışığı loş tapınak duvarlarına vurdu. Sırtımdan aşağı soğuk bir ter damladı. Bitti mi, Yoksa daha yeni mi başlıyor diye düşündüm. Bir adım attım. Toz kokusunun yerini temiz hava aldı. Gözlerim kamaştı, bedenim hafifledi. Tapınaktan çıktığımda gökyüzünü gördüm. Özgürdüm. Ama içimde bir şeyler hâlâ oturmuyordu. Bu kadar kolay olmamalıydı. Kapı aniden büyük bir gürültüyle kapandı. Sanki hiçbir zaman açılmamış gibi, antik taşlar yerine oturdu. Ve işte o an… Her yer titremeye başladı, deprem mi oluyordu, anlayamadım. Gökyüzü birden simsiyah oldu, toprak yarılmaya başladı, ve boşluktan aşağı doğru düşmeye başladım, sonsuzluğa doğru süzülerek... Gözlerimi açtığımda, bir anda her şey değişmişti. Masa lambasının soluk ışığı gözlerimi kamaştırdı. Sert bir yüzeye dayalıydım, başım zonkluyordu resmen. Elimde bir kalem vardı, önümde eski dava dosyaları… Başımı kaldırdım. Burası… ofisimdi. Ofisimdeydim. Önümde açık duran, sayfaları dağılmış Gizem Malikanesi Davası'nın dosyaları bana bakıyordu. Günlerdir eve gitmemiş, gözümü bile kırpmadan çalışmıştım. Anlaşılan dosyaların üzerinde uyuyakalmıştım. Bir an durdum. Gördüğüm her şey… Tapınak, bilmeceler, lanet… sadece bir rüyaydı. Ama ya değilse? Ellerim titriyordu. Her şey o kadar gerçek hissettirmişti ki… Dosyalardan birini çektim. Gizem Malikanesi'ndeki cinayetin krokisi önümdeydi. Kurbanın bedeni, saatler önce üzerinde çalıştığım terazi figürüne benziyordu. Bir anda içim ürperdi. Bu bir oyun muydu? Zihnim bana bir ipucu mu veriyordu? Ve o an fark ettim. Bingo. Katili bulmuştum...",
     /** Oyun sonu hikâye ses dosyası (varsa sağ panelde oynatıcı gösterilir). */
-    endAudioUrl: undefined as string | undefined,
+    endAudioUrl: "/games/tapinagin-laneti/audio/9-Tapınağın Laneti Oyun Sonu Seslendirme.mp3" as string | undefined,
     /** Oyun sonu görseli (varsa sağ panel üstünde gösterilir). */
     endImageUrl: "/games/tapinagin-laneti/images/Tapınağın Laneti Çıkış.png" as string | undefined,
     /** Çıkış ekranında gösterilecek ek CTA (örn. DAVA02 Gizem Malikanesi). */
     endGizemMalikanesiUrl: "https://www.5n1dedektif.com/gizemmalikanesi" as string | undefined,
     endGizemMalikanesiLabel: "DAVA02 Gizem Malikanesi'ne git!" as string | undefined,
     /** Giriş ekranı hikâye seslendirmesi (varsa intro sayfasında oynatıcı gösterilir). */
-    introAudioUrl: "/games/tapinagin-laneti/audio/intro.mp3" as string | undefined,
+    introAudioUrl: "/games/tapinagin-laneti/audio/1-Tapınak Girişi Seslendirme.mp3" as string | undefined,
     /** Lobi (hub) ekranında HİKAYE bölümünde gösterilecek metin. */
     hubStory:
       "Zifiri karanlık koridorun girişinde duruyorum. Hava ağır, sıcak ve kuru... Sanki yüzyıllardır burada hapsolmuş bir lanetin nefesini hissediyorum. Tozlu taş duvarlara dokunduğumda, parmaklarımın arasından ince kumlar dökülüyor. Sanki bu tapınak, zamanın içinde eriyip gitmiş ama beni bekliyormuş gibi.\n\nEfsaneler, buranın lanetli olduğunu söylüyor. Kaybolmuş bir firavunun, gömüldüğü yerin sonsuza dek mühürlenmesi için bir büyü yaptığını... İçeriye girenlerin asla geri dönemediğini... Yalnızca bütün sırları çözenler buradan sağ çıkabilirmiş.\n\nFakat bu bir masal değil. Önümde, taş bloklara kazınmış eski Mısır yazıları, bana sanki bir şeyler fısıldıyor. Arkamdaki giriş, içeri adım attığım anda büyük bir gürültüyle kapandı. Artık geri dönüş yok.\n\nYolumun üzerindeki altı odanın her biri bir sınav olacak. Kapılar, sadece doğru cevapları bulanlara açılacak. Eğer yanlış yaparsam... Efsanelerin söylediği gibi, bu tapınağın bir parçası olup kalacağım.\n\nDerin bir nefes alıyorum. Gözlerimi karanlığa dikiyorum. Bu benim bugüne kadar ki en zor sınavım... Ya tapınağın sırlarını çözüp kurtulacağım ya da bu lanetin bir parçası olacağım.",
     /** Lobi hikâye seslendirmesi (varsa hub HİKAYE bölümünde oynatıcı gösterilir). */
-    hubStoryAudioUrl: undefined as string | undefined,
+    hubStoryAudioUrl: "/games/tapinagin-laneti/audio/2-Tapınağın Laneti Giriş Seslendirme.mp3" as string | undefined,
   },
 ] as const;
 

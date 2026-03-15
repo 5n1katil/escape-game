@@ -234,7 +234,7 @@ export default function HubClient({
                 <p className="mb-1.5 text-xs text-zinc-500">
                   {t.storyAudioLabel}
                 </p>
-                <audio controls src={storyAudioUrl} className="h-9 w-full max-w-md" preload="metadata" />
+                <audio controls src={encodeURI(storyAudioUrl)} className="h-9 w-full max-w-md sm:h-10" preload="metadata" />
               </div>
             )}
             <div className="whitespace-pre-line text-base leading-relaxed text-zinc-300 sm:text-lg">
