@@ -520,20 +520,25 @@ export default function EscapeRoomGame({
         <section className="space-y-4" aria-label="Hikâye görselleri">
           <div
             className={
-              (currentRoom.id === 4 || currentRoom.id === 5) && currentRoom.storyImages.length === 2
+              currentRoom.id === 4 && currentRoom.storyImages.length === 2
                 ? "grid grid-cols-1 gap-4 sm:grid-cols-[minmax(0,1fr)_minmax(0,2fr)] sm:gap-6"
-                : "grid grid-cols-1 gap-4 sm:grid-cols-2"
+                : currentRoom.id === 5 && currentRoom.storyImages.length === 2
+                  ? "grid grid-cols-1 gap-4 sm:grid-cols-[minmax(0,1.5fr)_minmax(0,2fr)] sm:gap-6"
+                  : "grid grid-cols-1 gap-4 sm:grid-cols-2"
             }
           >
             {currentRoom.storyImages.map((img, idx) => {
               const rightFullScale = (currentRoom.id === 4 || currentRoom.id === 5) && idx === 1;
+              const leftRoom5 = currentRoom.id === 5 && idx === 0;
               return (
                 <div
                   key={idx}
                   className={
                     rightFullScale
                       ? "overflow-hidden rounded-xl border border-zinc-700/50 bg-zinc-800/30 flex min-w-0"
-                      : "overflow-hidden rounded-xl border border-zinc-700/50 bg-zinc-800/30"
+                      : leftRoom5
+                        ? "flex min-h-[280px] overflow-hidden rounded-xl border border-zinc-700/50 bg-zinc-800/30 sm:min-h-[340px]"
+                        : "overflow-hidden rounded-xl border border-zinc-700/50 bg-zinc-800/30"
                   }
                 >
                   <img
@@ -542,7 +547,9 @@ export default function EscapeRoomGame({
                     className={
                       rightFullScale
                         ? "h-auto w-full min-w-0 object-contain object-left"
-                        : "h-auto w-full object-contain"
+                        : leftRoom5
+                          ? "h-auto w-full object-contain object-center"
+                          : "h-auto w-full object-contain"
                     }
                   />
                 </div>
