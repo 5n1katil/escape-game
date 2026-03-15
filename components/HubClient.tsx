@@ -12,7 +12,7 @@ import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import { setStoredEscaped } from "@/lib/gameStorage";
 
-const MAP_IMAGE_PATH = "/games/tapinagin-laneti/images/map.png";
+const MAP_IMAGE_PATH = "/games/tapinagin-laneti/images/map.jpg";
 
 /** Harita üzerinde oda tıklama alanları (yüzde: top, left, width, height). Haritadaki 1–6 numaralı konumlara göre ayarlanabilir. */
 const MAP_SEGMENTS: { id: number; top: number; left: number; width: number; height: number }[] = [
