@@ -14,11 +14,12 @@ export const games = [
     story:
       "Ben, 5N1Dedektiflik bürosu uzman dedektifiyim. Olağanüstü vaka ve davaları çözme konusundaki yeteneklerimle tanınırım ve şimdiye kadar birçok gizemi aydınlattım. Ancak bu sefer karşılaştığım gizem, bildiğim her şeyin ötesinde. Birkaç hafta önce gelen şifreli bir mesaj beni, kadim bir uygarlığın izlerini taşıyan bir tapınağa sürükledi. Anlatılanlara göre, buraya giren hiç kimse geri dönmemişti. Tapınak, efsanelere göre sonsuz bir lanetin yuvasıydı; içeri girenleri dışarı çıkarmamak için lanetlenmişti!  İçeri girdiğimde devasa taş kapı arkamdan kapandı ve kaçış yolum kalmadı. Burada hapsolmuş durumdayım. Önümde altı farklı oda var ve her biri geçmişin sırlarını saklıyor. Kaçabilmem için her odadaki bulmacaları çözmem, ipuçlarını bir araya getirmem gerekiyor. Zamanım sınırlı, eğer sadece 60 dakika içerisinde tüm odaları geçerek tapınağın derinliklerinde gizlenen son anahtarı bulamazsam, sonsuza kadar bu lanetin içinde sıkışıp kalacağım...",
     rules: [
-      "Her odada bir bilmece veya soru bulacaksınız.",
-      "Cevabı küçük harfle, Türkçe karakter kullanmadan yazın (örn: güneş yerine gunes).",
-      "60 dakikalık süreniz var.",
-      "Yanlış cevap deneme sayınızı artırır.",
-      "Tüm odaları çözerek tapınaktan kaçın.",
+      "Oyuna başlamadan önce kağıt ve kaleminizi hazırlayın.",
+      "Tapınak haritasındaki odaları sırasıyla ziyaret edin.",
+      "Her odada çözülmesi gereken bir gizem sizi bekliyor. Öncelikle odadaki metni detaylıca okuyun ya da sesli bir şekilde dinleyin.",
+      "Bulmaca ya da şifreyi çözümledikten sonra sıradaki odaya giriş yapabileceksiniz.",
+      "6. ve son odaya geldikten sonra elde ettiğiniz şifre ile tapınaktan kaçabilirsiniz.",
+      "Fakat bütün bunları başarmak için sadece 1 saat süreniz olduğunu unutmayın!",
     ],
     durationMinutes: 60,
     roomCount: rooms.length,
