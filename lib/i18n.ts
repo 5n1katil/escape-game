@@ -88,6 +88,7 @@ export const translations = {
       finalCodeSubmit: "Kaçışı Tamamla",
       finalCodeWrong: "Yanlış şifre.",
       backToHub: "Ana Ekrana Dön",
+      backToTemple: "Tapınağa Dön",
     },
     result: {
       endTitle: "Tapınaktan Kaçtınız",
@@ -184,6 +185,7 @@ export const translations = {
       finalCodeSubmit: "Complete escape",
       finalCodeWrong: "Wrong code.",
       backToHub: "Back to hub",
+      backToTemple: "Back to temple",
     },
     result: {
       endTitle: "You escaped the temple",

@@ -9,7 +9,7 @@ import { isCorrectFinalCode } from "@/lib/rooms";
 import type { Translations } from "@/lib/i18n";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { setStoredEscaped } from "@/lib/gameStorage";
 
 const MAP_IMAGE_PATH = "/games/tapinagin-laneti/images/map.jpg";
@@ -52,6 +52,7 @@ export default function HubClient({
   const [finalError, setFinalError] = useState<string | null>(null);
   const [mounted, setMounted] = useState(false);
   const [mapError, setMapError] = useState(false);
+  const leftColumnRef = useRef<HTMLDivElement>(null);
 
   const roomIds = rooms.map((r) => r.id);
 
@@ -195,7 +196,10 @@ export default function HubClient({
         </div>
 
         {/* Sol yarı: geniş; mobilde üstten aşağı – sayaç, başlık, harita, hikâye, odalar, final */}
-        <div className="flex w-full flex-col gap-6 pt-12 sm:gap-8 md:max-h-screen md:min-w-0 md:flex-[1.4] md:overflow-y-auto md:pt-20 md:pl-6 md:pr-4 lg:flex-[1.5] lg:pl-8 lg:pr-6">
+        <div
+          ref={leftColumnRef}
+          className="flex w-full flex-col gap-6 pt-12 sm:gap-8 md:max-h-screen md:min-w-0 md:flex-[1.4] md:overflow-y-auto md:pt-20 md:pl-6 md:pr-4 lg:flex-[1.5] lg:pl-8 lg:pr-6"
+        >
           <div className="flex flex-col items-center gap-2">
             <CountdownTimer
               slug={slug}
@@ -231,7 +235,7 @@ export default function HubClient({
               {t.rooms}
             </h2>
             <p className="mb-3 text-xs text-zinc-500">
-              Odalara haritadan girin. Bu liste sadece ilerleme göstergesidir.
+              Odalara haritadan veya bu listeden girebilirsiniz. İpucu için çözülmüş odaya tıklayın.
             </p>
             <div className="grid gap-3 sm:grid-cols-2" role="list">
               {rooms.map((room) => {
@@ -239,19 +243,15 @@ export default function HubClient({
                 const maxSolved = getStoredMaxSolvedRoomIndex(slug, roomIds);
                 const roomIndex = rooms.findIndex((r) => r.id === room.id);
                 const solved = roomIndex >= 0 && roomIndex <= maxSolved;
-                return (
-                  <div
-                    key={room.id}
-                    role="listitem"
-                    className={`flex cursor-default items-center gap-3 rounded-lg border-2 px-4 py-3 ${
-                      unlocked
-                        ? solved
-                          ? "border-emerald-700/50 bg-emerald-950/20"
-                          : "border-zinc-700 bg-zinc-800/50"
-                        : "border-zinc-700/50 bg-zinc-800/30 opacity-60"
-                    }`}
-                    aria-label={`${room.title}: ${unlocked ? (solved ? "Çözüldü" : "Açık") : "Kilitli"}`}
-                  >
+                const itemClass = `flex items-center gap-3 rounded-lg border-2 px-4 py-3 ${
+                  unlocked
+                    ? solved
+                      ? "border-emerald-700/50 bg-emerald-950/20 cursor-pointer hover:bg-emerald-950/30 transition-colors"
+                      : "border-zinc-700 bg-zinc-800/50 cursor-pointer hover:bg-zinc-800 transition-colors"
+                    : "border-zinc-700/50 bg-zinc-800/30 opacity-60 cursor-default"
+                }`;
+                const content = (
+                  <>
                     <span
                       className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-lg text-lg ${
                         solved
@@ -267,9 +267,28 @@ export default function HubClient({
                       {room.title}
                     </span>
                     {unlocked && !solved && (
-                      <span className="ml-auto text-xs text-amber-500/70">Açık</span>
+                      <span className="ml-auto text-xs text-amber-500/70">{t.goToRoom}</span>
                     )}
-                    {solved && <span className="ml-auto text-xs text-emerald-400/80">Çözüldü</span>}
+                    {solved && (
+                      <span className="ml-auto text-xs text-emerald-400/80">Çözüldü · {t.goToRoom}</span>
+                    )}
+                  </>
+                );
+                return (
+                  <div key={room.id} role="listitem">
+                    {unlocked ? (
+                      <Link
+                        href={`/game/${slug}/room/${room.id}`}
+                        className={itemClass}
+                        aria-label={`${room.title}: ${solved ? "Çözüldü" : "Açık"} - ${t.goToRoom}`}
+                      >
+                        {content}
+                      </Link>
+                    ) : (
+                      <div className={itemClass} aria-label={`${room.title}: Kilitli`}>
+                        {content}
+                      </div>
+                    )}
                   </div>
                 );
               })}
@@ -309,6 +328,15 @@ export default function HubClient({
                   {t.finalCodeSubmit}
                 </button>
               </form>
+              <div className="mt-4">
+                <button
+                  type="button"
+                  onClick={() => leftColumnRef.current?.scrollTo({ top: 0, behavior: "smooth" })}
+                  className="w-full rounded-lg border border-amber-700/50 bg-amber-950/40 py-2.5 text-sm font-medium text-amber-200/90 transition-colors hover:bg-amber-900/50"
+                >
+                  {t.backToTemple}
+                </button>
+              </div>
             </section>
           )}
         </div>
