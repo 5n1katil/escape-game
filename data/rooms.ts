@@ -33,14 +33,24 @@ export interface Room {
 export const rooms: Room[] = [
   {
     id: 1,
-    title: "Tapınak Girişi",
-    description:
-      "Antik taş kapılar önünüzde yükseliyor. Kapının üzerinde güneş sembolleri kazınmış.",
-    type: "text",
+    title: "1. Oda: Anubis'in Laneti",
+    description: "Tapınağın 1. Odası",
+    type: "imageChoice",
     question:
-      "Gündüz parlar, gece kaybolur. Tapınağa girmek için onun adını yazın.",
-    answer: "gunes",
-    hint: "Gökyüzündeki en parlak nesne.",
+      "Bu odada laneti temsil eden doğru sembolü seçerek ilerleyin.",
+    answer: "0",
+    hint: "Ölüm ve öbür dünya tanrısıyla ilişkili sembol.",
+    story:
+      "Taş kapıyı açtığınızda loş bir odaya adım atıyorsunuz. Duvarlarda mumya bezleri ve hiyeroglifler var. Havada tütsü ve toz karışımı bir koku. Efsaneye göre bu tapınak, ölüleri koruyan bir tanrıya adanmış; onun laneti, yanlış seçim yapanları zamanın dışına hapsediyor. Odanın ortasında dört sembol taşıyorsunuz: biri çakal başlı bir figür, biri güneş diski ve kobra, biri piramit ve nehir, biri açılmış iki el. Laneti kırmak için bu odanın gerçek sahibini—ölüler diyarının bekçisini—temsil eden sembolü seçmelisiniz.",
+    puzzlePrompt:
+      "Doğru sembolü seçerek kaçışı tamamla. Ölüm ve öbür dünyayla ilişkili olan figürü bul.",
+    audioSrc: undefined,
+    media: [
+      { url: "", alt: "Çakal başlı figür" },
+      { url: "", alt: "Güneş diski ve bir kobra" },
+      { url: "", alt: "Bir piramit ve nehir" },
+      { url: "", alt: "Bir çift açılmış el" },
+    ],
   },
   {
     id: 2,

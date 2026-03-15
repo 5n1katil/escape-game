@@ -365,30 +365,35 @@ export default function EscapeRoomGame({
         const media = currentRoom.media ?? [];
         return (
           <div className="space-y-4">
-            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-2">
               {media.map((item, idx) => (
                 <button
                   key={idx}
                   type="button"
                   onClick={() => handleImageChoiceSelect(idx)}
-                  className="group relative aspect-square overflow-hidden rounded-lg border-2 border-zinc-700 transition-all hover:border-amber-500/50 active:scale-[0.98]"
+                  className="group relative flex min-h-[100px] flex-col overflow-hidden rounded-xl border-2 border-zinc-700 bg-zinc-800/50 transition-all hover:border-amber-500/50 hover:bg-zinc-800/70 active:scale-[0.98] sm:min-h-[120px]"
                 >
-                  <div className="flex h-full w-full items-center justify-center overflow-hidden bg-zinc-800/50">
-                    {item.url ? (
+                  <div className="flex flex-1 flex-col items-center justify-center gap-2 p-4">
+                    {item.url?.trim() ? (
                       <img
                         src={item.url}
                         alt={item.alt ?? ""}
-                        className="h-full w-full object-cover"
+                        className="h-full max-h-32 w-full object-contain"
                       />
                     ) : (
-                      <span className="text-4xl">🖼️</span>
+                      <span
+                        className="flex h-14 w-14 items-center justify-center rounded-full bg-amber-950/50 text-3xl text-amber-400/80"
+                        aria-hidden
+                      >
+                        {["◆", "◇", "●", "○"][idx % 4]}
+                      </span>
+                    )}
+                    {item.alt && (
+                      <span className="text-center text-sm font-medium text-zinc-200 group-hover:text-amber-100/90">
+                        {item.alt}
+                      </span>
                     )}
                   </div>
-                  {item.alt && (
-                    <span className="absolute bottom-0 left-0 right-0 bg-black/60 py-1 text-center text-xs text-zinc-300">
-                      {item.alt}
-                    </span>
-                  )}
                 </button>
               ))}
             </div>
@@ -458,16 +463,21 @@ export default function EscapeRoomGame({
 
   return (
     <div className="mx-auto w-full max-w-2xl space-y-4 rounded-lg border border-zinc-800/50 bg-zinc-900/30 px-4 py-5 text-left sm:space-y-5 sm:px-6 sm:py-6 md:px-8 md:py-7">
-      <div className="flex items-center justify-between gap-4">
-        <h2 className="text-lg font-semibold text-white sm:text-xl">
-          {currentRoom.title}
-        </h2>
-        <span
-          className="text-sm tabular-nums text-zinc-500"
-          aria-live="polite"
-        >
-          {t.attempts.replace("{count}", String(attempts))}
-        </span>
+      <div className="flex flex-col gap-1">
+        <div className="flex items-center justify-between gap-4">
+          <h2 className="text-lg font-semibold text-white sm:text-xl">
+            {currentRoom.title}
+          </h2>
+          <span
+            className="text-sm tabular-nums text-zinc-500"
+            aria-live="polite"
+          >
+            {t.attempts.replace("{count}", String(attempts))}
+          </span>
+        </div>
+        {currentRoom.description && (
+          <p className="text-sm text-amber-500/80">{currentRoom.description}</p>
+        )}
       </div>
 
       {currentRoom.audioSrc && (
