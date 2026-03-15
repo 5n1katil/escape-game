@@ -496,6 +496,10 @@ export default function EscapeRoomGame({
   const storyText = currentRoom.story ?? currentRoom.description;
   const puzzlePromptText = currentRoom.puzzlePrompt ?? currentRoom.question;
 
+  const roomIds = rooms.map((r) => r.id);
+  const maxSolvedIndex = getStoredMaxSolvedRoomIndex(slug, roomIds);
+  const isRoomAlreadySolved = hydrated && roomIndex <= maxSolvedIndex;
+
   return (
     <div className="mx-auto w-full max-w-2xl space-y-4 rounded-lg border border-zinc-800/50 bg-zinc-900/30 px-4 py-5 text-left sm:space-y-5 sm:px-6 sm:py-6 md:px-8 md:py-7">
       <div className="flex flex-col gap-1">
@@ -586,15 +590,26 @@ export default function EscapeRoomGame({
         </section>
       )}
 
-      <section aria-label={t.puzzlePromptLabel}>
-        <h3 className="mb-2 text-sm font-semibold uppercase tracking-wider text-amber-500/90">
-          {t.puzzlePromptLabel}
-        </h3>
-        <p className="mb-4 text-base leading-relaxed text-zinc-300 sm:text-lg">
-          {puzzlePromptText}
-        </p>
-        {renderPuzzle()}
-      </section>
+      {isRoomAlreadySolved ? (
+        <section
+          className="rounded-xl border border-amber-500/30 bg-amber-950/30 px-5 py-5 sm:px-6 sm:py-6"
+          aria-label={t.roomSolved}
+        >
+          <p className="text-center text-lg font-semibold text-amber-400 sm:text-xl">
+            {t.roomAlreadyCompleted}
+          </p>
+        </section>
+      ) : (
+        <section aria-label={t.puzzlePromptLabel}>
+          <h3 className="mb-2 text-sm font-semibold uppercase tracking-wider text-amber-500/90">
+            {t.puzzlePromptLabel}
+          </h3>
+          <p className="mb-4 text-base leading-relaxed text-zinc-300 sm:text-lg">
+            {puzzlePromptText}
+          </p>
+          {renderPuzzle()}
+        </section>
+      )}
 
       {/* Popup: tıklanınca görseli büyük göster */}
       {lightboxImage && (

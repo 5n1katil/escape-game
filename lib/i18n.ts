@@ -59,6 +59,7 @@ export const translations = {
       imageCloseLabel: "Görseli kapat",
       imageClickHint: "Büyütmek için tıklayın",
       chooseThisOption: "Bu cevabı seç",
+      roomAlreadyCompleted: "Bu odayı başarıyla tamamladınız.",
       goToNextRoom: "Sonraki Odaya Git",
       completeEscape: "Kaçışı Tamamla",
       puzzlePlaceholders: {
@@ -165,6 +166,7 @@ export const translations = {
       imageCloseLabel: "Close image",
       imageClickHint: "Click to enlarge",
       chooseThisOption: "Choose this answer",
+      roomAlreadyCompleted: "You have successfully completed this room.",
       goToNextRoom: "Go to Next Room",
       completeEscape: "Complete Escape",
       puzzlePlaceholders: {
