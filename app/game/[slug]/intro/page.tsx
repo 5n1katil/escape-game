@@ -31,19 +31,19 @@ export default async function IntroPage({ params }: IntroPageProps) {
   return (
     <div className="relative h-screen overflow-hidden bg-zinc-950">
       <main className="relative z-10 h-full">
-        {/* Geri butonu: mobil ve masaüstünde görünür, kolay tıklanabilir */}
+        {/* Geri butonu: mobilde sağda, masaüstünde solda */}
         <a
           href={getWixLandingUrl(slug)}
-          className="absolute left-4 top-4 z-20 inline-flex min-h-[48px] min-w-[48px] touch-manipulation items-center justify-center gap-2 rounded-xl border border-amber-700/50 bg-amber-950/80 px-4 py-2.5 text-base font-medium text-amber-200 shadow-lg backdrop-blur-sm transition-colors hover:border-amber-600/60 hover:bg-amber-900/70 hover:text-amber-100 active:scale-[0.98] sm:left-6 sm:top-6 sm:min-h-[44px] sm:px-4"
+          className="absolute right-4 left-auto top-4 z-20 inline-flex min-h-[48px] min-w-[48px] touch-manipulation items-center justify-center gap-2 rounded-xl border border-amber-700/50 bg-amber-950/80 px-4 py-2.5 text-base font-medium text-amber-200 shadow-lg backdrop-blur-sm transition-colors hover:border-amber-600/60 hover:bg-amber-900/70 hover:text-amber-100 active:scale-[0.98] sm:right-auto sm:left-6 sm:top-6 sm:min-h-[44px] sm:px-4"
           aria-label={t.intro.back}
         >
           <span className="text-xl leading-none" aria-hidden>←</span>
           <span>{t.intro.back.replace(/^←\s*/u, "")}</span>
         </a>
 
-        <div className="grid h-full min-h-0 md:grid-cols-[1.4fr_1fr] md:grid-rows-1 lg:grid-cols-[1.6fr_1fr]">
-          {/* Sol: görsel paneli tam kaplar, sayfa burada biter */}
-          <div className="relative order-2 min-h-[35vh] md:order-1 md:h-full md:min-h-0">
+        <div className="grid h-full min-h-0 grid-rows-[1fr_minmax(0,35vh)] md:grid-cols-[1.4fr_1fr] md:grid-rows-1 lg:grid-cols-[1.6fr_1fr]">
+          {/* Sol: masaüstünde görsel; mobilde altta sabit kalır */}
+          <div className="relative order-2 min-h-0 shrink-0 md:order-1 md:h-full md:min-h-0">
             <div className="absolute inset-0 bg-zinc-950">
               {coverImagePath ? (
                 <img
@@ -57,9 +57,9 @@ export default async function IntroPage({ params }: IntroPageProps) {
             </div>
           </div>
 
-          {/* Sağ: görselin bittiği yerde sınırlı, içerik mobilde büyük yazı, kaydırılabilir */}
-          <div className="order-1 flex min-h-0 flex-col overflow-y-auto bg-gradient-to-b from-amber-950/80 via-amber-950/60 to-amber-950/90 md:order-2 md:h-full">
-            <div className="flex flex-1 flex-col px-4 py-6 sm:px-5 sm:py-8">
+          {/* Sağ: mobilde hikaye kaydırılabilir, görsel altta sabit; masaüstünde aynı */}
+          <div className="order-1 flex min-h-0 min-w-0 flex-col overflow-y-auto overflow-x-hidden bg-gradient-to-b from-amber-950/80 via-amber-950/60 to-amber-950/90 md:order-2 md:h-full">
+            <div className="flex min-h-0 flex-1 flex-col px-4 py-6 sm:px-5 sm:py-8">
               <h1 className="mb-3 text-2xl font-bold tracking-tight text-amber-100 sm:text-3xl md:text-4xl">
                 {game.title}
               </h1>
