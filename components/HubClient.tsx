@@ -313,8 +313,8 @@ export default function HubClient({
           )}
         </div>
 
-        {/* Sağ yarı (sadece web): harita sticky, sayfa kayarken ekranda sabit kalır */}
-        <aside className="hidden md:flex md:sticky md:top-0 md:h-screen md:w-[38%] md:flex-shrink-0 md:self-start lg:w-[42%] xl:max-w-[520px]">
+        {/* Sağ yarı (sadece web): harita sticky, header altında tam görünür kalır */}
+        <aside className="hidden md:flex md:sticky md:top-16 md:h-[calc(100vh-4rem)] md:w-[38%] md:flex-shrink-0 md:self-start lg:w-[42%] xl:max-w-[520px]">
           <div className="flex h-full w-full items-center justify-center border-l border-zinc-800/50 bg-zinc-950/95 p-4 lg:p-6">
             <div className="relative h-full w-full min-h-0">
               {mapContent}
