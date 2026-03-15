@@ -90,14 +90,68 @@ export default function HubClient({
     );
   }
 
+  const mapContent = !mapError ? (
+    <div className="relative h-full min-h-[200px] w-full md:min-h-[400px]">
+      <img
+        src={MAP_IMAGE_PATH}
+        alt="Tapınak haritası - odalara tıklayarak gidebilirsiniz"
+        className="h-full w-full object-contain"
+        onError={() => setMapError(true)}
+      />
+      <div
+        className="absolute inset-0 grid grid-cols-3 grid-rows-2"
+        aria-hidden
+      >
+        {[1, 2, 3, 4, 5, 6].map((roomId) => {
+          const room = rooms.find((r) => r.id === roomId);
+          const unlocked = unlockedIds.includes(roomId);
+          const maxSolved = getStoredMaxSolvedRoomIndex(slug, roomIds);
+          const roomIndex = rooms.findIndex((r) => r.id === roomId);
+          const solved = roomIndex >= 0 && roomIndex <= maxSolved;
+          if (unlocked && room) {
+            return (
+              <Link
+                key={roomId}
+                href={`/game/${slug}/room/${roomId}`}
+                className="flex items-center justify-center rounded border-2 border-transparent bg-black/0 transition-colors hover:border-amber-400/60 hover:bg-amber-500/10"
+                aria-label={`${room.title} - ${t.goToRoom}`}
+                title={room.title}
+              >
+                <span className="flex h-10 w-10 items-center justify-center rounded-full bg-black/50 text-lg font-bold text-white backdrop-blur-sm">
+                  {solved ? "✓" : roomId}
+                </span>
+              </Link>
+            );
+          }
+          return (
+            <div
+              key={roomId}
+              className="flex cursor-not-allowed items-center justify-center rounded bg-black/20"
+              title="Kilitli"
+              aria-hidden
+            >
+              <span className="flex h-8 w-8 items-center justify-center rounded-full bg-zinc-800/80 text-sm text-zinc-500">
+                🔒
+              </span>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  ) : (
+    <div className="flex min-h-[200px] items-center justify-center bg-zinc-900/50 text-5xl text-zinc-600 md:min-h-[400px]" aria-hidden>
+      🗺️
+    </div>
+  );
+
   return (
     <div className="relative min-h-screen overflow-hidden bg-zinc-950">
       <div
         className="pointer-events-none absolute inset-0 bg-gradient-to-b from-zinc-900/50 via-transparent to-zinc-950/80"
         aria-hidden
       />
-      <main className="relative z-10 flex min-h-screen flex-col gap-6 px-4 py-20 pb-24 sm:gap-8 sm:px-6 sm:py-16 md:flex-row md:items-start md:justify-center md:gap-8 md:pt-24 lg:gap-10 lg:px-8">
-        <div className="absolute left-4 right-4 top-4 flex items-center justify-between sm:left-6 sm:right-6 sm:top-6">
+      <main className="relative z-10 flex min-h-screen flex-col px-4 py-20 pb-24 sm:px-6 sm:py-16 md:flex-row md:gap-0 md:px-0 md:pt-16">
+        <div className="absolute left-4 right-4 top-4 z-20 flex items-center justify-between sm:left-6 sm:right-6 sm:top-6">
           <Link
             href={`/game/${slug}/intro`}
             className="flex min-h-[44px] min-w-[44px] items-center justify-center rounded-lg text-sm text-zinc-500 transition-colors hover:text-amber-500 sm:px-2"
@@ -107,15 +161,28 @@ export default function HubClient({
           <RestartButton slug={slug} label="Oyunu Yeniden Başlat" />
         </div>
 
-        <div className="flex w-full flex-1 flex-col items-center gap-6 pt-12 sm:gap-8 md:max-w-2xl md:pt-16">
-          <h1 className="text-xl font-bold tracking-tight text-white drop-shadow-lg sm:text-2xl md:text-3xl lg:text-4xl">
-            {gameTitle}
-          </h1>
-          <CountdownTimer
-            slug={slug}
-            initialMinutes={durationMinutes}
-            ariaLabelTemplate={timerAriaLabel}
-          />
+        {/* Sol yarı (mobil: üstten aşağı – sayaç, başlık, harita, hikâye, odalar, final) */}
+        <div className="flex w-full flex-col gap-6 pt-12 sm:gap-8 md:max-h-screen md:min-w-0 md:flex-1 md:overflow-y-auto md:pt-20 md:pl-6 md:pr-4 lg:pl-8 lg:pr-6">
+          <div className="flex flex-col items-center gap-2">
+            <CountdownTimer
+              slug={slug}
+              initialMinutes={durationMinutes}
+              ariaLabelTemplate={timerAriaLabel}
+            />
+            <h1 className="text-center text-xl font-bold tracking-tight text-white drop-shadow-lg sm:text-2xl md:text-3xl lg:text-4xl">
+              {gameTitle}
+            </h1>
+          </div>
+
+          {/* Mobilde: harita hemen başlık altında */}
+          <section className="w-full rounded-lg border border-zinc-800/50 bg-zinc-900/40 overflow-hidden md:hidden">
+            <h2 className="border-b border-zinc-700/50 px-4 py-3 text-sm font-semibold uppercase tracking-wider text-amber-500/90">
+              {t.map}
+            </h2>
+            <div className="relative min-h-[220px] bg-zinc-900/50 p-2">
+              {mapContent}
+            </div>
+          </section>
 
           <section className="w-full rounded-lg border border-zinc-800/50 bg-zinc-900/30 px-4 py-4 sm:px-6 sm:py-5">
             <h2 className="mb-3 text-sm font-semibold uppercase tracking-wider text-amber-500/90">
@@ -123,26 +190,6 @@ export default function HubClient({
             </h2>
             <div className="whitespace-pre-line text-base leading-relaxed text-zinc-300 sm:text-lg">
               {story}
-            </div>
-          </section>
-
-          <section className="w-full rounded-lg border border-zinc-800/50 bg-zinc-900/40 overflow-hidden">
-            <h2 className="border-b border-zinc-700/50 px-4 py-3 text-sm font-semibold uppercase tracking-wider text-amber-500/90">
-              {t.map}
-            </h2>
-            <div className="relative flex min-h-[180px] items-center justify-center overflow-hidden bg-zinc-900/50 p-4">
-              {!mapError ? (
-                <img
-                  src={MAP_IMAGE_PATH}
-                  alt="Tapınak haritası"
-                  className="max-h-[200px] max-w-full object-contain"
-                  onError={() => setMapError(true)}
-                />
-              ) : (
-                <div className="flex min-h-[120px] items-center justify-center text-5xl text-zinc-600" aria-hidden>
-                  🗺️
-                </div>
-              )}
             </div>
           </section>
 
@@ -223,6 +270,15 @@ export default function HubClient({
             </section>
           )}
         </div>
+
+        {/* Sağ yarı (sadece web): büyük harita, tıklanabilir segmentler */}
+        <aside className="hidden md:flex md:min-h-screen md:w-1/2 md:flex-shrink-0 md:flex-col lg:w-[55%]">
+          <div className="sticky top-0 flex h-screen w-full items-center justify-center overflow-hidden border-l border-zinc-800/50 bg-zinc-950/95 p-4 lg:p-6">
+            <div className="relative h-full w-full max-w-4xl">
+              {mapContent}
+            </div>
+          </div>
+        </aside>
       </main>
     </div>
   );
