@@ -1,5 +1,6 @@
 "use client";
 
+import { saveScore } from "@/lib/firebase";
 import {
   clearGameState,
   getStoredAttempts,
@@ -18,7 +19,7 @@ import {
 import type { Room } from "@/data/rooms";
 import type { Translations } from "@/lib/i18n";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 interface EscapeRoomGameProps {
   slug: string;
@@ -51,6 +52,7 @@ export default function EscapeRoomGame({
   const [showSuccess, setShowSuccess] = useState(false);
   const [escaped, setEscapedState] = useState(false);
   const [hydrated, setHydrated] = useState(false);
+  const scoreSavedRef = useRef(false);
 
   const currentRoom = rooms[roomIndex];
   const isLastRoom = roomIndex === rooms.length - 1;
@@ -70,6 +72,56 @@ export default function EscapeRoomGame({
     if (!hydrated) return;
     setStoredEscaped(slug, escaped);
   }, [hydrated, slug, escaped]);
+
+  useEffect(() => {
+    const session = getSession(slug);
+    const scoreResult = session ? calculateScore(session) : null;
+
+    console.log("[score-save] effect run", {
+      escaped,
+      hydrated,
+      slug,
+      hasSession: !!session,
+      hasScoreResult: !!scoreResult,
+    });
+
+    if (!hydrated) {
+      console.warn("[score-save] skipped: not hydrated");
+      return;
+    }
+    if (!escaped) {
+      console.warn("[score-save] skipped: not escaped");
+      return;
+    }
+    if (scoreSavedRef.current) {
+      console.warn("[score-save] skipped: already saved");
+      return;
+    }
+
+    const playerName = "testDedektifWeb";
+    const score = scoreResult?.finalScore ?? 0;
+    const time = scoreResult?.remainingTime ?? 0;
+    const mistakes = scoreResult?.totalAttempts ?? 0;
+
+    if (!session) {
+      console.warn("[score-save] skipped: no session (using fallback 0,0,0 for debug)");
+    }
+    if (!scoreResult) {
+      console.warn("[score-save] no scoreResult (using fallback values for debug)");
+    }
+
+    scoreSavedRef.current = true;
+    console.log("[score-save] attempting save", { playerName, score, time, mistakes });
+
+    (async () => {
+      try {
+        await saveScore(playerName, score, time, mistakes);
+        console.log("[score-save] completed");
+      } catch (e) {
+        console.error("[score-save] error", e);
+      }
+    })();
+  }, [escaped, slug, hydrated]);
 
   function markRoomSolved() {
     const roomIds = rooms.map((r) => r.id);
