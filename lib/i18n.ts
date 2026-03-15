@@ -93,6 +93,9 @@ export const translations = {
       endTitle: "Tapınaktan Kaçtınız",
       endStory: "Laneti kırdınız ve tapınağı güvenle terk ettiniz. Tebrikler!",
       backToWix: "Wix Sitesine Dön",
+      leaderboardTitle: "Liderlik tablosu",
+      leaderboardLoading: "Liderlik tablosu yükleniyor...",
+      leaderboardError: "Liderlik tablosu şu an gösterilemiyor.",
     },
   },
   en: {
@@ -186,6 +189,9 @@ export const translations = {
       endTitle: "You escaped the temple",
       endStory: "You broke the curse and left the temple safely. Congratulations!",
       backToWix: "Back to Wix site",
+      leaderboardTitle: "Leaderboard",
+      leaderboardLoading: "Loading leaderboard...",
+      leaderboardError: "Leaderboard is unavailable.",
     },
   },
 } as const;
