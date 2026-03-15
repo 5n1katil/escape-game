@@ -121,7 +121,7 @@ export default function RoomMap({
               {isUnlocked ? (
                 <Link
                   href={`/game/${slug}/room/${room.id}`}
-                  className={`group flex w-full cursor-pointer flex-col items-center gap-0.5 rounded-lg px-2 py-2 transition-all duration-200 hover:bg-zinc-800/60 hover:scale-105 active:scale-100 ${
+                  className={`group flex w-full min-h-[48px] cursor-pointer touch-manipulation flex-col items-center justify-center gap-0.5 rounded-lg px-2 py-2 transition-all duration-200 hover:bg-zinc-800/60 hover:scale-105 active:scale-100 ${
                     state === "current"
                       ? "bg-amber-500/10 ring-1 ring-amber-500/30"
                       : "hover:ring-1 hover:ring-emerald-500/40"
@@ -139,7 +139,7 @@ export default function RoomMap({
                 </Link>
               ) : (
                 <div
-                  className="flex cursor-not-allowed flex-col items-center gap-0.5 px-2 py-2"
+                  className="flex cursor-not-allowed touch-none flex-col items-center gap-0.5 px-2 py-2"
                   role="img"
                   aria-label={`${room.title} (kilitli)`}
                 >

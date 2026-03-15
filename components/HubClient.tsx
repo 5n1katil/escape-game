@@ -127,12 +127,12 @@ export default function HubClient({
               <Link
                 key={roomId}
                 href={`/game/${slug}/room/${roomId}`}
-                className="absolute flex items-center justify-center rounded border-2 border-transparent bg-black/0 transition-colors hover:border-amber-400/60 hover:bg-amber-500/10"
+                className="absolute flex cursor-pointer items-center justify-center rounded border-2 border-transparent bg-black/0 transition-colors hover:border-amber-400/60 hover:bg-amber-500/10 touch-manipulation"
                 style={style}
                 aria-label={`${room.title} - ${t.goToRoom}`}
                 title={room.title}
               >
-                <span className="flex h-10 w-10 items-center justify-center rounded-full bg-black/50 text-lg font-bold text-white backdrop-blur-sm">
+                <span className="flex h-10 w-10 min-h-[44px] min-w-[44px] items-center justify-center rounded-full bg-black/50 text-lg font-bold text-white backdrop-blur-sm">
                   {solved ? "✓" : roomId}
                 </span>
               </Link>
@@ -141,7 +141,7 @@ export default function HubClient({
           return (
             <div
               key={roomId}
-              className="absolute flex cursor-not-allowed items-center justify-center rounded bg-black/20"
+              className="absolute flex cursor-not-allowed items-center justify-center rounded bg-black/20 pointer-events-none"
               style={style}
               title="Kilitli"
               aria-hidden
