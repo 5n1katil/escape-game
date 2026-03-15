@@ -34,17 +34,17 @@ export default async function IntroPage({ params }: IntroPageProps) {
         </a>
 
         <div className="grid min-h-screen md:grid-cols-[1.4fr_1fr] md:grid-rows-1 lg:grid-cols-[1.6fr_1fr]">
-          {/* Sol: görsel tam ekran deneyimi, köşeler kesilmeden (object-contain) */}
+          {/* Sol: görsel paneli tam kaplar, yan boşluk kalmaz (object-cover) */}
           <div className="relative order-2 min-h-[35vh] md:order-1 md:h-screen md:min-h-0">
-            <div className="absolute inset-0 flex items-center justify-center bg-zinc-950">
+            <div className="absolute inset-0 bg-zinc-950">
               {coverImagePath ? (
                 <img
                   src={coverImagePath}
                   alt=""
-                  className="max-h-full max-w-full object-contain object-center"
+                  className="h-full w-full object-cover object-center"
                 />
               ) : (
-                <span className="text-9xl opacity-40">🏛️</span>
+                <span className="flex h-full w-full items-center justify-center text-9xl opacity-40">🏛️</span>
               )}
             </div>
           </div>
