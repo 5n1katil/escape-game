@@ -20,7 +20,12 @@ export default async function IntroPage({ params }: IntroPageProps) {
 
   const coverImagePath =
     slug === "tapinagin-laneti"
-      ? "/games/tapinagin-laneti/images/" + encodeURIComponent("Tapınağın Laneti.png")
+      ? "/games/tapinagin-laneti/images/" + encodeURIComponent("Lanetli Tapınak Giriş.png")
+      : null;
+
+  const introAudioUrl =
+    typeof (game as { introAudioUrl?: string }).introAudioUrl === "string"
+      ? (game as { introAudioUrl: string }).introAudioUrl
       : null;
 
   return (
@@ -56,9 +61,23 @@ export default async function IntroPage({ params }: IntroPageProps) {
                 {game.title}
               </h1>
 
-              <div className="mb-3 flex items-center gap-2 rounded-lg border border-amber-700/40 bg-amber-900/30 px-2.5 py-1.5 sm:mb-4">
-                <span className="text-base">🔊</span>
-                <span className="text-xs text-amber-200/80">{t.intro.audio}</span>
+              <div className="mb-3 sm:mb-4">
+                {introAudioUrl ? (
+                  <div className="rounded-lg border border-amber-700/40 bg-amber-900/30 px-2.5 py-2">
+                    <p className="mb-1.5 text-xs text-amber-200/80">{t.intro.audio}</p>
+                    <audio
+                      controls
+                      src={introAudioUrl}
+                      className="h-9 w-full max-w-md"
+                      preload="metadata"
+                    />
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-2 rounded-lg border border-amber-700/40 bg-amber-900/30 px-2.5 py-1.5">
+                    <span className="text-base">🔊</span>
+                    <span className="text-xs text-amber-200/80">{t.intro.audio}</span>
+                  </div>
+                )}
               </div>
 
               <section className="mb-4">

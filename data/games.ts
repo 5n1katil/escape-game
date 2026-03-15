@@ -31,6 +31,8 @@ export const games = [
     endAudioUrl: undefined as string | undefined,
     /** Oyun sonu görseli (varsa sağ panel üstünde gösterilir). */
     endImageUrl: undefined as string | undefined,
+    /** Giriş ekranı hikâye seslendirmesi (varsa intro sayfasında oynatıcı gösterilir). */
+    introAudioUrl: "/games/tapinagin-laneti/audio/intro.mp3" as string | undefined,
   },
 ] as const;
 
