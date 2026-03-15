@@ -187,7 +187,7 @@ export default function HubClient({
         className="pointer-events-none absolute inset-0 bg-gradient-to-b from-zinc-900/50 via-transparent to-zinc-950/80"
         aria-hidden
       />
-      <main className="relative z-10 flex min-h-screen flex-col px-4 py-20 pb-24 sm:px-6 sm:py-16 md:flex-row md:gap-0 md:px-0 md:pt-16">
+      <main className="relative z-10 flex min-h-screen flex-col px-4 py-4 pb-20 sm:px-6 sm:py-6 md:flex-row md:gap-0 md:px-0 md:pt-4">
         <div className="absolute left-4 right-4 top-4 z-20 flex items-center justify-between sm:left-6 sm:right-6 sm:top-6">
           <Link
             href={`/game/${slug}/intro`}
@@ -198,21 +198,22 @@ export default function HubClient({
           <RestartButton slug={slug} label="Oyunu Yeniden Başlat" />
         </div>
 
-        {/* Sol yarı: geniş; mobilde üstten aşağı – sayaç, başlık, harita, hikâye, odalar, final */}
+        {/* Sol yarı: sayaç kutu içinde yatay, içerik yukarı taşındı */}
         <div
           ref={leftColumnRef}
-          className="flex w-full flex-col gap-6 pt-12 sm:gap-8 md:max-h-screen md:min-w-0 md:flex-[1.4] md:overflow-y-auto md:pt-20 md:pl-6 md:pr-4 lg:flex-[1.5] lg:pl-8 lg:pr-6"
+          className="flex w-full flex-col gap-4 pt-14 sm:gap-5 sm:pt-16 md:max-h-screen md:min-w-0 md:flex-[1.4] md:overflow-y-auto md:pt-14 md:pl-6 md:pr-4 lg:flex-[1.5] lg:pl-8 lg:pr-6"
         >
-          <div className="flex flex-col items-center gap-2">
+          <section className="flex flex-row flex-wrap items-center justify-center gap-3 rounded-xl border border-zinc-700/60 bg-zinc-900/50 px-4 py-3 sm:gap-4 sm:px-5 sm:py-3.5">
             <CountdownTimer
               slug={slug}
               initialMinutes={durationMinutes}
               ariaLabelTemplate={timerAriaLabel}
+              compact
             />
-            <h1 className="text-center text-xl font-bold tracking-tight text-white drop-shadow-lg sm:text-2xl md:text-3xl lg:text-4xl">
+            <h1 className="text-center text-lg font-bold tracking-tight text-white drop-shadow-md sm:text-xl md:text-2xl">
               {gameTitle}
             </h1>
-          </div>
+          </section>
 
           {/* Mobilde: harita hemen başlık altında */}
           <section className="w-full rounded-lg border border-zinc-800/50 bg-zinc-900/40 overflow-hidden md:hidden">
@@ -224,8 +225,8 @@ export default function HubClient({
             </div>
           </section>
 
-          <section className="w-full rounded-lg border border-zinc-800/50 bg-zinc-900/30 px-4 py-4 sm:px-6 sm:py-5">
-            <h2 className="mb-3 text-sm font-semibold uppercase tracking-wider text-amber-500/90">
+          <section className="w-full rounded-lg border border-zinc-800/50 bg-zinc-900/30 px-4 py-3 sm:px-6 sm:py-4">
+            <h2 className="mb-2 text-sm font-semibold uppercase tracking-wider text-amber-500/90">
               {t.story}
             </h2>
             {storyAudioUrl && (
@@ -241,8 +242,8 @@ export default function HubClient({
             </div>
           </section>
 
-          <section className="w-full rounded-lg border border-zinc-800/50 bg-zinc-900/40 px-4 py-4 sm:px-6 sm:py-5" aria-label="Oda ilerleme durumu">
-            <h2 className="mb-4 text-sm font-semibold uppercase tracking-wider text-amber-500/90">
+          <section className="w-full rounded-lg border border-zinc-800/50 bg-zinc-900/40 px-4 py-3 sm:px-6 sm:py-4" aria-label="Oda ilerleme durumu">
+            <h2 className="mb-3 text-sm font-semibold uppercase tracking-wider text-amber-500/90">
               {t.rooms}
             </h2>
             <p className="mb-3 text-xs text-zinc-500">
