@@ -4,6 +4,8 @@ export interface GameSession {
   gameSlug: string;
   startedAt: number;
   durationSeconds: number;
+  /** Süre cezası (yanlış cevap): toplam eklenen saniye. */
+  penaltySeconds: number;
   currentRoomId: number;
   solvedRoomIds: number[];
   unlockedRoomIds: number[];
@@ -125,6 +127,7 @@ export function createSession(
     gameSlug,
     startedAt: Date.now(), // timer starts at this moment
     durationSeconds,
+    penaltySeconds: 0,
     currentRoomId: firstRoomId,
     solvedRoomIds: [],
     unlockedRoomIds: [firstRoomId],
@@ -138,7 +141,7 @@ export function createSession(
 
 export function updateSession(
   gameSlug: string,
-  updates: Partial<Pick<GameSession, "currentRoomId" | "solvedRoomIds" | "unlockedRoomIds" | "attemptsByRoom" | "hintUsedCount" | "roomsSolvedFirstTry" | "escaped">>
+  updates: Partial<Pick<GameSession, "currentRoomId" | "solvedRoomIds" | "unlockedRoomIds" | "attemptsByRoom" | "hintUsedCount" | "roomsSolvedFirstTry" | "escaped" | "penaltySeconds">>
 ): void {
   if (typeof window === "undefined") return;
   const session = getSession(gameSlug);
@@ -155,8 +158,9 @@ export function clearSession(gameSlug: string): void {
   }
 }
 
-/** Remaining time in seconds, computed from startedAt. */
+/** Remaining time in seconds, computed from startedAt minus penalty. */
 export function getRemainingTime(session: GameSession): number {
   const elapsed = Math.floor((Date.now() - session.startedAt) / 1000);
-  return Math.max(0, session.durationSeconds - elapsed);
+  const penalty = session.penaltySeconds ?? 0;
+  return Math.max(0, session.durationSeconds - elapsed - penalty);
 }

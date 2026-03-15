@@ -22,6 +22,12 @@ export interface Room {
   hint?: string;
   options?: string[];
   media?: { url: string; alt?: string }[];
+  /** Oda hikâye / atmosfer metni. Yoksa description kullanılır. */
+  story?: string;
+  /** Bilmece yönlendirme metni. Yoksa question kullanılır. */
+  puzzlePrompt?: string;
+  /** Oda ses dosyası yolu (varsa ses oynatıcı gösterilir). */
+  audioSrc?: string;
 }
 
 export const rooms: Room[] = [

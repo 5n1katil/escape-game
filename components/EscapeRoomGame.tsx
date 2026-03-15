@@ -2,6 +2,7 @@
 
 import { saveScore } from "@/lib/firebase";
 import {
+  addPenaltySeconds,
   clearGameState,
   getStoredAttempts,
   getStoredEscaped,
@@ -144,9 +145,11 @@ export default function EscapeRoomGame({
   }
 
   function handleWrongAnswer() {
-    setError(t.wrongAnswer);
+    const penaltyMinutes = currentRoom.id;
+    addPenaltySeconds(slug, penaltyMinutes * 60);
     setAttempts((a) => a + 1);
     setInputValue("");
+    setError(t.penaltyMessage.replace("{minutes}", String(penaltyMinutes)));
   }
 
   function handleTextSubmit(e: React.FormEvent) {
@@ -442,6 +445,9 @@ export default function EscapeRoomGame({
     }
   }
 
+  const storyText = currentRoom.story ?? currentRoom.description;
+  const puzzlePromptText = currentRoom.puzzlePrompt ?? currentRoom.question;
+
   return (
     <div className="mx-auto w-full max-w-2xl space-y-4 rounded-lg border border-zinc-800/50 bg-zinc-900/30 px-4 py-5 text-left sm:space-y-5 sm:px-6 sm:py-6 md:px-8 md:py-7">
       <div className="flex items-center justify-between gap-4">
@@ -456,11 +462,40 @@ export default function EscapeRoomGame({
         </span>
       </div>
 
-      <p className="text-base leading-relaxed text-zinc-300 sm:text-lg">
-        {currentRoom.question}
-      </p>
+      {currentRoom.audioSrc && (
+        <div className="flex items-center gap-3 rounded-lg border border-zinc-700/50 bg-zinc-800/30 px-4 py-3">
+          <span className="text-2xl" aria-hidden>🔊</span>
+          <audio
+            controls
+            src={currentRoom.audioSrc}
+            className="h-10 flex-1 max-w-full"
+            preload="metadata"
+          >
+            {t.audioLabel}
+          </audio>
+        </div>
+      )}
 
-      {renderPuzzle()}
+      {storyText && (
+        <section aria-label={t.storyLabel}>
+          <h3 className="mb-2 text-sm font-semibold uppercase tracking-wider text-amber-500/90">
+            {t.storyLabel}
+          </h3>
+          <p className="text-base leading-relaxed text-zinc-300 sm:text-lg">
+            {storyText}
+          </p>
+        </section>
+      )}
+
+      <section aria-label={t.puzzlePromptLabel}>
+        <h3 className="mb-2 text-sm font-semibold uppercase tracking-wider text-amber-500/90">
+          {t.puzzlePromptLabel}
+        </h3>
+        <p className="mb-4 text-base leading-relaxed text-zinc-300 sm:text-lg">
+          {puzzlePromptText}
+        </p>
+        {renderPuzzle()}
+      </section>
     </div>
   );
 }

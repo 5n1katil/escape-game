@@ -62,6 +62,15 @@ export function setStoredEscaped(slug: string, value: boolean): void {
   updateSession(slug, { escaped: value });
 }
 
+/** Yanlış cevap cezası: oda numarasına göre dakika * 60 saniye eklenir. */
+export function addPenaltySeconds(slug: string, seconds: number): void {
+  const session = getSession(slug);
+  if (!session) return;
+  updateSession(slug, {
+    penaltySeconds: (session.penaltySeconds ?? 0) + seconds,
+  });
+}
+
 export function getStoredMaxSolvedRoomIndex(
   slug: string,
   roomIds?: number[]
