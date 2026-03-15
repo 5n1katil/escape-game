@@ -41,9 +41,10 @@ export default async function IntroPage({ params }: IntroPageProps) {
           <span>{t.intro.back.replace(/^←\s*/u, "")}</span>
         </a>
 
-        <div className="grid h-full min-h-0 grid-rows-[1fr_minmax(0,35vh)] md:grid-cols-[1.4fr_1fr] md:grid-rows-1 lg:grid-cols-[1.6fr_1fr]">
-          {/* Sol: masaüstünde görsel; mobilde altta sabit kalır */}
-          <div className="relative order-2 min-h-0 shrink-0 md:order-1 md:h-full md:min-h-0">
+        {/* Mobil: görsel üstte, metin altta kaydırılabilir. Masaüstü: görsel sol, metin sağ. */}
+        <div className="grid h-full min-h-0 grid-rows-[minmax(0,35vh)_1fr] md:grid-cols-[1.4fr_1fr] md:grid-rows-1 lg:grid-cols-[1.6fr_1fr]">
+          {/* Görsel: mobilde üstte, masaüstünde solda */}
+          <div className="relative order-1 min-h-0 shrink-0 md:order-1 md:h-full md:min-h-0">
             <div className="absolute inset-0 bg-zinc-950">
               {coverImagePath ? (
                 <img
@@ -57,8 +58,8 @@ export default async function IntroPage({ params }: IntroPageProps) {
             </div>
           </div>
 
-          {/* Sağ: mobilde hikaye kaydırılabilir, görsel altta sabit; masaüstünde aynı */}
-          <div className="order-1 flex min-h-0 min-w-0 flex-col overflow-y-auto overflow-x-hidden bg-gradient-to-b from-amber-950/80 via-amber-950/60 to-amber-950/90 md:order-2 md:h-full">
+          {/* Metin: mobilde altta kaydırılabilir, masaüstünde sağda */}
+          <div className="order-2 flex min-h-0 min-w-0 flex-col overflow-y-auto overflow-x-hidden bg-gradient-to-b from-amber-950/80 via-amber-950/60 to-amber-950/90 md:order-2 md:h-full">
             <div className="flex min-h-0 flex-1 flex-col px-4 py-6 sm:px-5 sm:py-8">
               <h1 className="mb-3 text-2xl font-bold tracking-tight text-amber-100 sm:text-3xl md:text-4xl">
                 {game.title}
