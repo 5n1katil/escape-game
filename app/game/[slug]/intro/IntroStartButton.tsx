@@ -30,22 +30,22 @@ export default function IntroStartButton({
     setMounted(true);
   }, [slug]);
 
-  /** Session and 60min timer start only here — not on intro page load. */
+  /** Session and 60min timer start only here — not on intro page load. Then go to hub. */
   function handleStart() {
     createSession(slug, durationSeconds, firstRoomId);
-    router.push(`/game/${slug}/room/${firstRoomId}`);
+    router.push(`/game/${slug}/hub`);
   }
 
   function handleContinue() {
     const session = getSession(slug);
     if (!session) return;
-    router.push(`/game/${slug}/room/${session.currentRoomId}`);
+    router.push(`/game/${slug}/hub`);
   }
 
   function handleRestart() {
     clearSession(slug);
     createSession(slug, durationSeconds, firstRoomId);
-    router.push(`/game/${slug}/room/${firstRoomId}`);
+    router.push(`/game/${slug}/hub`);
   }
 
   if (!mounted) {

@@ -37,7 +37,7 @@ export default async function RoomPage({ params }: RoomPageProps) {
       <main className="relative z-10 flex min-h-screen flex-col gap-6 px-4 py-20 pb-24 sm:gap-10 sm:px-6 sm:py-16 md:flex-row md:items-start md:justify-center md:gap-8 md:pt-24 lg:gap-12 lg:px-8">
         <div className="absolute left-4 right-4 top-4 flex items-center justify-between sm:left-6 sm:right-6 sm:top-6 md:left-6 md:right-6">
           <Link
-            href={`/game/${slug}/intro`}
+            href={`/game/${slug}/hub`}
             className="flex min-h-[44px] min-w-[44px] touch-manipulation items-center justify-center rounded-lg text-sm text-zinc-500 transition-colors hover:text-amber-500 active:bg-zinc-800/50 sm:justify-start sm:px-2"
           >
             {t.room.back}
@@ -70,6 +70,7 @@ export default async function RoomPage({ params }: RoomPageProps) {
             roomIndex={roomIndex}
             rooms={rooms}
             t={t.room}
+            backToHubLabel={t.hub.backToHub}
           />
         </div>
 

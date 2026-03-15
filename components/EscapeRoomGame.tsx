@@ -26,6 +26,8 @@ interface EscapeRoomGameProps {
   roomIndex: number;
   rooms: readonly Room[];
   t: Translations["room"];
+  /** Label for "back to hub" button after solving a room */
+  backToHubLabel?: string;
 }
 
 function getInitialAttempts(slug: string, roomId: number): number {
@@ -44,6 +46,7 @@ export default function EscapeRoomGame({
   roomIndex,
   rooms,
   t,
+  backToHubLabel = "Ana Ekrana Dön",
 }: EscapeRoomGameProps) {
   const router = useRouter();
   const [attempts, setAttempts] = useState(0);
@@ -190,18 +193,10 @@ export default function EscapeRoomGame({
         </p>
         <button
           type="button"
-          onClick={() => {
-            if (isLastRoom) {
-              setEscapedState(true);
-              setShowSuccess(false);
-            } else {
-              const nextRoom = rooms[roomIndex + 1];
-              router.push(`/game/${slug}/room/${nextRoom.id}`);
-            }
-          }}
+          onClick={() => router.push(`/game/${slug}/hub`)}
           className="w-full min-h-[48px] touch-manipulation rounded-lg bg-emerald-600 px-6 py-3.5 text-base font-semibold text-white transition-colors hover:bg-emerald-500 active:scale-[0.98] sm:py-4 sm:text-lg"
         >
-          {isLastRoom ? t.completeEscape : t.goToNextRoom}
+          {backToHubLabel}
         </button>
       </div>
     );

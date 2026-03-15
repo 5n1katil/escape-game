@@ -22,6 +22,8 @@ export const games = [
     ],
     durationMinutes: 60,
     roomCount: rooms.length,
+    /** Final escape code entered on hub after all 6 rooms solved. */
+    finalCode: "lanet",
   },
 ] as const;
 
