@@ -106,8 +106,8 @@ export const rooms: Room[] = [
     puzzlePrompt:
       "Papirüslerdeki şifreli sembolleri çözüp doğru ismi bulun ve aşağıdaki alana yazın.",
     storyImages: [
-      { url: "/games/tapinagin-laneti/images/şifreli semboller.png", alt: "Şifreli semboller – papirüs" },
-      { url: "/games/tapinagin-laneti/images/şifreli semboller-2.png", alt: "Şifreli semboller – papirüs 2" },
+      { url: "/games/tapinagin-laneti/images/şifreli semboller-2.png", alt: "Şifreli semboller – anahtar" },
+      { url: "/games/tapinagin-laneti/images/şifreli semboller.png", alt: "Şifreli semboller – papirüs (şifreli mesaj)" },
     ],
   },
   {

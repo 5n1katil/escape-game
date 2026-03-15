@@ -518,16 +518,30 @@ export default function EscapeRoomGame({
 
       {currentRoom.storyImages && currentRoom.storyImages.length > 0 && (
         <section className="space-y-4" aria-label="Hikâye görselleri">
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <div
+            className={
+              currentRoom.id === 4 && currentRoom.storyImages.length === 2
+                ? "grid grid-cols-1 gap-4 sm:grid-cols-[minmax(0,1fr)_minmax(0,2fr)] sm:gap-6"
+                : "grid grid-cols-1 gap-4 sm:grid-cols-2"
+            }
+          >
             {currentRoom.storyImages.map((img, idx) => (
               <div
                 key={idx}
-                className="overflow-hidden rounded-xl border border-zinc-700/50 bg-zinc-800/30"
+                className={
+                  currentRoom.id === 4 && idx === 1
+                    ? "overflow-hidden rounded-xl border border-zinc-700/50 bg-zinc-800/30 flex min-w-0"
+                    : "overflow-hidden rounded-xl border border-zinc-700/50 bg-zinc-800/30"
+                }
               >
                 <img
                   src={encodeURI(img.url)}
                   alt={img.alt ?? ""}
-                  className="h-auto w-full object-contain"
+                  className={
+                    currentRoom.id === 4 && idx === 1
+                      ? "h-auto w-full min-w-0 object-contain object-left"
+                      : "h-auto w-full object-contain"
+                  }
                 />
               </div>
             ))}
