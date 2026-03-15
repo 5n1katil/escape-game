@@ -112,13 +112,21 @@ export const rooms: Room[] = [
   },
   {
     id: 5,
-    title: "Lanetli Hazine",
-    description:
-      "Altın paralar ve mücevherlerle dolu bir oda. Değerli bir hazine.",
+    title: "5. Oda: Çölün Kum Saati",
+    description: "Tapınağın 5. Odası",
     type: "text",
-    question: "Parlak, sarı, değerli. Kralların sevdiği bu nedir?",
-    answer: "altin",
-    hint: "Para ve mücevher yapımında kullanılır.",
+    question:
+      "Duvar ve papirüsteki sayılar ile okları kullanarak şifreyi çözün. Kum saatinin mesajına göre bulduğunuz kelimeyi aşağıya yazın.",
+    answer: "zaman",
+    hint: "Lanet geri sayıyor, yalnızca zamanı doğru okuyan kurtulabilir – sayı ve okları alfabe tablosuyla eşleştirin.",
+    story:
+      "Kapı arkamdan büyük bir gürültüyle kapandığında, odanın ortasında duran kum saatinin içindeki taneler hızla akmaya başladı. Kumun sesi, odayı dolduran tek sesti; ince, düzenli ve durdurulamaz bir fısıltı gibi... Oda önceki odalara benzemiyordu. Burada ne heykeller vardı ne de tanıdık figürler. Duvarlar, rastgele yerleştirilmiş gibi görünen sayılar, oklar ve tuhaf işaretlerle kaplıydı. Bazı sayılar büyüktü ve öne çıkıyordu, bazıları ise neredeyse silinmiş gibiydi.\n\nKöşeyi döndüğümde sağ duvarda, kum saati figürleri ile çevrelenen büyük bir çerçeve içerisindeki harfler dikkatimi çekti. Çerçevenin ortasında alfabe ve alfabenin en sol üstünde anlamlandıramadığım bir başlangıç noktası vardı. Duvarın hemen önünde yerde yırtık bir papirüs kağıdı buldum. Burada bir şifrenin gizlendiği açıktı. Ok sembolleri ve sayılar bana bir şey anlatmaya çalışıyor gibiydi, kafam karıştı zaman daralıyordu.\n\nArkamı döndüğümde, kum saatinin cam yüzeyine yansımış bir yazı fark ettim. Ancak yazı sabit değildi; kumlar aktıkça kelimeler de şekil değiştiriyordu. Gözlerimi kıstım ve bir anlığına cümlenin tamamını okuyabildim:\n\n\"Lanet geri sayıyor, yalnızca zamanı doğru okuyan kurtulabilir.\"\n\nOda her geçen saniye daralıyormuş gibi hissettim. Kum saati, yalnızca zamanı değil, benim kaderimi de ölçüyordu. Kumların son tanesi düştüğünde ne olacağını bilmiyordum, ama tek bir şey kesindi… Buradan çıkmak için zamanın dilini anlamalıydım..",
+    puzzlePrompt:
+      "Sayı ve okları alfabe tablosuyla eşleştirip şifreyi çözün. Bulduğunuz kelimeyi aşağıdaki alana yazın.",
+    storyImages: [
+      { url: "/games/tapinagin-laneti/images/Kum saati figürlü duvar.png", alt: "Kum saati figürlü duvar – alfabe tablosu" },
+      { url: "/games/tapinagin-laneti/images/sayılar ve oklar.png", alt: "Sayılar ve oklar – papirüs şifresi" },
+    ],
   },
   {
     id: 6,
