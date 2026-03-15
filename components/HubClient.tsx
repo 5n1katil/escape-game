@@ -12,7 +12,7 @@ import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import { setStoredEscaped } from "@/lib/gameStorage";
 
-const MAP_IMAGE_PATH = "/games/tapinagin-laneti/map.png";
+const MAP_IMAGE_PATH = "/games/tapinagin-laneti/images/map.png";
 
 interface HubClientProps {
   slug: string;
@@ -130,12 +130,12 @@ export default function HubClient({
             <h2 className="border-b border-zinc-700/50 px-4 py-3 text-sm font-semibold uppercase tracking-wider text-amber-500/90">
               {t.map}
             </h2>
-            <div className="relative flex min-h-[180px] items-center justify-center bg-zinc-900/50 p-4">
+            <div className="relative flex min-h-[180px] items-center justify-center overflow-hidden bg-zinc-900/50 p-4">
               {!mapError ? (
                 <img
                   src={MAP_IMAGE_PATH}
                   alt="Tapınak haritası"
-                  className="max-h-[200px] w-auto object-contain"
+                  className="max-h-[200px] max-w-full object-contain"
                   onError={() => setMapError(true)}
                 />
               ) : (
