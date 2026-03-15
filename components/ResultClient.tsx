@@ -22,6 +22,9 @@ interface ResultClientProps {
   wixUrl: string;
   tResult: Translations["result"];
   tRoomResult: Translations["room"]["result"];
+  endStoryLong?: string;
+  endAudioUrl?: string;
+  endImageUrl?: string;
 }
 
 function formatTime(seconds: number): string {
@@ -50,6 +53,9 @@ export default function ResultClient({
   wixUrl,
   tResult,
   tRoomResult,
+  endStoryLong,
+  endAudioUrl,
+  endImageUrl,
 }: ResultClientProps) {
   const router = useRouter();
   const [escaped, setEscaped] = useState<boolean | null>(null);
@@ -118,95 +124,134 @@ export default function ResultClient({
   const session = getSession(slug);
   const scoreResult = session ? calculateScore(session) : null;
 
+  const storyText = endStoryLong ?? tResult.endStory;
+
   return (
     <div className="min-h-screen bg-zinc-950 px-4 py-12 sm:py-16">
-      <main className="mx-auto max-w-xl space-y-6 rounded-xl border border-amber-500/30 bg-zinc-900/50 px-5 py-8 shadow-xl sm:space-y-8 sm:px-8 sm:py-10">
-        <header className="text-center">
-          <p className="text-sm font-medium uppercase tracking-wider text-amber-500/90">{gameTitle}</p>
-          <h1 className="mt-2 text-2xl font-bold text-amber-400 sm:text-3xl md:text-4xl">
-            {tResult.endTitle}
-          </h1>
-          <p className="mt-3 text-base leading-relaxed text-zinc-300 sm:text-lg">
-            {tResult.endStory}
-          </p>
-        </header>
+      <main className="mx-auto max-w-6xl">
+        <div className="flex flex-col gap-8 md:flex-row md:gap-10 lg:gap-12">
+          {/* Sol: sonuç özeti + sıralama listesi + Wix butonu */}
+          <div className="flex flex-1 flex-col space-y-6 md:max-w-md md:flex-none sm:space-y-8">
+            <header>
+              <p className="text-sm font-medium uppercase tracking-wider text-amber-500/90">{gameTitle}</p>
+              <h1 className="mt-2 text-2xl font-bold text-amber-400 sm:text-3xl">
+                {tResult.endTitle}
+              </h1>
+              <p className="mt-2 text-sm text-zinc-400">{tResult.endStory}</p>
+            </header>
 
-        {scoreResult && (
-          <section
-            className="rounded-xl border border-amber-500/25 bg-amber-950/20 px-4 py-5 sm:px-6 sm:py-6"
-            role="region"
-            aria-label={tRoomResult.title}
-          >
-            <h2 className="text-center text-lg font-semibold text-amber-300 sm:text-xl">
-              {tRoomResult.title}
-            </h2>
-            <dl className="mt-4 grid gap-3 sm:grid-cols-2">
-              <div className="flex justify-between rounded-lg bg-zinc-900/50 px-4 py-2 sm:flex-col sm:gap-0">
-                <dt className="text-sm text-zinc-400">{tRoomResult.finalScore}</dt>
-                <dd className="text-lg font-bold text-white tabular-nums">{scoreResult.finalScore}</dd>
-              </div>
-              <div className="flex justify-between rounded-lg bg-zinc-900/50 px-4 py-2 sm:flex-col sm:gap-0">
-                <dt className="text-sm text-zinc-400">{tRoomResult.remainingTime}</dt>
-                <dd className="text-lg font-medium text-zinc-200 tabular-nums">
-                  {formatTime(scoreResult.remainingTime)}
-                </dd>
-              </div>
-              <div className="flex justify-between rounded-lg bg-zinc-900/50 px-4 py-2 sm:flex-col sm:gap-0">
-                <dt className="text-sm text-zinc-400">{tRoomResult.totalAttempts}</dt>
-                <dd className="text-lg font-medium text-zinc-200 tabular-nums">{scoreResult.totalAttempts}</dd>
-              </div>
-              <div className="flex justify-between rounded-lg bg-zinc-900/50 px-4 py-2 sm:flex-col sm:gap-0">
-                <dt className="text-sm text-zinc-400">{tRoomResult.firstTryCount}</dt>
-                <dd className="text-lg font-medium text-zinc-200 tabular-nums">
-                  {scoreResult.roomsSolvedFirstTry}
-                </dd>
-              </div>
-            </dl>
-          </section>
-        )}
+            {scoreResult && (
+              <section
+                className="rounded-xl border border-amber-500/25 bg-amber-950/20 px-4 py-5 sm:px-6 sm:py-6"
+                role="region"
+                aria-label={tRoomResult.title}
+              >
+                <h2 className="text-center text-lg font-semibold text-amber-300 sm:text-xl">
+                  {tRoomResult.title}
+                </h2>
+                <dl className="mt-4 grid gap-3 sm:grid-cols-2">
+                  <div className="flex justify-between rounded-lg bg-zinc-900/50 px-4 py-2 sm:flex-col sm:gap-0">
+                    <dt className="text-sm text-zinc-400">{tRoomResult.finalScore}</dt>
+                    <dd className="text-lg font-bold text-white tabular-nums">{scoreResult.finalScore}</dd>
+                  </div>
+                  <div className="flex justify-between rounded-lg bg-zinc-900/50 px-4 py-2 sm:flex-col sm:gap-0">
+                    <dt className="text-sm text-zinc-400">{tRoomResult.remainingTime}</dt>
+                    <dd className="text-lg font-medium text-zinc-200 tabular-nums">
+                      {formatTime(scoreResult.remainingTime)}
+                    </dd>
+                  </div>
+                  <div className="flex justify-between rounded-lg bg-zinc-900/50 px-4 py-2 sm:flex-col sm:gap-0">
+                    <dt className="text-sm text-zinc-400">{tRoomResult.totalAttempts}</dt>
+                    <dd className="text-lg font-medium text-zinc-200 tabular-nums">{scoreResult.totalAttempts}</dd>
+                  </div>
+                  <div className="flex justify-between rounded-lg bg-zinc-900/50 px-4 py-2 sm:flex-col sm:gap-0">
+                    <dt className="text-sm text-zinc-400">{tRoomResult.firstTryCount}</dt>
+                    <dd className="text-lg font-medium text-zinc-200 tabular-nums">
+                      {scoreResult.roomsSolvedFirstTry}
+                    </dd>
+                  </div>
+                </dl>
+              </section>
+            )}
 
-        <section
-          className="rounded-xl border border-zinc-700/50 bg-zinc-900/40 px-4 py-5 sm:px-6"
-          aria-label={tResult.leaderboardTitle}
-        >
-          <h2 className="text-center text-base font-semibold text-amber-500/90 sm:text-lg">
-            {tResult.leaderboardTitle}
-          </h2>
-          {leaderboardError && (
-            <p className="mt-4 text-center text-sm text-zinc-500">{tResult.leaderboardError}</p>
-          )}
-          {!leaderboardError && leaderboard === null && (
-            <p className="mt-4 text-center text-sm text-zinc-500">{tResult.leaderboardLoading}</p>
-          )}
-          {!leaderboardError && leaderboard && leaderboard.length > 0 && (
-            <ol className="mt-4 space-y-2">
-              {leaderboard.map((entry, i) => (
-                <li
-                  key={entry.name + i}
-                  className="flex items-center justify-between rounded-lg bg-zinc-800/60 px-4 py-2.5 text-left"
-                >
-                  <span className="font-medium text-zinc-200">
-                    {i + 1}. {entry.name}
+            <section
+              className="rounded-xl border border-zinc-700/50 bg-zinc-900/40 px-4 py-5 sm:px-6"
+              aria-label={tResult.leaderboardTitle}
+            >
+              <h2 className="text-center text-base font-semibold text-amber-500/90 sm:text-lg">
+                {tResult.leaderboardTitle}
+              </h2>
+              {leaderboardError && (
+                <p className="mt-4 text-center text-sm text-zinc-500">{tResult.leaderboardError}</p>
+              )}
+              {!leaderboardError && leaderboard === null && (
+                <p className="mt-4 text-center text-sm text-zinc-500">{tResult.leaderboardLoading}</p>
+              )}
+              {!leaderboardError && leaderboard && leaderboard.length > 0 && (
+                <ol className="mt-4 space-y-2">
+                  {leaderboard.map((entry, i) => (
+                    <li
+                      key={entry.name + i}
+                      className="flex items-center justify-between rounded-lg bg-zinc-800/60 px-4 py-2.5 text-left"
+                    >
+                      <span className="font-medium text-zinc-200">
+                        {i + 1}. {entry.name}
+                      </span>
+                      <span className="tabular-nums text-amber-400/90">
+                        {entry.score} · {formatTime(entry.time)}
+                      </span>
+                    </li>
+                  ))}
+                </ol>
+              )}
+              {!leaderboardError && leaderboard && leaderboard.length === 0 && (
+                <p className="mt-4 text-center text-sm text-zinc-500">{tResult.leaderboardError}</p>
+              )}
+            </section>
+
+            <div className="flex justify-center pt-2">
+              <a
+                href={wixUrl}
+                className="inline-flex min-h-[52px] min-w-[200px] items-center justify-center rounded-xl bg-amber-600 px-8 py-3.5 text-lg font-semibold text-white transition-colors hover:bg-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:ring-offset-2 focus:ring-offset-zinc-900"
+              >
+                {tResult.backToWix}
+              </a>
+            </div>
+          </div>
+
+          {/* Sağ: görsel + oyun sonu hikayesi + ses */}
+          <div className="flex flex-1 flex-col gap-6 md:min-w-0 lg:gap-8">
+            {endImageUrl && (
+              <div className="overflow-hidden rounded-xl border border-zinc-700/50 bg-zinc-900/50">
+                <img
+                  src={endImageUrl}
+                  alt=""
+                  className="h-auto w-full object-cover"
+                />
+              </div>
+            )}
+            <section className="rounded-xl border border-zinc-700/50 bg-zinc-900/40 px-4 py-5 sm:px-6 sm:py-6">
+              <h2 className="text-base font-semibold text-amber-500/90 sm:text-lg">
+                {tResult.endStoryHeading}
+              </h2>
+              <p className="mt-4 whitespace-pre-line text-sm leading-relaxed text-zinc-300 sm:text-base">
+                {storyText}
+              </p>
+              {endAudioUrl && (
+                <div className="mt-5 flex flex-col gap-2">
+                  <span className="text-xs font-medium text-zinc-500">
+                    {tResult.endStoryAudioLabel}
                   </span>
-                  <span className="tabular-nums text-amber-400/90">
-                    {entry.score} · {formatTime(entry.time)}
-                  </span>
-                </li>
-              ))}
-            </ol>
-          )}
-          {!leaderboardError && leaderboard && leaderboard.length === 0 && (
-            <p className="mt-4 text-center text-sm text-zinc-500">{tResult.leaderboardError}</p>
-          )}
-        </section>
-
-        <div className="flex justify-center pt-2">
-          <a
-            href={wixUrl}
-            className="inline-flex min-h-[52px] min-w-[200px] items-center justify-center rounded-xl bg-amber-600 px-8 py-3.5 text-lg font-semibold text-white transition-colors hover:bg-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:ring-offset-2 focus:ring-offset-zinc-900"
-          >
-            {tResult.backToWix}
-          </a>
+                  <audio
+                    controls
+                    src={endAudioUrl}
+                    className="h-10 w-full max-w-md"
+                    preload="metadata"
+                  />
+                </div>
+              )}
+            </section>
+          </div>
         </div>
       </main>
     </div>

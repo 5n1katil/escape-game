@@ -99,6 +99,8 @@ export const translations = {
       leaderboardTitle: "Liderlik tablosu",
       leaderboardLoading: "Liderlik tablosu yükleniyor...",
       leaderboardError: "Liderlik tablosu şu an gösterilemiyor.",
+      endStoryHeading: "Oyun sonu hikayesi",
+      endStoryAudioLabel: "Hikayeyi sesli dinle",
     },
   },
   en: {
@@ -198,6 +200,8 @@ export const translations = {
       leaderboardTitle: "Leaderboard",
       leaderboardLoading: "Loading leaderboard...",
       leaderboardError: "Leaderboard is unavailable.",
+      endStoryHeading: "End game story",
+      endStoryAudioLabel: "Listen to the story",
     },
   },
 } as const;

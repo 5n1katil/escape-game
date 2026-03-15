@@ -19,6 +19,10 @@ export default async function ResultPage({ params }: ResultPageProps) {
   if (!game) notFound();
 
   const wixUrl = getWixLandingUrl(slug);
+  const g = game as { endStoryLong?: string; endAudioUrl?: string; endImageUrl?: string };
+  const endStoryLong = g.endStoryLong;
+  const endAudioUrl = g.endAudioUrl;
+  const endImageUrl = g.endImageUrl;
 
   return (
     <ResultClient
@@ -27,6 +31,9 @@ export default async function ResultPage({ params }: ResultPageProps) {
       wixUrl={wixUrl}
       tResult={t.result}
       tRoomResult={t.room.result}
+      endStoryLong={endStoryLong}
+      endAudioUrl={endAudioUrl}
+      endImageUrl={endImageUrl}
     />
   );
 }
