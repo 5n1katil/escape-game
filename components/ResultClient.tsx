@@ -20,6 +20,8 @@ interface ResultClientProps {
   slug: string;
   gameTitle: string;
   wixUrl: string;
+  /** Ana sayfa URL (sonuç ekranında "Ana Sayfaya Dön" butonu). */
+  mainPageUrl?: string;
   tResult: Translations["result"];
   tRoomResult: Translations["room"]["result"];
   endStoryLong?: string;
@@ -53,6 +55,7 @@ export default function ResultClient({
   slug,
   gameTitle,
   wixUrl,
+  mainPageUrl,
   tResult,
   tRoomResult,
   endStoryLong,
@@ -130,11 +133,14 @@ export default function ResultClient({
 
   const storyText = endStoryLong ?? tResult.endStory;
 
+  const backUrl = mainPageUrl ?? wixUrl;
+  const backLabel = mainPageUrl ? tResult.backToMain : tResult.backToWix;
+
   return (
     <div className="min-h-screen bg-zinc-950 px-4 py-12 sm:py-16">
-      <main className="mx-auto max-w-6xl">
+      <main className="mx-auto max-w-6xl space-y-8 lg:space-y-10">
+        {/* Üst: sol = başlık + puan + liderlik, sağ = görsel */}
         <div className="flex flex-col gap-8 md:flex-row md:gap-10 lg:gap-12">
-          {/* Sol: sonuç özeti + sıralama listesi + Wix butonu */}
           <div className="flex flex-1 flex-col space-y-6 md:max-w-md md:flex-none sm:space-y-8">
             <header>
               <p className="text-sm font-medium uppercase tracking-wider text-amber-500/90">{gameTitle}</p>
@@ -212,29 +218,10 @@ export default function ResultClient({
                 <p className="mt-4 text-center text-sm text-zinc-500">{tResult.leaderboardError}</p>
               )}
             </section>
-
-            <div className="flex flex-col items-center gap-3 pt-2 sm:gap-4">
-              {gizemMalikanesiUrl && gizemMalikanesiLabel && (
-                <a
-                  href={gizemMalikanesiUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex min-h-[52px] min-w-[200px] items-center justify-center rounded-xl bg-emerald-600 px-8 py-3.5 text-lg font-semibold text-white transition-colors hover:bg-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:ring-offset-2 focus:ring-offset-zinc-900"
-                >
-                  {gizemMalikanesiLabel}
-                </a>
-              )}
-              <a
-                href={wixUrl}
-                className="inline-flex min-h-[52px] min-w-[200px] items-center justify-center rounded-xl bg-amber-600 px-8 py-3.5 text-lg font-semibold text-white transition-colors hover:bg-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:ring-offset-2 focus:ring-offset-zinc-900"
-              >
-                {tResult.backToWix}
-              </a>
-            </div>
           </div>
 
-          {/* Sağ: görsel + oyun sonu hikayesi + ses */}
-          <div className="flex flex-1 flex-col gap-6 md:min-w-0 lg:gap-8">
+          {/* Sağ: sadece görsel */}
+          <div className="flex flex-1 flex-col md:min-w-0">
             {endImageUrl && (
               <div className="overflow-hidden rounded-xl border border-zinc-700/50 bg-zinc-900/50">
                 <img
@@ -244,28 +231,53 @@ export default function ResultClient({
                 />
               </div>
             )}
-            <section className="rounded-xl border border-zinc-700/50 bg-zinc-900/40 px-4 py-5 sm:px-6 sm:py-6">
-              <h2 className="text-base font-semibold text-amber-500/90 sm:text-lg">
-                {tResult.endStoryHeading}
-              </h2>
-              <p className="mt-4 whitespace-pre-line text-sm leading-relaxed text-zinc-300 sm:text-base">
-                {storyText}
-              </p>
-              {endAudioUrl && (
-                <div className="mt-5 flex flex-col gap-2">
-                  <span className="text-xs font-medium text-zinc-500">
-                    {tResult.endStoryAudioLabel}
-                  </span>
-                  <audio
-                    controls
-                    src={endAudioUrl}
-                    className="h-10 w-full max-w-md"
-                    preload="metadata"
-                  />
-                </div>
-              )}
-            </section>
           </div>
+        </div>
+
+        {/* Oyun sonu hikayesi: tam genişlik */}
+        <section
+          className="w-full rounded-xl border border-zinc-700/50 bg-zinc-900/40 px-5 py-6 sm:px-8 sm:py-8 md:px-10"
+          aria-label={tResult.endStoryHeading}
+        >
+          <h2 className="text-base font-semibold text-amber-500/90 sm:text-lg">
+            {tResult.endStoryHeading}
+          </h2>
+          <p className="mt-4 max-w-none whitespace-pre-line text-sm leading-relaxed text-zinc-300 sm:text-base">
+            {storyText}
+          </p>
+          {endAudioUrl && (
+            <div className="mt-5 flex flex-col gap-2">
+              <span className="text-xs font-medium text-zinc-500">
+                {tResult.endStoryAudioLabel}
+              </span>
+              <audio
+                controls
+                src={endAudioUrl}
+                className="h-10 w-full max-w-md"
+                preload="metadata"
+              />
+            </div>
+          )}
+        </section>
+
+        {/* Butonlar: hikayenin altında, tam genişlikte, görünür ve kolay tıklanabilir */}
+        <div className="flex flex-wrap items-center justify-center gap-4 py-4 sm:gap-6 sm:py-6">
+          {gizemMalikanesiUrl && gizemMalikanesiLabel && (
+            <a
+              href={gizemMalikanesiUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex min-h-[52px] min-w-[220px] flex-shrink-0 items-center justify-center rounded-xl bg-emerald-600 px-8 py-3.5 text-lg font-semibold text-white shadow-lg transition-colors hover:bg-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:ring-offset-2 focus:ring-offset-zinc-900 active:scale-[0.98]"
+            >
+              {gizemMalikanesiLabel}
+            </a>
+          )}
+          <a
+            href={backUrl}
+            className="inline-flex min-h-[52px] min-w-[220px] flex-shrink-0 items-center justify-center rounded-xl bg-amber-600 px-8 py-3.5 text-lg font-semibold text-white shadow-lg transition-colors hover:bg-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:ring-offset-2 focus:ring-offset-zinc-900 active:scale-[0.98]"
+          >
+            {backLabel}
+          </a>
         </div>
       </main>
     </div>

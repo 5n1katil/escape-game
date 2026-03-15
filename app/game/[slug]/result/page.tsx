@@ -37,6 +37,7 @@ export default async function ResultPage({ params }: ResultPageProps) {
       slug={slug}
       gameTitle={game.title}
       wixUrl={wixUrl}
+      mainPageUrl="https://www.5n1dedektif.com/"
       tResult={t.result}
       tRoomResult={t.room.result}
       endStoryLong={endStoryLong}
