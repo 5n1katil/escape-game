@@ -94,13 +94,21 @@ export const rooms: Room[] = [
   },
   {
     id: 4,
-    title: "Gizli Tünel",
-    description:
-      "Karanlık bir tünel. İlerleyebilmek için bir şey bulmalısınız.",
+    title: "4. Oda: Firavunun Laneti",
+    description: "Tapınağın 4. Odası",
     type: "text",
-    question: "Karanlığı yener, yolunu gösterir. Tünelde ne ararsın?",
-    answer: "isik",
-    hint: "Geceleri lamba veya fener ne sağlar?",
+    question:
+      "Taş levhadaki yazıya göre papirüslerdeki sembolleri çözüp doğru ismi bulun. Bulduğunuz ismi aşağıya yazın.",
+    answer: "firavun",
+    hint: "Ölüler huzur içinde yatmaz, ismi unutulan sonsuza dek kaybolur – papirüsteki şifreyi çözerek ismi bulun.",
+    story:
+      "Kapı arkamdan ağır bir gürültüyle kapandı. Burası, önceki odalardan daha büyük ve daha ürkütücüydü. Havanın içinde eski papirüslerin tozlu kokusu ve hafif bir rutubet vardı. Ortam loştu, yalnızca duvarlara monte edilmiş eski meşaleler titrek bir ışık yayıyordu. Duvarlar tamamen hiyerogliflerle kaplıydı, ancak diğer odalardan farklı olarak burada bazı hiyeroglifler ters çizilmiş ya da kazınmış gibi duruyordu. Sanki bir şey saklamak ya da gizlemek için özellikle böyle işlenmişlerdi.\n\nTam karşımdaki duvarda, devasa bir firavun tasviri vardı. Firavunun gözleri, üzerime bakıyormuş gibi hissettiriyordu. Ellerinde tuttuğu bir anahtar, belki de odanın sırrını açıklıyordu. Ama gözlerimi firavunun altına kaydırdığımda kazınmış eski bir yazı gördüm. Taş levhada şu kelimeler vardı: \"Ölüler huzur içinde yatmaz, ismi unutulan sonsuza dek kaybolur.\" Bu cümle kafamı kurcaladı. Belli ki burada bulunması gereken bir isim vardı.\n\nOdanın merkezinde, yerde 2 tane eski papirüs parçası buldum, üstünde karmaşık semboller vardı. Papirüslerin altında yerde eski Mısır tanrılarını simgeleyen semboller kazınmıştı. Ama bunlardan yalnızca biri doğruydu. Eğer yanlış ismi seçersem, Firavunun lanetini üzerime çekebilirdim. Şimdi papirüslerdeki sembolleri dikkatlice incelemeliyim. Doğru ismi bulamazsam, bu tapınağın lanetinin kurbanı olmaktan kaçamayacağım…",
+    puzzlePrompt:
+      "Papirüslerdeki şifreli sembolleri çözüp doğru ismi bulun ve aşağıdaki alana yazın.",
+    storyImages: [
+      { url: "/games/tapinagin-laneti/images/şifreli semboller.png", alt: "Şifreli semboller – papirüs" },
+      { url: "/games/tapinagin-laneti/images/şifreli semboller-2.png", alt: "Şifreli semboller – papirüs 2" },
+    ],
   },
   {
     id: 5,
