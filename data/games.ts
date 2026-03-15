@@ -33,6 +33,11 @@ export const games = [
     endImageUrl: undefined as string | undefined,
     /** Giriş ekranı hikâye seslendirmesi (varsa intro sayfasında oynatıcı gösterilir). */
     introAudioUrl: "/games/tapinagin-laneti/audio/intro.mp3" as string | undefined,
+    /** Lobi (hub) ekranında HİKAYE bölümünde gösterilecek metin. */
+    hubStory:
+      "Zifiri karanlık koridorun girişinde duruyorum. Hava ağır, sıcak ve kuru... Sanki yüzyıllardır burada hapsolmuş bir lanetin nefesini hissediyorum. Tozlu taş duvarlara dokunduğumda, parmaklarımın arasından ince kumlar dökülüyor. Sanki bu tapınak, zamanın içinde eriyip gitmiş ama beni bekliyormuş gibi.\n\nEfsaneler, buranın lanetli olduğunu söylüyor. Kaybolmuş bir firavunun, gömüldüğü yerin sonsuza dek mühürlenmesi için bir büyü yaptığını... İçeriye girenlerin asla geri dönemediğini... Yalnızca bütün sırları çözenler buradan sağ çıkabilirmiş.\n\nFakat bu bir masal değil. Önümde, taş bloklara kazınmış eski Mısır yazıları, bana sanki bir şeyler fısıldıyor. Arkamdaki giriş, içeri adım attığım anda büyük bir gürültüyle kapandı. Artık geri dönüş yok.\n\nYolumun üzerindeki altı odanın her biri bir sınav olacak. Kapılar, sadece doğru cevapları bulanlara açılacak. Eğer yanlış yaparsam... Efsanelerin söylediği gibi, bu tapınağın bir parçası olup kalacağım.\n\nDerin bir nefes alıyorum. Gözlerimi karanlığa dikiyorum. Bu benim bugüne kadar ki en zor sınavım... Ya tapınağın sırlarını çözüp kurtulacağım ya da bu lanetin bir parçası olacağım.",
+    /** Lobi hikâye seslendirmesi (varsa hub HİKAYE bölümünde oynatıcı gösterilir). */
+    hubStoryAudioUrl: undefined as string | undefined,
   },
 ] as const;
 

@@ -21,13 +21,17 @@ export default async function HubPage({ params }: HubPageProps) {
   if (!game || rooms.length === 0) notFound();
 
   const finalCode = "finalCode" in game ? (game as { finalCode?: string }).finalCode : undefined;
+  const g = game as { hubStory?: string; hubStoryAudioUrl?: string };
+  const story = g.hubStory ?? game.story;
+  const storyAudioUrl = g.hubStoryAudioUrl ?? null;
 
   return (
     <GameStateGate slug={slug}>
       <HubClient
         slug={slug}
         gameTitle={game.title}
-        story={game.story}
+        story={story}
+        storyAudioUrl={storyAudioUrl || undefined}
         rooms={rooms}
         finalCode={finalCode}
         t={t.hub}

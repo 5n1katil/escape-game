@@ -13,8 +13,6 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { setStoredEscaped } from "@/lib/gameStorage";
 
 const MAP_IMAGE_PATH = "/games/tapinagin-laneti/images/map.jpg";
-/** Lobi ekranında sayaç/başlık altında gösterilen giriş görseli (Tapınağın Laneti). */
-const HUB_ENTRANCE_IMAGE_PATH = "/games/tapinagin-laneti/images/" + encodeURIComponent("Lanetli Tapınak Giriş.png");
 
 /** Harita üzerinde oda tıklama alanları (yüzde: top, left, width, height). Haritadaki 1–6 numaralı konumlara göre ayarlanabilir. */
 const MAP_SEGMENTS: { id: number; top: number; left: number; width: number; height: number }[] = [
@@ -30,6 +28,8 @@ interface HubClientProps {
   slug: string;
   gameTitle: string;
   story: string;
+  /** Lobi hikâye seslendirmesi (varsa HİKAYE bölümünde oynatıcı gösterilir). */
+  storyAudioUrl?: string | null;
   rooms: readonly Room[];
   finalCode: string | undefined;
   t: Translations["hub"];
@@ -41,6 +41,7 @@ export default function HubClient({
   slug,
   gameTitle,
   story,
+  storyAudioUrl,
   rooms,
   finalCode,
   t,
@@ -213,16 +214,6 @@ export default function HubClient({
             </h1>
           </div>
 
-          {slug === "tapinagin-laneti" && (
-            <div className="flex justify-center">
-              <img
-                src={HUB_ENTRANCE_IMAGE_PATH}
-                alt="Tapınak girişi"
-                className="max-h-[220px] w-full max-w-lg rounded-lg border border-zinc-700/50 object-contain sm:max-h-[280px]"
-              />
-            </div>
-          )}
-
           {/* Mobilde: harita hemen başlık altında */}
           <section className="w-full rounded-lg border border-zinc-800/50 bg-zinc-900/40 overflow-hidden md:hidden">
             <h2 className="border-b border-zinc-700/50 px-4 py-3 text-sm font-semibold uppercase tracking-wider text-amber-500/90">
@@ -237,6 +228,14 @@ export default function HubClient({
             <h2 className="mb-3 text-sm font-semibold uppercase tracking-wider text-amber-500/90">
               {t.story}
             </h2>
+            {storyAudioUrl && (
+              <div className="mb-3">
+                <p className="mb-1.5 text-xs text-zinc-500">
+                  {t.storyAudioLabel}
+                </p>
+                <audio controls src={storyAudioUrl} className="h-9 w-full max-w-md" preload="metadata" />
+              </div>
+            )}
             <div className="whitespace-pre-line text-base leading-relaxed text-zinc-300 sm:text-lg">
               {story}
             </div>
