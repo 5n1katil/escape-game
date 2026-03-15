@@ -108,6 +108,12 @@ export const translations = {
       endStoryHeading: "Oyun sonu hikayesi",
       endStoryAudioLabel: "Hikayeyi sesli dinle",
     },
+    gameOver: {
+      message: "Tapınak sizi lanetledi, sonsuza kadar burada tutsak kaldınız...",
+      subtitle: "Süreniz doldu. Tapınaktan kaçamadınız.",
+      playAgain: "Tekrar Oyna",
+      exit: "Çıkış Yap",
+    },
   },
   en: {
     meta: {
@@ -214,6 +220,12 @@ export const translations = {
       leaderboardError: "Leaderboard is unavailable.",
       endStoryHeading: "End game story",
       endStoryAudioLabel: "Listen to the story",
+    },
+    gameOver: {
+      message: "The temple has cursed you; you are trapped here forever...",
+      subtitle: "Time is up. You did not escape the temple.",
+      playAgain: "Play Again",
+      exit: "Exit",
     },
   },
 } as const;
