@@ -1,6 +1,5 @@
-import { games, getGameBySlug } from "@/data/games";
+import { games, getGameBySlug, getWixLandingUrl } from "@/data/games";
 import { getTranslations } from "@/lib/i18n";
-import Link from "next/link";
 import { notFound } from "next/navigation";
 import IntroStartButton from "./IntroStartButton";
 
@@ -22,12 +21,12 @@ export default async function IntroPage({ params }: IntroPageProps) {
   return (
     <div className="relative min-h-screen overflow-hidden bg-zinc-950">
       <main className="relative z-10 min-h-screen">
-        <Link
-          href="/escape-rooms"
+        <a
+          href={getWixLandingUrl(slug)}
           className="absolute left-4 top-4 z-20 inline-flex min-h-[44px] items-center text-sm text-zinc-400 transition-colors hover:text-amber-500 sm:left-6 sm:top-6"
         >
           {t.intro.back}
-        </Link>
+        </a>
 
         <div className="grid min-h-screen md:grid-cols-2 md:grid-rows-1">
           {/* Left: large cover image */}
