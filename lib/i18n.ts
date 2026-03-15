@@ -56,6 +56,9 @@ export const translations = {
       roomSolved: "Oda çözüldü!",
       escapePasswordLabel: "Tapınaktan kaçış şifresi",
       escapePasswordHint: "Ana ekranda son şifre alanına bu kelimeyi yazarak kaçışı tamamlayın.",
+      imageCloseLabel: "Görseli kapat",
+      imageClickHint: "Büyütmek için tıklayın",
+      chooseThisOption: "Bu cevabı seç",
       goToNextRoom: "Sonraki Odaya Git",
       completeEscape: "Kaçışı Tamamla",
       puzzlePlaceholders: {
@@ -159,6 +162,9 @@ export const translations = {
       roomSolved: "Room solved!",
       escapePasswordLabel: "Temple escape password",
       escapePasswordHint: "Enter this word in the final code field on the main screen to complete your escape.",
+      imageCloseLabel: "Close image",
+      imageClickHint: "Click to enlarge",
+      chooseThisOption: "Choose this answer",
       goToNextRoom: "Go to Next Room",
       completeEscape: "Complete Escape",
       puzzlePlaceholders: {

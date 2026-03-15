@@ -59,6 +59,7 @@ export default function EscapeRoomGame({
   const [showSuccess, setShowSuccess] = useState(false);
   const [escaped, setEscapedState] = useState(false);
   const [hydrated, setHydrated] = useState(false);
+  const [lightboxImage, setLightboxImage] = useState<{ url: string; alt?: string } | null>(null);
   const scoreSavedRef = useRef(false);
 
   const currentRoom = rooms[roomIndex];
@@ -79,6 +80,19 @@ export default function EscapeRoomGame({
     if (!hydrated) return;
     setStoredEscaped(slug, escaped);
   }, [hydrated, slug, escaped]);
+
+  useEffect(() => {
+    if (!lightboxImage) return;
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setLightboxImage(null);
+    };
+    document.body.style.overflow = "hidden";
+    document.addEventListener("keydown", onKeyDown);
+    return () => {
+      document.body.style.overflow = "";
+      document.removeEventListener("keydown", onKeyDown);
+    };
+  }, [lightboxImage]);
 
   useEffect(() => {
     const session = getSession(slug);
@@ -378,18 +392,21 @@ export default function EscapeRoomGame({
           <div className="space-y-4">
             <div className="grid grid-cols-2 gap-3 sm:grid-cols-2">
               {media.map((item, idx) => (
-                <button
+                <div
                   key={idx}
-                  type="button"
-                  onClick={() => handleImageChoiceSelect(idx)}
-                  className="group relative flex min-h-[100px] flex-col overflow-hidden rounded-xl border-2 border-zinc-700 bg-zinc-800/50 transition-all hover:border-amber-500/50 hover:bg-zinc-800/70 active:scale-[0.98] sm:min-h-[120px]"
+                  className="group flex min-h-[100px] flex-col overflow-hidden rounded-xl border-2 border-zinc-700 bg-zinc-800/50 transition-all hover:border-amber-500/50 hover:bg-zinc-800/70 sm:min-h-[120px]"
                 >
-                  <div className="flex flex-1 flex-col items-center justify-center gap-2 p-4">
+                  <button
+                    type="button"
+                    onClick={() => item.url?.trim() && setLightboxImage({ url: item.url!, alt: item.alt })}
+                    className="flex flex-1 flex-col items-center justify-center gap-2 p-4 cursor-zoom-in touch-manipulation text-left"
+                    title={t.imageClickHint}
+                  >
                     {item.url?.trim() ? (
                       <img
-                        src={item.url}
+                        src={encodeURI(item.url)}
                         alt={item.alt ?? ""}
-                        className="h-full max-h-32 w-full object-contain"
+                        className="h-full max-h-32 w-full object-contain pointer-events-none"
                       />
                     ) : (
                       <span
@@ -404,8 +421,15 @@ export default function EscapeRoomGame({
                         {item.alt}
                       </span>
                     )}
-                  </div>
-                </button>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleImageChoiceSelect(idx)}
+                    className="min-h-[44px] w-full touch-manipulation border-t border-zinc-700 bg-zinc-800/80 px-4 py-2 text-sm font-medium text-amber-400 transition-colors hover:bg-amber-500/20 active:scale-[0.98]"
+                  >
+                    {t.chooseThisOption}
+                  </button>
+                </div>
               ))}
             </div>
             {media.length === 0 && (
@@ -531,28 +555,31 @@ export default function EscapeRoomGame({
               const rightFullScale = (currentRoom.id === 4 || currentRoom.id === 5) && idx === 1;
               const leftRoom5 = currentRoom.id === 5 && idx === 0;
               return (
-                <div
+                <button
                   key={idx}
+                  type="button"
+                  onClick={() => setLightboxImage({ url: img.url, alt: img.alt })}
                   className={
                     rightFullScale
-                      ? "overflow-hidden rounded-xl border border-zinc-700/50 bg-zinc-800/30 flex min-w-0"
+                      ? "overflow-hidden rounded-xl border border-zinc-700/50 bg-zinc-800/30 flex min-w-0 cursor-zoom-in touch-manipulation text-left"
                       : leftRoom5
-                        ? "flex min-h-[280px] overflow-hidden rounded-xl border border-zinc-700/50 bg-zinc-800/30 sm:min-h-[340px]"
-                        : "overflow-hidden rounded-xl border border-zinc-700/50 bg-zinc-800/30"
+                        ? "flex min-h-[280px] overflow-hidden rounded-xl border border-zinc-700/50 bg-zinc-800/30 sm:min-h-[340px] cursor-zoom-in touch-manipulation text-left"
+                        : "overflow-hidden rounded-xl border border-zinc-700/50 bg-zinc-800/30 cursor-zoom-in touch-manipulation text-left"
                   }
+                  title={t.imageClickHint}
                 >
                   <img
                     src={encodeURI(img.url)}
                     alt={img.alt ?? ""}
                     className={
                       rightFullScale
-                        ? "h-auto w-full min-w-0 object-contain object-left"
+                        ? "h-auto w-full min-w-0 object-contain object-left pointer-events-none"
                         : leftRoom5
-                          ? "h-auto w-full object-contain object-center"
-                          : "h-auto w-full object-contain"
+                          ? "h-auto w-full object-contain object-center pointer-events-none"
+                          : "h-auto w-full object-contain pointer-events-none"
                     }
                   />
-                </div>
+                </button>
               );
             })}
           </div>
@@ -568,6 +595,37 @@ export default function EscapeRoomGame({
         </p>
         {renderPuzzle()}
       </section>
+
+      {/* Popup: tıklanınca görseli büyük göster */}
+      {lightboxImage && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-label={t.imageCloseLabel}
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 p-4"
+          onClick={() => setLightboxImage(null)}
+        >
+          <button
+            type="button"
+            onClick={() => setLightboxImage(null)}
+            className="absolute right-4 top-4 z-10 flex h-10 w-10 items-center justify-center rounded-full bg-zinc-800 text-white shadow-lg transition-colors hover:bg-zinc-700 focus:outline-none focus:ring-2 focus:ring-amber-400"
+            aria-label={t.imageCloseLabel}
+          >
+            <span className="text-xl leading-none" aria-hidden>×</span>
+          </button>
+          <div
+            className="relative max-h-[90vh] max-w-[95vw] overflow-auto"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <img
+              src={encodeURI(lightboxImage.url)}
+              alt={lightboxImage.alt ?? ""}
+              className="max-h-[85vh] w-auto max-w-full object-contain"
+              draggable={false}
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 }
