@@ -14,6 +14,16 @@ import { setStoredEscaped } from "@/lib/gameStorage";
 
 const MAP_IMAGE_PATH = "/games/tapinagin-laneti/images/map.png";
 
+/** Harita üzerinde oda tıklama alanları (yüzde: top, left, width, height). Haritadaki 1–6 numaralı konumlara göre ayarlanabilir. */
+const MAP_SEGMENTS: { id: number; top: number; left: number; width: number; height: number }[] = [
+  { id: 1, top: 8, left: 10, width: 26, height: 40 },
+  { id: 2, top: 8, left: 38, width: 26, height: 40 },
+  { id: 3, top: 8, left: 66, width: 26, height: 40 },
+  { id: 4, top: 52, left: 10, width: 26, height: 40 },
+  { id: 5, top: 52, left: 38, width: 26, height: 40 },
+  { id: 6, top: 52, left: 66, width: 26, height: 40 },
+];
+
 interface HubClientProps {
   slug: string;
   gameTitle: string;
@@ -98,22 +108,27 @@ export default function HubClient({
         className="h-full w-full object-contain"
         onError={() => setMapError(true)}
       />
-      <div
-        className="absolute inset-0 grid grid-cols-3 grid-rows-2"
-        aria-hidden
-      >
-        {[1, 2, 3, 4, 5, 6].map((roomId) => {
+      <div className="absolute inset-0" aria-hidden>
+        {MAP_SEGMENTS.map((seg) => {
+          const roomId = seg.id;
           const room = rooms.find((r) => r.id === roomId);
           const unlocked = unlockedIds.includes(roomId);
           const maxSolved = getStoredMaxSolvedRoomIndex(slug, roomIds);
           const roomIndex = rooms.findIndex((r) => r.id === roomId);
           const solved = roomIndex >= 0 && roomIndex <= maxSolved;
+          const style = {
+            top: `${seg.top}%`,
+            left: `${seg.left}%`,
+            width: `${seg.width}%`,
+            height: `${seg.height}%`,
+          };
           if (unlocked && room) {
             return (
               <Link
                 key={roomId}
                 href={`/game/${slug}/room/${roomId}`}
-                className="flex items-center justify-center rounded border-2 border-transparent bg-black/0 transition-colors hover:border-amber-400/60 hover:bg-amber-500/10"
+                className="absolute flex items-center justify-center rounded border-2 border-transparent bg-black/0 transition-colors hover:border-amber-400/60 hover:bg-amber-500/10"
+                style={style}
                 aria-label={`${room.title} - ${t.goToRoom}`}
                 title={room.title}
               >
@@ -126,7 +141,8 @@ export default function HubClient({
           return (
             <div
               key={roomId}
-              className="flex cursor-not-allowed items-center justify-center rounded bg-black/20"
+              className="absolute flex cursor-not-allowed items-center justify-center rounded bg-black/20"
+              style={style}
               title="Kilitli"
               aria-hidden
             >
@@ -161,8 +177,8 @@ export default function HubClient({
           <RestartButton slug={slug} label="Oyunu Yeniden Başlat" />
         </div>
 
-        {/* Sol yarı (mobil: üstten aşağı – sayaç, başlık, harita, hikâye, odalar, final) */}
-        <div className="flex w-full flex-col gap-6 pt-12 sm:gap-8 md:max-h-screen md:min-w-0 md:flex-1 md:overflow-y-auto md:pt-20 md:pl-6 md:pr-4 lg:pl-8 lg:pr-6">
+        {/* Sol yarı: geniş; mobilde üstten aşağı – sayaç, başlık, harita, hikâye, odalar, final */}
+        <div className="flex w-full flex-col gap-6 pt-12 sm:gap-8 md:max-h-screen md:min-w-0 md:flex-[1.4] md:overflow-y-auto md:pt-20 md:pl-6 md:pr-4 lg:flex-[1.5] lg:pl-8 lg:pr-6">
           <div className="flex flex-col items-center gap-2">
             <CountdownTimer
               slug={slug}
@@ -271,10 +287,10 @@ export default function HubClient({
           )}
         </div>
 
-        {/* Sağ yarı (sadece web): büyük harita, tıklanabilir segmentler */}
-        <aside className="hidden md:flex md:min-h-screen md:w-1/2 md:flex-shrink-0 md:flex-col lg:w-[55%]">
+        {/* Sağ yarı (sadece web): harita genişliği kadar, büyük harita + tıklanabilir segmentler */}
+        <aside className="hidden md:flex md:min-h-screen md:w-[38%] md:flex-shrink-0 md:flex-col lg:w-[42%] xl:max-w-[520px]">
           <div className="sticky top-0 flex h-screen w-full items-center justify-center overflow-hidden border-l border-zinc-800/50 bg-zinc-950/95 p-4 lg:p-6">
-            <div className="relative h-full w-full max-w-4xl">
+            <div className="relative h-full w-full">
               {mapContent}
             </div>
           </div>
