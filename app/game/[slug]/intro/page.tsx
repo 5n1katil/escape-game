@@ -33,15 +33,15 @@ export default async function IntroPage({ params }: IntroPageProps) {
           {t.intro.back}
         </a>
 
-        <div className="grid min-h-screen md:grid-cols-[1.15fr_1fr] md:grid-rows-1 lg:grid-cols-[1.25fr_1fr]">
-          {/* Left: cover image – sayfaya sığacak şekilde */}
-          <div className="relative order-2 min-h-[32vh] md:order-1 md:min-h-screen md:max-h-screen">
-            <div className="absolute inset-0 flex items-center justify-center overflow-hidden bg-gradient-to-br from-amber-950/30 via-zinc-900 to-zinc-950">
+        <div className="grid min-h-screen md:grid-cols-[1.4fr_1fr] md:grid-rows-1 lg:grid-cols-[1.6fr_1fr]">
+          {/* Sol: görsel tam ekran deneyimi, köşeler kesilmeden (object-contain) */}
+          <div className="relative order-2 min-h-[35vh] md:order-1 md:h-screen md:min-h-0">
+            <div className="absolute inset-0 flex items-center justify-center bg-zinc-950">
               {coverImagePath ? (
                 <img
                   src={coverImagePath}
                   alt=""
-                  className="h-full w-full object-contain object-center"
+                  className="max-h-full max-w-full object-contain object-center"
                 />
               ) : (
                 <span className="text-9xl opacity-40">🏛️</span>
