@@ -100,6 +100,9 @@ export default function HubClient({
     );
   }
 
+  const maxSolved = getStoredMaxSolvedRoomIndex(slug, roomIds);
+  const activeRoomId = roomIds[maxSolved + 1] ?? null;
+
   const mapContent = !mapError ? (
     <div className="relative h-full min-h-[200px] w-full md:min-h-[400px]">
       <img
@@ -113,43 +116,57 @@ export default function HubClient({
           const roomId = seg.id;
           const room = rooms.find((r) => r.id === roomId);
           const unlocked = unlockedIds.includes(roomId);
-          const maxSolved = getStoredMaxSolvedRoomIndex(slug, roomIds);
           const roomIndex = rooms.findIndex((r) => r.id === roomId);
           const solved = roomIndex >= 0 && roomIndex <= maxSolved;
+          const active = unlocked && !solved && roomId === activeRoomId;
           const style = {
             top: `${seg.top}%`,
             left: `${seg.left}%`,
             width: `${seg.width}%`,
             height: `${seg.height}%`,
           };
-          if (unlocked && room) {
+          if (!unlocked || !room) {
             return (
-              <Link
+              <div
                 key={roomId}
-                href={`/game/${slug}/room/${roomId}`}
-                className="absolute flex cursor-pointer items-center justify-center rounded border-2 border-transparent bg-black/0 transition-colors hover:border-amber-400/60 hover:bg-amber-500/10 touch-manipulation"
+                className="absolute flex cursor-not-allowed items-center justify-center rounded bg-black/10 pointer-events-none opacity-70"
                 style={style}
-                aria-label={`${room.title} - ${t.goToRoom}`}
-                title={room.title}
+                title="Kilitli"
+                aria-hidden
               >
-                <span className="flex h-10 w-10 min-h-[44px] min-w-[44px] items-center justify-center rounded-full bg-black/50 text-lg font-bold text-white backdrop-blur-sm">
-                  {solved ? "✓" : roomId}
+                <span className="flex h-10 w-10 min-h-[44px] min-w-[44px] items-center justify-center rounded-full bg-zinc-800/90 text-base text-zinc-500 shadow-inner">
+                  🔒
                 </span>
-              </Link>
+              </div>
             );
           }
           return (
-            <div
+            <Link
               key={roomId}
-              className="absolute flex cursor-not-allowed items-center justify-center rounded bg-black/20 pointer-events-none"
+              href={`/game/${slug}/room/${roomId}`}
+              className={`absolute flex cursor-pointer items-center justify-center rounded transition-all duration-200 touch-manipulation ${
+                active
+                  ? "ring-2 ring-amber-400/80 ring-offset-2 ring-offset-zinc-900/80 shadow-[0_0_16px_rgba(251,191,36,0.35)]"
+                  : solved
+                    ? "hover:ring-2 hover:ring-emerald-400/40"
+                    : "hover:ring-2 hover:ring-amber-400/50 hover:shadow-[0_0_12px_rgba(251,191,36,0.2)]"
+              }`}
               style={style}
-              title="Kilitli"
-              aria-hidden
+              aria-label={`${room.title} - ${t.goToRoom}`}
+              title={room.title}
             >
-              <span className="flex h-8 w-8 items-center justify-center rounded-full bg-zinc-800/80 text-sm text-zinc-500">
-                🔒
+              <span
+                className={`flex h-10 w-10 min-h-[44px] min-w-[44px] items-center justify-center rounded-full text-lg font-bold backdrop-blur-sm ${
+                  solved
+                    ? "bg-emerald-900/70 text-emerald-300 shadow-[0_0_12px_rgba(52,211,153,0.25)]"
+                    : active
+                      ? "bg-amber-500/30 text-amber-200 ring-1 ring-amber-400/50"
+                      : "bg-black/50 text-amber-400"
+                }`}
+              >
+                {solved ? "✓" : roomId}
               </span>
-            </div>
+            </Link>
           );
         })}
       </div>
