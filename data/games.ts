@@ -10,7 +10,7 @@ export const games = [
   {
     slug: "tapinagin-laneti",
     title: "Tapınağın Laneti",
-    wixLandingUrl: "https://www.5n1dedektif.com/tapinagin-laneti",
+    wixLandingUrl: "https://www.5n1dedektif.com/tap%C4%B1na%C4%9F%C4%B1n-laneti",
     story:
       "Antik tapınak önünüzde yükseliyor; taş duvarları yüzyılların yağmuru ve gölgesiyle aşınmış. Efsane, gizli hazinesini arayanların üzerine konan bir lanetten bahseder—sadece akıllı ve cesur olanlar sağ çıkar.\n\nAğır kapıları itip açıyorsunuz. Toz loş ışıkta savruluyor. Saatiniz başlayacak. İpuçlarını bulun, bilmeceleri çözün ve zaman dolmadan laneti kırın.",
     rules: [
