@@ -209,41 +209,50 @@ export default function HubClient({
             </div>
           </section>
 
-          <section className="w-full rounded-lg border border-zinc-800/50 bg-zinc-900/40 px-4 py-4 sm:px-6 sm:py-5">
+          <section className="w-full rounded-lg border border-zinc-800/50 bg-zinc-900/40 px-4 py-4 sm:px-6 sm:py-5" aria-label="Oda ilerleme durumu">
             <h2 className="mb-4 text-sm font-semibold uppercase tracking-wider text-amber-500/90">
               {t.rooms}
             </h2>
-            <div className="grid gap-3 sm:grid-cols-2">
+            <p className="mb-3 text-xs text-zinc-500">
+              Odalara haritadan girin. Bu liste sadece ilerleme göstergesidir.
+            </p>
+            <div className="grid gap-3 sm:grid-cols-2" role="list">
               {rooms.map((room) => {
                 const unlocked = unlockedIds.includes(room.id);
                 const maxSolved = getStoredMaxSolvedRoomIndex(slug, roomIds);
                 const roomIndex = rooms.findIndex((r) => r.id === room.id);
                 const solved = roomIndex >= 0 && roomIndex <= maxSolved;
                 return (
-                  <div key={room.id}>
-                    {unlocked ? (
-                      <Link
-                        href={`/game/${slug}/room/${room.id}`}
-                        className="flex items-center gap-3 rounded-lg border-2 border-zinc-700 bg-zinc-800/50 px-4 py-3 transition-colors hover:border-amber-500/60 hover:bg-zinc-800"
-                      >
-                        <span
-                          className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-lg text-lg ${
-                            solved ? "bg-emerald-900/50 text-emerald-400" : "bg-amber-900/30 text-amber-400"
-                          }`}
-                        >
-                          {solved ? "✓" : room.id}
-                        </span>
-                        <span className="font-medium text-zinc-200">{room.title}</span>
-                        <span className="ml-auto text-sm text-amber-500/80">{t.goToRoom}</span>
-                      </Link>
-                    ) : (
-                      <div className="flex items-center gap-3 rounded-lg border-2 border-zinc-700/50 bg-zinc-800/30 px-4 py-3 opacity-60">
-                        <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-zinc-800 text-zinc-500">
-                          🔒
-                        </span>
-                        <span className="font-medium text-zinc-500">{room.title}</span>
-                      </div>
+                  <div
+                    key={room.id}
+                    role="listitem"
+                    className={`flex cursor-default items-center gap-3 rounded-lg border-2 px-4 py-3 ${
+                      unlocked
+                        ? solved
+                          ? "border-emerald-700/50 bg-emerald-950/20"
+                          : "border-zinc-700 bg-zinc-800/50"
+                        : "border-zinc-700/50 bg-zinc-800/30 opacity-60"
+                    }`}
+                    aria-label={`${room.title}: ${unlocked ? (solved ? "Çözüldü" : "Açık") : "Kilitli"}`}
+                  >
+                    <span
+                      className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-lg text-lg ${
+                        solved
+                          ? "bg-emerald-900/50 text-emerald-400"
+                          : unlocked
+                            ? "bg-amber-900/30 text-amber-400"
+                            : "bg-zinc-800 text-zinc-500"
+                      }`}
+                    >
+                      {solved ? "✓" : unlocked ? room.id : "🔒"}
+                    </span>
+                    <span className={`font-medium ${unlocked ? "text-zinc-200" : "text-zinc-500"}`}>
+                      {room.title}
+                    </span>
+                    {unlocked && !solved && (
+                      <span className="ml-auto text-xs text-amber-500/70">Açık</span>
                     )}
+                    {solved && <span className="ml-auto text-xs text-emerald-400/80">Çözüldü</span>}
                   </div>
                 );
               })}

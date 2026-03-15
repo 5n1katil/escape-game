@@ -144,6 +144,14 @@ export default function EscapeRoomGame({
     setInputValue("");
   }
 
+  useEffect(() => {
+    if (!showSuccess) return;
+    const t = setTimeout(() => {
+      router.push(`/game/${slug}/hub`);
+    }, 2500);
+    return () => clearTimeout(t);
+  }, [showSuccess, slug, router]);
+
   function handleWrongAnswer() {
     const penaltyMinutes = currentRoom.id;
     addPenaltySeconds(slug, penaltyMinutes * 60);

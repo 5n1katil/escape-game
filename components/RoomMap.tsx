@@ -67,29 +67,27 @@ export default function RoomMap({
   return (
     <aside
       className="flex flex-col rounded-xl border border-zinc-800/50 bg-zinc-900/40 px-4 py-4"
-      aria-label="Oda haritası"
+      aria-label="Oda ilerleme durumu"
     >
       <h3 className="mb-4 text-center text-sm font-semibold uppercase tracking-wider text-amber-500/90">
-        Harita
+        İlerleme
       </h3>
 
-      <nav className="flex flex-col gap-0" role="list">
+      <div className="flex flex-col gap-0" role="list" aria-label="Oda durumları (navigasyon haritadan yapılır)">
         {rooms.map((room, index) => {
           const state = getRoomState(index, currentRoomIndex, maxSolved);
-          const isUnlocked =
-            state === "current" || state === "solved" || state === "available";
 
           const content = (
             <span className="flex flex-col items-center gap-0.5">
               <span
-                className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border-2 text-lg transition-colors group-hover:border-emerald-500/60 md:h-11 md:w-11 ${
+                className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border-2 text-lg md:h-11 md:w-11 ${
                   state === "locked"
-                    ? "cursor-not-allowed border-zinc-700 bg-zinc-800/50 text-zinc-600 opacity-60"
+                    ? "cursor-default border-zinc-700 bg-zinc-800/50 text-zinc-600 opacity-60"
                     : state === "current"
                       ? "border-amber-500 bg-amber-500/20 text-amber-400 ring-2 ring-amber-500/40"
                       : state === "solved"
-                        ? "border-emerald-700/60 bg-emerald-950/40 text-emerald-400 group-hover:bg-emerald-500/20"
-                        : "border-amber-500/60 bg-amber-950/30 text-amber-400/90 group-hover:bg-amber-500/20"
+                        ? "border-emerald-700/60 bg-emerald-950/40 text-emerald-400"
+                        : "border-amber-500/60 bg-amber-950/30 text-amber-400/90"
                 }`}
                 title={
                   state === "locked"
@@ -98,16 +96,14 @@ export default function RoomMap({
                       ? "Mevcut oda"
                       : state === "solved"
                         ? "Çözüldü"
-                        : "Sonraki oda"
+                        : "Açık"
                 }
               >
                 {state === "locked" ? "🔒" : state === "solved" ? "✓" : index + 1}
               </span>
               <span
                 className={`max-w-[88px] truncate text-xs font-medium md:max-w-[100px] md:text-center ${
-                  state === "locked"
-                    ? "text-zinc-500"
-                    : "text-zinc-400 group-hover:text-white"
+                  state === "locked" ? "text-zinc-500" : "text-zinc-400"
                 }`}
                 title={room.title}
               >
@@ -118,34 +114,15 @@ export default function RoomMap({
 
           return (
             <div key={room.id} className="flex flex-col items-center">
-              {isUnlocked ? (
-                <Link
-                  href={`/game/${slug}/room/${room.id}`}
-                  className={`group flex w-full min-h-[48px] cursor-pointer touch-manipulation flex-col items-center justify-center gap-0.5 rounded-lg px-2 py-2 transition-all duration-200 hover:bg-zinc-800/60 hover:scale-105 active:scale-100 ${
-                    state === "current"
-                      ? "bg-amber-500/10 ring-1 ring-amber-500/30"
-                      : "hover:ring-1 hover:ring-emerald-500/40"
-                  }`}
-                  aria-current={state === "current" ? "location" : undefined}
-                  aria-label={
-                    state === "current"
-                      ? `${room.title} (mevcut oda)`
-                      : state === "solved"
-                        ? `${room.title} (çözüldü) - tıklayarak git`
-                        : `${room.title} (sonraki oda) - tıklayarak git`
-                  }
-                >
-                  {content}
-                </Link>
-              ) : (
-                <div
-                  className="flex cursor-not-allowed touch-none flex-col items-center gap-0.5 px-2 py-2"
-                  role="img"
-                  aria-label={`${room.title} (kilitli)`}
-                >
-                  {content}
-                </div>
-              )}
+              <div
+                className={`flex w-full flex-col items-center gap-0.5 px-2 py-2 ${
+                  state === "current" ? "bg-amber-500/10 ring-1 ring-amber-500/30 rounded-lg" : ""
+                }`}
+                role="listitem"
+                aria-label={`${room.title}: ${state === "locked" ? "Kilitli" : state === "solved" ? "Çözüldü" : state === "current" ? "Mevcut oda" : "Açık"}`}
+              >
+                {content}
+              </div>
 
               {index < rooms.length - 1 && (
                 <div
@@ -158,7 +135,14 @@ export default function RoomMap({
             </div>
           );
         })}
-      </nav>
+      </div>
+
+      <Link
+        href={`/game/${slug}/hub`}
+        className="mt-4 flex min-h-[44px] w-full items-center justify-center rounded-lg border border-amber-700/50 bg-amber-950/30 px-3 py-2 text-center text-sm font-medium text-amber-200/90 transition-colors hover:bg-amber-900/40 hover:text-amber-100"
+      >
+        Ana Ekrana Dön
+      </Link>
     </aside>
   );
 }
