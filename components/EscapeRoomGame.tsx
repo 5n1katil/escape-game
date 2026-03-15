@@ -510,9 +510,28 @@ export default function EscapeRoomGame({
           <h3 className="mb-2 text-sm font-semibold uppercase tracking-wider text-amber-500/90">
             {t.storyLabel}
           </h3>
-          <p className="text-base leading-relaxed text-zinc-300 sm:text-lg">
+          <p className="whitespace-pre-line text-base leading-relaxed text-zinc-300 sm:text-lg">
             {storyText}
           </p>
+        </section>
+      )}
+
+      {currentRoom.storyImages && currentRoom.storyImages.length > 0 && (
+        <section className="space-y-4" aria-label="Hikâye görselleri">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            {currentRoom.storyImages.map((img, idx) => (
+              <div
+                key={idx}
+                className="overflow-hidden rounded-xl border border-zinc-700/50 bg-zinc-800/30"
+              >
+                <img
+                  src={encodeURI(img.url)}
+                  alt={img.alt ?? ""}
+                  className="h-auto w-full object-contain"
+                />
+              </div>
+            ))}
+          </div>
         </section>
       )}
 

@@ -28,6 +28,8 @@ export interface Room {
   puzzlePrompt?: string;
   /** Oda ses dosyası yolu (varsa ses oynatıcı gösterilir). */
   audioSrc?: string;
+  /** Hikâye bölümünde gösterilecek görseller (papirüs, duvar vb.). */
+  storyImages?: { url: string; alt?: string }[];
 }
 
 export const rooms: Room[] = [
@@ -54,25 +56,41 @@ export const rooms: Room[] = [
   },
   {
     id: 2,
-    title: "Kayıp Koridor",
-    description:
-      "Dar bir koridor. Duvarlarda eski yön işaretleri var. Hangi yöne gideceğinizi bilmelisiniz.",
-    type: "text",
+    title: "2. Oda: Akrep Kral'ın Mezarı",
+    description: "Tapınağın 2. Odası",
+    type: "imageChoice",
     question:
-      "Pusulanın başlangıcı, dört yönden ilki. Koridorda hangi yöne gitmelisin?",
-    answer: "kuzey",
-    hint: "Yıldızların gösterdiği yön.",
+      "Lahitteki yazıta göre doğru objeyi seçerek mezarın kapısını açın.",
+    answer: "2",
+    hint: "Yazıtta 'benim armağanımı sunan' diyor – Kral'ın kimliğini taşıyan obje.",
+    story:
+      "Kapı ağır bir gürültüyle arkamdan kapandı. İçeriye keskin, sıcak ve kuru bir hava yayıldı. Kum, her adım attığımda hafifçe hareket ediyor, sanki ayaklarımın altında yaşıyormuş gibi bir his veriyordu. Odanın merkezinde, büyük bir taş lahit duruyordu. Üzerine kazınmış figürlerden, buranın Akrep Kral'a ait olduğu açıktı.\n\nDuvarlarda, devasa akreplerin ve firavun giysileri giymiş bir adamın tasvirleri dikkatimi çekti. Adam, elinde bir asa tutuyor, önünde diz çöken halkı ona saygı gösteriyordu. Fakat biraz ileride, aynı adam tahtında otururken bir akrep tarafından sokuluyor ve karanlık bir varlığa dönüşüyordu.\n\nLahitin kapağında derin kazınmış eski bir yazıt vardı: \"Bana ait olanı çalmak isteyen, ölümün zehrini tatmalı. Yalnızca benim armağanımı sunan, mezarımın kapısını açabilir.\"\n\nBiraz ileride, duvarın hemen önünde, üç farklı obje duruyordu:\n\n1️⃣ Altın bir asa – Üzerinde akrep kabartmaları olan, işlemeli bir asa.\n\n2️⃣ Bir hançer – Kavisli ve sivri ucu olan eski bir Mısır hançeri.\n\n3️⃣ Taş bir mühür – Üzerinde Akrep Kral'ın ismi hiyerogliflerle işlenmiş küçük bir mühür.\n\nDoğru objeyi seçmek zorundaydım. Duvarlardan yükselen fısıltılar eğer yanlış seçersem… odanın kumlarla dolacağını ve beni burada hapsedeceğini söylüyordu...",
+    puzzlePrompt:
+      "Doğru objeyi seçerek mezarın sırrını çöz!",
+    audioSrc: undefined,
+    media: [
+      { url: "", alt: "Altın Asa" },
+      { url: "", alt: "Antik Mısır Hançeri" },
+      { url: "", alt: "Taş Mühür" },
+    ],
   },
   {
     id: 3,
-    title: "Firavun Odası",
-    description:
-      "Mısır temalı bir oda. Piramit resimleri ve hiyeroglifler duvarları süslüyor.",
+    title: "3. Oda: Hiyerogliflerin Sırrı",
+    description: "Tapınağın 3. Odası",
     type: "text",
     question:
-      "Sarı kuma gömülü, sargılarla sarılı. Bu odada ne saklanır?",
-    answer: "mumya",
-    hint: "Eski Mısır'da ölüler korunurdu.",
+      "Papirüsteki sembollerle duvardaki sembolleri eşleştirip şifreyi çözün. Bulduğunuz kelimeyi aşağıya yazın.",
+    answer: "sir",
+    hint: "Sembollerin karşılık geldiği harfleri bularak anlamlı bir kelime oluşturun.",
+    story:
+      "Kapı arkamdan ağır bir gürültüyle kapandı. Oda, önceki odalara göre daha dardı ve havası biraz daha ağırdı. Duvarlar baştan sona hiyerogliflerle kaplıydı, ama bazı semboller diğerlerinden daha farklı görünüyordu. Sanki zaman onları silmeye çalışmış ama bir güç onları korumuş gibiydi. İçeride yankılanan tuhaf bir sessizlik vardı. Ne bir rüzgârın uğultusu ne de uzaktan gelen bir ses… Sadece bu antik yazıtların sessiz çığlıkları.\n\nKöşede yere bırakılmış, zamanın etkisiyle kırılganlaşmış eski bir papirüs rulosu gözüme çarptı. Onu dikkatlice açtığımda, karmaşık semboller ve tanıdık görünen harflerle yazılmış bir şifre gördüm. Ama bu semboller dağınık haldeydi, mantıklı bir sıraya girmiyordu. Bir şeyler eksikti. Belki de doğru sıralamayı bulmam gerekiyordu.\n\nDuvarlardaki farklı semboller dikkatimi çekti. Diğerlerinden daha derindi ve ışık vurdukça hafifçe parlıyordu. Sanki bana bir şey anlatmaya çalışıyorlardı. Aynı sembolleri papirüste de gördüm, ancak buradaki sıralama farklıydı. Bu bir koddu. Eğer bu sembollerin hangi harfe karşılık geldiğini anlayabilirsem, belki de odanın çıkış kapısını açacak kelimeleri bulabilirdim. Ama bir hata yaparsam… bu tapınağın bana sunacağı cezanın ne olacağını bilmiyordum.",
+    puzzlePrompt:
+      "Şifreyi çözüp bulduğunuz kelimeyi aşağıdaki alana yazın.",
+    storyImages: [
+      { url: "/games/tapinagin-laneti/images/papirüs.png", alt: "Papirüs üzerinde semboller ve harfler" },
+      { url: "/games/tapinagin-laneti/images/12.png", alt: "Duvarda parlayan hiyeroglif semboller" },
+    ],
   },
   {
     id: 4,
