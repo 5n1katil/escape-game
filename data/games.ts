@@ -22,8 +22,8 @@ export const games = [
     ],
     durationMinutes: 60,
     roomCount: rooms.length,
-    /** Final escape code entered on hub after all 6 rooms solved. */
-    finalCode: "lanet",
+    /** Final escape code entered on hub after all 6 rooms solved (6. odada gösterilir). */
+    finalCode: "lanetlitapınağıngizemi",
     /** Uzun oyun sonu hikâyesi (sonuç ekranı sağ panel). */
     endStoryLong:
       "Taş kollar gıcırdadı, Sonsuzluk Kapısı açıldı. Taze havaya adım attınız—ta ki kapı çarparak kapandı ve sarsıntı her yeri sardı. Kendinizi bir boşlukta buldunuz; uyandığınızda bir ofisteydiniz. Tapınak deneyimi geride kalmıştı; Gizem Malikanesi Davası'ndaki ipuçları zihninizde yer etti. Katili bulmuştunuz.",
