@@ -20,7 +20,7 @@ export default async function IntroPage({ params }: IntroPageProps) {
 
   const coverImagePath =
     slug === "tapinagin-laneti"
-      ? "/games/tapinagin-laneti/images/" + encodeURIComponent("Lanetli Tapınak Giriş.png")
+      ? "/games/tapinagin-laneti/images/" + encodeURIComponent("Tapınağın Laneti.png")
       : null;
 
   const introAudioUrl =

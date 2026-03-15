@@ -13,6 +13,8 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { setStoredEscaped } from "@/lib/gameStorage";
 
 const MAP_IMAGE_PATH = "/games/tapinagin-laneti/images/map.jpg";
+/** Lobi ekranında sayaç/başlık altında gösterilen giriş görseli (Tapınağın Laneti). */
+const HUB_ENTRANCE_IMAGE_PATH = "/games/tapinagin-laneti/images/" + encodeURIComponent("Lanetli Tapınak Giriş.png");
 
 /** Harita üzerinde oda tıklama alanları (yüzde: top, left, width, height). Haritadaki 1–6 numaralı konumlara göre ayarlanabilir. */
 const MAP_SEGMENTS: { id: number; top: number; left: number; width: number; height: number }[] = [
@@ -210,6 +212,16 @@ export default function HubClient({
               {gameTitle}
             </h1>
           </div>
+
+          {slug === "tapinagin-laneti" && (
+            <div className="flex justify-center">
+              <img
+                src={HUB_ENTRANCE_IMAGE_PATH}
+                alt="Tapınak girişi"
+                className="max-h-[220px] w-full max-w-lg rounded-lg border border-zinc-700/50 object-contain sm:max-h-[280px]"
+              />
+            </div>
+          )}
 
           {/* Mobilde: harita hemen başlık altında */}
           <section className="w-full rounded-lg border border-zinc-800/50 bg-zinc-900/40 overflow-hidden md:hidden">
