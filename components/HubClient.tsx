@@ -178,7 +178,7 @@ export default function HubClient({
   );
 
   return (
-    <div className="relative min-h-screen overflow-hidden bg-zinc-950">
+    <div className="relative min-h-screen overflow-x-hidden bg-zinc-950">
       <div
         className="pointer-events-none absolute inset-0 bg-gradient-to-b from-zinc-900/50 via-transparent to-zinc-950/80"
         aria-hidden
@@ -194,8 +194,8 @@ export default function HubClient({
           <RestartButton slug={slug} label="Oyunu Yeniden Başlat" />
         </div>
 
-        {/* Sol yarı: geniş; mobilde üstten aşağı – sayaç, başlık, harita, hikâye, odalar, final */}
-        <div className="flex w-full flex-col gap-6 pt-12 sm:gap-8 md:max-h-screen md:min-w-0 md:flex-[1.4] md:overflow-y-auto md:pt-20 md:pl-6 md:pr-4 lg:flex-[1.5] lg:pl-8 lg:pr-6">
+        {/* Sol yarı: tek scroll ile sayfa kayar, içerik doğal yükseklikte */}
+        <div className="flex w-full flex-col gap-6 pt-12 sm:gap-8 md:min-w-0 md:flex-[1.4] md:pt-20 md:pl-6 md:pr-4 lg:flex-[1.5] lg:pl-8 lg:pr-6 lg:pb-12">
           <div className="flex flex-col items-center gap-2">
             <CountdownTimer
               slug={slug}
@@ -313,10 +313,10 @@ export default function HubClient({
           )}
         </div>
 
-        {/* Sağ yarı (sadece web): harita genişliği kadar, büyük harita + tıklanabilir segmentler */}
-        <aside className="hidden md:flex md:min-h-screen md:w-[38%] md:flex-shrink-0 md:flex-col lg:w-[42%] xl:max-w-[520px]">
-          <div className="sticky top-0 flex h-screen w-full items-center justify-center overflow-hidden border-l border-zinc-800/50 bg-zinc-950/95 p-4 lg:p-6">
-            <div className="relative h-full w-full">
+        {/* Sağ yarı (sadece web): harita sticky, sayfa kayarken ekranda sabit kalır */}
+        <aside className="hidden md:flex md:sticky md:top-0 md:h-screen md:w-[38%] md:flex-shrink-0 md:self-start lg:w-[42%] xl:max-w-[520px]">
+          <div className="flex h-full w-full items-center justify-center border-l border-zinc-800/50 bg-zinc-950/95 p-4 lg:p-6">
+            <div className="relative h-full w-full min-h-0">
               {mapContent}
             </div>
           </div>
