@@ -130,12 +130,22 @@ export const rooms: Room[] = [
   },
   {
     id: 6,
-    title: "Son Kapı",
-    description:
-      "Özgürlüğe açılan son kapı. Sadece doğru kelimeyle geçebilirsiniz.",
-    type: "text",
-    question: "Anahtarsız açılır, kilitsiz kapanır.",
-    answer: "goz",
-    hint: "İnsanın kendi bedeninde var.",
+    title: "6. Oda: Sonsuzluğun Kapısı",
+    description: "Tapınağın 6. Odası",
+    type: "imageChoice",
+    question:
+      "Taş kaidedeki yazıya göre teraziyi dengeleyecek doğru sembolü seçin.",
+    answer: "2",
+    hint: "Ruhu hafif olan geçer – Terazi ruhun ağırlığını ölçer. Adalet ve hakikati simgeleyen sembol.",
+    story:
+      "Kapı arkamdan ağır bir gürültüyle kapandı. İçeriye ince bir ışık huzmesi süzülüyordu, burası diğer odalar gibi karanlık ve kasvetli değildi. Tam karşıda, yüksek tavanın en tepesinden içeri süzülen altın sarısı güneş ışınları bir noktayı aydınlatıyordu: Devasa bir taş kapıyı. Kapının üzerinde, bir çift göz sembolü ve güneş diski işlenmişti. Duvarlardaki hiyeroglifler ise sanki bir sonun değil, bir başlangıcın hikayesini anlatıyordu. Ama kapıya ulaşmak kolay olmayacaktı. Odanın ortasında, firavunların yargılanma sahnesini hatırlatan devasa bir taş terazi duruyordu. Bir kolu yukarıda, diğeri aşağıdaydı. Denge bozuktu.\n\nTerazinin önünde, eski taş bir kaide vardı. Üzerine oyulmuş yazı hala okunabiliyordu:\n\n\"Ölçülen güç değil, gerçektir, gözler bazen yanıltır, ışığı taşıyan değil, ruhu hafif olan geçer...\n\nTerazi, adaleti değil, ruhun ağırlığını ölçer.\nÜstüne fazla yük binen düşer, eksik olan kaybolur.\nYolunu bulan, ancak dengeyi sağlayandır.\"\n\nTaş kaidenin üstünde terazinin hemen önüne yerleştirilmiş dört farklı taş sembol vardı. Belli ki doğru olanı terazinin boş kefesine koymalıydım.\n\nAma hangisi?\n\n1️⃣ Kapalı Göz – Bilinmeyeni, gizemi ve unutulmuş sırları işaret ediyordu.\n\n2️⃣ Kurt Başlı Asa – Firavunların gücünü temsil ediyordu.\n\n3️⃣ Tüy – Maat'ın adaleti ve hakikati simgeliyordu.\n\n4️⃣ Güneş Taşı – Sonsuz yaşam ve ilahi ışıkla ilişkilendiriliyordu.\n\nEtrafıma bakındım. Çok yaklaştığımı hissediyordum, kalbim çok hızlı atmaya başladı. Kapının üzerindeki gözler sanki bana bakıyordu. Tapınağın laneti özgürlüğümü istiyordu, gücümü toparladım ve odaklandım... Şimdi seçim yapmalıyım...",
+    puzzlePrompt:
+      "Hangi sembol teraziyi dengeleyecek? Doğru sembolü seçin.",
+    media: [
+      { url: "", alt: "Kapalı Göz" },
+      { url: "", alt: "Kurt Başlı Asa" },
+      { url: "", alt: "Tüy" },
+      { url: "", alt: "Güneş Taşı" },
+    ],
   },
 ];
