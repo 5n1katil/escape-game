@@ -56,15 +56,6 @@ export default async function RoomPage({ params }: RoomPageProps) {
             ariaLabelTemplate={t.room.timerAriaLabel}
           />
 
-          <div className="mx-auto w-full max-w-2xl space-y-3 rounded-lg border border-zinc-800/50 bg-zinc-900/30 px-4 py-4 text-left sm:space-y-4 sm:px-6 sm:py-5 md:px-8 md:py-6">
-            <p className="text-base leading-relaxed text-zinc-300 sm:text-lg">
-              {game.story.split("\n\n")[0]}
-            </p>
-            <p className="text-base leading-relaxed text-zinc-300 sm:text-lg">
-              {game.story.split("\n\n")[1]}
-            </p>
-          </div>
-
           <EscapeRoomGame
             slug={slug}
             roomIndex={roomIndex}
