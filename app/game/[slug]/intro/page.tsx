@@ -33,20 +33,18 @@ export default async function IntroPage({ params }: IntroPageProps) {
           {t.intro.back}
         </a>
 
-        <div className="grid min-h-screen md:grid-cols-[1.35fr_1fr] md:grid-rows-1 lg:grid-cols-[1.5fr_1fr]">
-          {/* Left: large cover image */}
-          <div className="relative order-2 min-h-[40vh] md:order-1 md:min-h-screen">
-            <div className="absolute inset-0 overflow-hidden bg-gradient-to-br from-amber-950/30 via-zinc-900 to-zinc-950">
+        <div className="grid min-h-screen md:grid-cols-[1.15fr_1fr] md:grid-rows-1 lg:grid-cols-[1.25fr_1fr]">
+          {/* Left: cover image – sayfaya sığacak şekilde */}
+          <div className="relative order-2 min-h-[32vh] md:order-1 md:min-h-screen md:max-h-screen">
+            <div className="absolute inset-0 flex items-center justify-center overflow-hidden bg-gradient-to-br from-amber-950/30 via-zinc-900 to-zinc-950">
               {coverImagePath ? (
                 <img
                   src={coverImagePath}
                   alt=""
-                  className="h-full w-full object-cover object-center"
+                  className="h-full w-full object-contain object-center"
                 />
               ) : (
-                <div className="flex h-full w-full items-center justify-center">
-                  <span className="text-9xl opacity-40">🏛️</span>
-                </div>
+                <span className="text-9xl opacity-40">🏛️</span>
               )}
             </div>
           </div>
@@ -82,15 +80,6 @@ export default async function IntroPage({ params }: IntroPageProps) {
                   ))}
                 </ul>
               </section>
-
-              <div className="mb-6">
-                <h2 className="mb-2 text-xs font-semibold uppercase tracking-wider text-amber-400/90 sm:text-sm">
-                  {t.intro.mapPreview}
-                </h2>
-                <div className="flex aspect-video w-full items-center justify-center overflow-hidden rounded-lg border border-amber-700/40 bg-amber-900/20">
-                  <span className="text-3xl opacity-60">🗺️</span>
-                </div>
-              </div>
 
               <div className="mt-auto pt-4">
                 <IntroStartButton
