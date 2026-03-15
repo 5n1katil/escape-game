@@ -16,12 +16,12 @@ const MAP_IMAGE_PATH = "/games/tapinagin-laneti/images/map.jpg";
 
 /** Harita üzerinde oda tıklama alanları (yüzde: top, left, width, height). Haritadaki 1–6 numaralı konumlara göre ayarlanabilir. */
 const MAP_SEGMENTS: { id: number; top: number; left: number; width: number; height: number }[] = [
-  { id: 1, top: 8, left: 10, width: 26, height: 40 },
+  { id: 1, top: 8, left: 7, width: 26, height: 40 },
   { id: 2, top: 8, left: 38, width: 26, height: 40 },
-  { id: 3, top: 8, left: 66, width: 26, height: 40 },
-  { id: 4, top: 52, left: 10, width: 26, height: 40 },
+  { id: 3, top: 8, left: 69, width: 26, height: 40 },
+  { id: 4, top: 52, left: 7, width: 26, height: 40 },
   { id: 5, top: 52, left: 38, width: 26, height: 40 },
-  { id: 6, top: 52, left: 66, width: 26, height: 40 },
+  { id: 6, top: 52, left: 69, width: 26, height: 40 },
 ];
 
 interface HubClientProps {
