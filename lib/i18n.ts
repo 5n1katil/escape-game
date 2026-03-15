@@ -54,6 +54,8 @@ export const translations = {
       solved: "Çözüldü",
       restartGame: "Oyunu Yeniden Başlat",
       roomSolved: "Oda çözüldü!",
+      escapePasswordLabel: "Tapınaktan kaçış şifresi",
+      escapePasswordHint: "Ana ekranda son şifre alanına bu kelimeyi yazarak kaçışı tamamlayın.",
       goToNextRoom: "Sonraki Odaya Git",
       completeEscape: "Kaçışı Tamamla",
       puzzlePlaceholders: {
@@ -151,6 +153,8 @@ export const translations = {
       solved: "Solved",
       restartGame: "Restart Game",
       roomSolved: "Room solved!",
+      escapePasswordLabel: "Temple escape password",
+      escapePasswordHint: "Enter this word in the final code field on the main screen to complete your escape.",
       goToNextRoom: "Go to Next Room",
       completeEscape: "Complete Escape",
       puzzlePlaceholders: {

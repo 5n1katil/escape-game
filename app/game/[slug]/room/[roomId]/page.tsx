@@ -71,6 +71,7 @@ export default async function RoomPage({ params }: RoomPageProps) {
             rooms={rooms}
             t={t.room}
             backToHubLabel={t.hub.backToHub}
+            finalCode={"finalCode" in game ? (game as { finalCode?: string }).finalCode : undefined}
           />
         </div>
 

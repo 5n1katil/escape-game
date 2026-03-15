@@ -29,6 +29,8 @@ interface EscapeRoomGameProps {
   t: Translations["room"];
   /** Label for "back to hub" button after solving a room */
   backToHubLabel?: string;
+  /** Final escape code to show when last room is solved */
+  finalCode?: string;
 }
 
 function getInitialAttempts(slug: string, roomId: number): number {
@@ -48,6 +50,7 @@ export default function EscapeRoomGame({
   rooms,
   t,
   backToHubLabel = "Ana Ekrana Dön",
+  finalCode,
 }: EscapeRoomGameProps) {
   const router = useRouter();
   const [attempts, setAttempts] = useState(0);
@@ -194,6 +197,19 @@ export default function EscapeRoomGame({
         <p className="text-base leading-relaxed text-zinc-300 sm:text-lg">
           {currentRoom.title} tamamlandı.
         </p>
+        {isLastRoom && finalCode && (
+          <div className="rounded-lg border border-amber-500/40 bg-amber-950/30 px-4 py-3 text-left">
+            <p className="text-sm font-semibold text-amber-400/90">
+              {t.escapePasswordLabel}
+            </p>
+            <p className="mt-1 font-mono text-lg font-bold tracking-wide text-amber-200">
+              {finalCode}
+            </p>
+            <p className="mt-2 text-sm text-zinc-400">
+              {t.escapePasswordHint}
+            </p>
+          </div>
+        )}
         <p className="text-sm text-zinc-400">
           Hazır olduğunuzda aşağıdaki butonla ana ekrana dönüp diğer odalara geçebilirsiniz.
         </p>
