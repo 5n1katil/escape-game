@@ -31,11 +31,14 @@ export default async function IntroPage({ params }: IntroPageProps) {
   return (
     <div className="relative h-screen overflow-hidden bg-zinc-950">
       <main className="relative z-10 h-full">
+        {/* Geri butonu: mobil ve masaüstünde görünür, kolay tıklanabilir */}
         <a
           href={getWixLandingUrl(slug)}
-          className="absolute left-4 top-4 z-20 inline-flex min-h-[44px] items-center text-sm text-zinc-400 transition-colors hover:text-amber-500 sm:left-6 sm:top-6"
+          className="absolute left-4 top-4 z-20 inline-flex min-h-[48px] min-w-[48px] touch-manipulation items-center justify-center gap-2 rounded-xl border border-amber-700/50 bg-amber-950/80 px-4 py-2.5 text-base font-medium text-amber-200 shadow-lg backdrop-blur-sm transition-colors hover:border-amber-600/60 hover:bg-amber-900/70 hover:text-amber-100 active:scale-[0.98] sm:left-6 sm:top-6 sm:min-h-[44px] sm:px-4"
+          aria-label={t.intro.back}
         >
-          {t.intro.back}
+          <span className="text-xl leading-none" aria-hidden>←</span>
+          <span>{t.intro.back.replace(/^←\s*/u, "")}</span>
         </a>
 
         <div className="grid h-full min-h-0 md:grid-cols-[1.4fr_1fr] md:grid-rows-1 lg:grid-cols-[1.6fr_1fr]">
@@ -54,53 +57,53 @@ export default async function IntroPage({ params }: IntroPageProps) {
             </div>
           </div>
 
-          {/* Sağ: görselin bittiği yerde sınırlı, içerik küçültüldü, kaydırılabilir */}
+          {/* Sağ: görselin bittiği yerde sınırlı, içerik mobilde büyük yazı, kaydırılabilir */}
           <div className="order-1 flex min-h-0 flex-col overflow-y-auto bg-gradient-to-b from-amber-950/80 via-amber-950/60 to-amber-950/90 md:order-2 md:h-full">
             <div className="flex flex-1 flex-col px-4 py-6 sm:px-5 sm:py-8">
-              <h1 className="mb-2 text-lg font-bold tracking-tight text-amber-100 sm:text-xl md:text-2xl">
+              <h1 className="mb-3 text-2xl font-bold tracking-tight text-amber-100 sm:text-3xl md:text-4xl">
                 {game.title}
               </h1>
 
-              <div className="mb-3 sm:mb-4">
+              <div className="mb-4 sm:mb-5">
                 {introAudioUrl ? (
-                  <div className="rounded-lg border border-amber-700/40 bg-amber-900/30 px-2.5 py-2">
-                    <p className="mb-1.5 text-xs text-amber-200/80">{t.intro.audio}</p>
+                  <div className="rounded-lg border border-amber-700/40 bg-amber-900/30 px-3 py-2.5">
+                    <p className="mb-2 text-sm font-medium text-amber-200/90">{t.intro.audio}</p>
                     <audio
                       controls
                       src={introAudioUrl}
-                      className="h-9 w-full max-w-md"
+                      className="h-10 w-full max-w-md"
                       preload="metadata"
                     />
                   </div>
                 ) : (
-                  <div className="flex items-center gap-2 rounded-lg border border-amber-700/40 bg-amber-900/30 px-2.5 py-1.5">
-                    <span className="text-base">🔊</span>
-                    <span className="text-xs text-amber-200/80">{t.intro.audio}</span>
+                  <div className="flex items-center gap-2 rounded-lg border border-amber-700/40 bg-amber-900/30 px-3 py-2">
+                    <span className="text-lg">🔊</span>
+                    <span className="text-sm text-amber-200/80">{t.intro.audio}</span>
                   </div>
                 )}
               </div>
 
-              <section className="mb-4">
-                <h2 className="mb-1.5 text-xs font-semibold uppercase tracking-wider text-amber-400/90">
+              <section className="mb-5">
+                <h2 className="mb-2 text-sm font-semibold uppercase tracking-wider text-amber-400/90 sm:text-base">
                   {t.intro.story}
                 </h2>
-                <div className="whitespace-pre-line text-xs leading-relaxed text-amber-100/90 sm:text-sm">
+                <div className="whitespace-pre-line text-base leading-relaxed text-amber-100/90 sm:text-base">
                   {game.story}
                 </div>
               </section>
 
-              <section className="mb-4">
-                <h2 className="mb-1.5 text-xs font-semibold uppercase tracking-wider text-amber-400/90">
+              <section className="mb-5">
+                <h2 className="mb-2 text-sm font-semibold uppercase tracking-wider text-amber-400/90 sm:text-base">
                   {t.intro.rules}
                 </h2>
-                <ul className="list-inside list-disc space-y-1 text-xs leading-relaxed text-amber-100/90 sm:text-sm">
+                <ul className="list-inside list-disc space-y-1.5 text-base leading-relaxed text-amber-100/90 sm:text-base">
                   {game.rules.map((rule, i) => (
                     <li key={i}>{rule}</li>
                   ))}
                 </ul>
               </section>
 
-              <div className="mt-auto pt-3">
+              <div className="mt-auto pt-4">
                 <IntroStartButton
                   slug={slug}
                   durationSeconds={game.durationMinutes * 60}
