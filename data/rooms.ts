@@ -81,7 +81,7 @@ export const rooms: Room[] = [
     type: "text",
     question:
       "Papirüsteki sembollerle duvardaki sembolleri eşleştirip şifreyi çözün. Bulduğunuz kelimeyi aşağıya yazın.",
-    answer: "sir",
+    answer: "lanetibozangerçeğigörür",
     hint: "Sembollerin karşılık geldiği harfleri bularak anlamlı bir kelime oluşturun.",
     story:
       "Kapı arkamdan ağır bir gürültüyle kapandı. Oda, önceki odalara göre daha dardı ve havası biraz daha ağırdı. Duvarlar baştan sona hiyerogliflerle kaplıydı, ama bazı semboller diğerlerinden daha farklı görünüyordu. Sanki zaman onları silmeye çalışmış ama bir güç onları korumuş gibiydi. İçeride yankılanan tuhaf bir sessizlik vardı. Ne bir rüzgârın uğultusu ne de uzaktan gelen bir ses… Sadece bu antik yazıtların sessiz çığlıkları.\n\nKöşede yere bırakılmış, zamanın etkisiyle kırılganlaşmış eski bir papirüs rulosu gözüme çarptı. Onu dikkatlice açtığımda, karmaşık semboller ve tanıdık görünen harflerle yazılmış bir şifre gördüm. Ama bu semboller dağınık haldeydi, mantıklı bir sıraya girmiyordu. Bir şeyler eksikti. Belki de doğru sıralamayı bulmam gerekiyordu.\n\nDuvarlardaki farklı semboller dikkatimi çekti. Diğerlerinden daha derindi ve ışık vurdukça hafifçe parlıyordu. Sanki bana bir şey anlatmaya çalışıyorlardı. Aynı sembolleri papirüste de gördüm, ancak buradaki sıralama farklıydı. Bu bir koddu. Eğer bu sembollerin hangi harfe karşılık geldiğini anlayabilirsem, belki de odanın çıkış kapısını açacak kelimeleri bulabilirdim. Ama bir hata yaparsam… bu tapınağın bana sunacağı cezanın ne olacağını bilmiyordum.",
