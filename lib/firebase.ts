@@ -14,7 +14,7 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 export const db = getDatabase(app);
 
-const LEADERBOARD_PATH = "leaderboards/escape_room/players";
+const LEADERBOARD_BASE_PATH = "leaderboards";
 const PLAYER_STATS_PATH = "playerGameStats";
 
 function getAttemptMultiplier(attemptCount: number): number {
@@ -46,8 +46,11 @@ export async function saveScore(
 
   const safeGameKey = String(gameKey ?? "").trim() || "unknown-game";
   const playerKey = safePlayerName || "Dedektif";
+  const type = "escape_room";
 
-  const leaderboardPath = `${LEADERBOARD_PATH}/${playerKey}`;
+  // Multi-game leaderboard path:
+  // leaderboards/{type}/{gameKey}/{playerKey}
+  const leaderboardPath = `${LEADERBOARD_BASE_PATH}/${type}/${safeGameKey}/${playerKey}`;
   const statsPath = `${PLAYER_STATS_PATH}/${playerKey}/${safeGameKey}`;
   console.log("[saveScore] writing to paths:", { leaderboardPath, statsPath });
 
@@ -136,7 +139,7 @@ export async function saveScore(
 
     await update(statsRef, {
       playerName: playerName.trim(),
-      type: "escape_room",
+      type,
       game: safeGameKey,
       attemptCount,
       lastBaseScore: score,
@@ -153,9 +156,15 @@ export async function saveScore(
 
     if (isNewBest) {
       await update(leaderboardRef, {
+        name: playerName.trim(),
         score: finalScore,
+        baseScore: score,
         time,
         mistakes,
+        attemptCount,
+        type,
+        game: safeGameKey,
+        updatedAt: now,
       });
       console.log("[saveScore] success (new best)");
     } else {
