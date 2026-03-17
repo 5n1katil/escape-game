@@ -37,6 +37,12 @@ type GlobalLeaderboardRow = {
 
 type LeaderboardMode = "game" | "global";
 
+interface LeaderboardFilterState {
+  mode: LeaderboardMode;
+  type: "escape_room" | "cases";
+  gameKey: string;
+}
+
 interface ResultClientProps {
   slug: string;
   gameTitle: string;
@@ -102,6 +108,17 @@ async function fetchGlobalLeaderboard(limit: number): Promise<LeaderboardEntry[]
   return entries.slice(0, limit);
 }
 
+async function resolveLeaderboardData(
+  filter: LeaderboardFilterState,
+  limit: number
+): Promise<LeaderboardEntry[]> {
+  if (filter.mode === "global") {
+    return fetchGlobalLeaderboard(limit);
+  }
+  // mode === "game"
+  return fetchGameLeaderboard(filter.type, filter.gameKey, limit);
+}
+
 export default function ResultClient({
   slug,
   gameTitle,
@@ -119,7 +136,11 @@ export default function ResultClient({
   const [escaped, setEscaped] = useState<boolean | null>(null);
   const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[] | null>(null);
   const [leaderboardError, setLeaderboardError] = useState(false);
-  const [leaderboardMode, setLeaderboardMode] = useState<LeaderboardMode>("game");
+  const [leaderboardFilter, setLeaderboardFilter] = useState<LeaderboardFilterState>({
+    mode: "game",
+    type: "escape_room",
+    gameKey: slug,
+  });
   const scoreSavedRef = useRef(false);
 
   useEffect(() => {
@@ -158,10 +179,7 @@ export default function ResultClient({
     let cancelled = false;
     (async () => {
       try {
-        const top =
-          leaderboardMode === "global"
-            ? await fetchGlobalLeaderboard(5)
-            : await fetchGameLeaderboard("escape_room", slug, 5);
+        const top = await resolveLeaderboardData(leaderboardFilter, 5);
         if (!cancelled) {
           setLeaderboard(top);
           setLeaderboardError(false);
@@ -176,7 +194,7 @@ export default function ResultClient({
     return () => {
       cancelled = true;
     };
-  }, [escaped, slug, leaderboardMode]);
+  }, [escaped, leaderboardFilter]);
 
   if (escaped === null || !escaped) {
     return (
@@ -256,9 +274,16 @@ export default function ResultClient({
               <div className="mt-3 flex justify-center gap-2 text-xs sm:mt-4 sm:text-sm">
                 <button
                   type="button"
-                  onClick={() => setLeaderboardMode("game")}
+                  onClick={() =>
+                    setLeaderboardFilter((prev) => ({
+                      ...prev,
+                      mode: "game",
+                      type: "escape_room",
+                      gameKey: slug,
+                    }))
+                  }
                   className={`rounded-full px-3 py-1.5 transition-colors ${
-                    leaderboardMode === "game"
+                    leaderboardFilter.mode === "game"
                       ? "bg-amber-600 text-white"
                       : "bg-zinc-800 text-zinc-300 hover:bg-zinc-700"
                   }`}
@@ -267,9 +292,14 @@ export default function ResultClient({
                 </button>
                 <button
                   type="button"
-                  onClick={() => setLeaderboardMode("global")}
+                  onClick={() =>
+                    setLeaderboardFilter((prev) => ({
+                      ...prev,
+                      mode: "global",
+                    }))
+                  }
                   className={`rounded-full px-3 py-1.5 transition-colors ${
-                    leaderboardMode === "global"
+                    leaderboardFilter.mode === "global"
                       ? "bg-amber-600 text-white"
                       : "bg-zinc-800 text-zinc-300 hover:bg-zinc-700"
                   }`}
