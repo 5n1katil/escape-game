@@ -1,5 +1,5 @@
 import { initializeApp } from "firebase/app";
-import { getDatabase, ref, update } from "firebase/database";
+import { get, getDatabase, ref, update } from "firebase/database";
 
 const firebaseConfig = {
   apiKey: "AIzaSyChKoVNt3S_o1EIHgBMdJB7meGIjrR4h5c",
@@ -15,6 +15,13 @@ const app = initializeApp(firebaseConfig);
 export const db = getDatabase(app);
 
 const LEADERBOARD_PATH = "leaderboards/escape_room/players";
+
+function getAttemptMultiplier(attemptCount: number): number {
+  if (attemptCount <= 1) return 1.0;
+  if (attemptCount === 2) return 0.8;
+  if (attemptCount === 3) return 0.6;
+  return 0.4;
+}
 
 export async function saveScore(
   playerName: string,
@@ -40,10 +47,31 @@ export async function saveScore(
   const playerRef = ref(db, path);
 
   try {
+    // Read existing attemptCount (if any) to apply penalty on replays.
+    const snapshot = await get(playerRef);
+    const existing = snapshot.exists() ? (snapshot.val() as { attemptCount?: unknown } | null) : null;
+    const prevAttemptCount =
+      typeof existing?.attemptCount === "number" && Number.isFinite(existing.attemptCount)
+        ? existing.attemptCount
+        : 0;
+
+    const attemptCount = prevAttemptCount + 1;
+    const multiplier = getAttemptMultiplier(attemptCount);
+    const finalScore = Math.round(score * multiplier);
+
+    console.log("[saveScore] attempt penalty", {
+      prevAttemptCount,
+      attemptCount,
+      multiplier,
+      baseScore: score,
+      finalScore,
+    });
+
     await update(playerRef, {
-      score,
+      score: finalScore,
       time,
       mistakes,
+      attemptCount,
     });
     console.log("[saveScore] success");
   } catch (error) {
