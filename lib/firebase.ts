@@ -15,6 +15,7 @@ const app = initializeApp(firebaseConfig);
 export const db = getDatabase(app);
 
 const LEADERBOARD_PATH = "leaderboards/escape_room/players";
+const PLAYER_STATS_PATH = "playerGameStats";
 
 function getAttemptMultiplier(attemptCount: number): number {
   if (attemptCount <= 1) return 1.0;
@@ -25,12 +26,14 @@ function getAttemptMultiplier(attemptCount: number): number {
 
 export async function saveScore(
   playerName: string,
+  gameKey: string,
   score: number,
   time: number,
   mistakes: number
 ) {
   console.log("[saveScore] called", {
     playerName,
+    gameKey,
     score,
     time,
     mistakes,
@@ -41,37 +44,57 @@ export async function saveScore(
     console.log("[saveScore] sanitized name", { from: playerName.trim(), to: safePlayerName });
   }
 
-  const path = `${LEADERBOARD_PATH}/${safePlayerName}`;
-  console.log("[saveScore] writing to path:", path);
+  const safeGameKey = String(gameKey ?? "").trim() || "unknown-game";
+  const playerKey = safePlayerName || "Dedektif";
 
-  const playerRef = ref(db, path);
+  const leaderboardPath = `${LEADERBOARD_PATH}/${playerKey}`;
+  const statsPath = `${PLAYER_STATS_PATH}/${playerKey}/${safeGameKey}`;
+  console.log("[saveScore] writing to paths:", { leaderboardPath, statsPath });
+
+  const leaderboardRef = ref(db, leaderboardPath);
+  const statsRef = ref(db, statsPath);
 
   try {
-    // Read existing attemptCount (if any) to apply penalty on replays.
-    const snapshot = await get(playerRef);
-    const existing = snapshot.exists() ? (snapshot.val() as { attemptCount?: unknown } | null) : null;
-    const prevAttemptCount =
+    // Read attemptCount from playerGameStats (NOT from leaderboard record).
+    const snapshot = await get(statsRef);
+    const existing = snapshot.exists()
+      ? (snapshot.val() as { attemptCount?: unknown } | null)
+      : null;
+    const oldAttemptCount =
       typeof existing?.attemptCount === "number" && Number.isFinite(existing.attemptCount)
         ? existing.attemptCount
         : 0;
 
-    const attemptCount = prevAttemptCount + 1;
+    const attemptCount = oldAttemptCount + 1;
     const multiplier = getAttemptMultiplier(attemptCount);
     const finalScore = Math.round(score * multiplier);
+    const now = Date.now();
 
     console.log("[saveScore] attempt penalty", {
-      prevAttemptCount,
+      oldAttemptCount,
       attemptCount,
       multiplier,
       baseScore: score,
       finalScore,
     });
 
-    await update(playerRef, {
+    await update(statsRef, {
+      playerName: playerName.trim(),
+      type: "escape_room",
+      game: safeGameKey,
+      attemptCount,
+      lastBaseScore: score,
+      lastFinalScore: finalScore,
+      lastTime: time,
+      lastMultiplier: multiplier,
+      lastPlayedAt: now,
+      updatedAt: now,
+    });
+
+    await update(leaderboardRef, {
       score: finalScore,
       time,
       mistakes,
-      attemptCount,
     });
     console.log("[saveScore] success");
   } catch (error) {

@@ -138,7 +138,7 @@ export default function EscapeRoomGame({
 
     (async () => {
       try {
-        await saveScore(playerName, score, time, mistakes);
+        await saveScore(playerName, slug, score, time, mistakes);
         console.log("[score-save] completed");
       } catch (e) {
         console.error("[score-save] error", e);

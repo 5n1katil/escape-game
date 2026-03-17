@@ -90,6 +90,7 @@ export default function ResultClient({
         const playerName = normalizePlayerName(storedPlayer);
         await saveScore(
           playerName,
+          slug,
           scoreResult.finalScore,
           scoreResult.remainingTime,
           scoreResult.totalAttempts
