@@ -35,6 +35,8 @@ type GlobalLeaderboardRow = {
   updatedAt?: number;
 };
 
+type LeaderboardMode = "game" | "global";
+
 interface ResultClientProps {
   slug: string;
   gameTitle: string;
@@ -117,6 +119,7 @@ export default function ResultClient({
   const [escaped, setEscaped] = useState<boolean | null>(null);
   const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[] | null>(null);
   const [leaderboardError, setLeaderboardError] = useState(false);
+  const [leaderboardMode, setLeaderboardMode] = useState<LeaderboardMode>("game");
   const scoreSavedRef = useRef(false);
 
   useEffect(() => {
@@ -155,9 +158,10 @@ export default function ResultClient({
     let cancelled = false;
     (async () => {
       try {
-        // Şimdilik oyun-bazlı leaderboard kullanılıyor.
-        // İleride global total leaderboard için fetchGlobalLeaderboard kullanılabilir.
-        const top = await fetchGameLeaderboard("escape_room", slug, 5);
+        const top =
+          leaderboardMode === "global"
+            ? await fetchGlobalLeaderboard(5)
+            : await fetchGameLeaderboard("escape_room", slug, 5);
         if (!cancelled) {
           setLeaderboard(top);
           setLeaderboardError(false);
@@ -172,7 +176,7 @@ export default function ResultClient({
     return () => {
       cancelled = true;
     };
-  }, [escaped]);
+  }, [escaped, slug, leaderboardMode]);
 
   if (escaped === null || !escaped) {
     return (
@@ -249,6 +253,30 @@ export default function ResultClient({
               <h2 className="text-center text-base font-semibold text-amber-500/90 sm:text-lg">
                 {tResult.leaderboardTitle}
               </h2>
+              <div className="mt-3 flex justify-center gap-2 text-xs sm:mt-4 sm:text-sm">
+                <button
+                  type="button"
+                  onClick={() => setLeaderboardMode("game")}
+                  className={`rounded-full px-3 py-1.5 transition-colors ${
+                    leaderboardMode === "game"
+                      ? "bg-amber-600 text-white"
+                      : "bg-zinc-800 text-zinc-300 hover:bg-zinc-700"
+                  }`}
+                >
+                  Oyun Skoru
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setLeaderboardMode("global")}
+                  className={`rounded-full px-3 py-1.5 transition-colors ${
+                    leaderboardMode === "global"
+                      ? "bg-amber-600 text-white"
+                      : "bg-zinc-800 text-zinc-300 hover:bg-zinc-700"
+                  }`}
+                >
+                  Toplam Puan
+                </button>
+              </div>
               {leaderboardError && (
                 <p className="mt-4 text-center text-sm text-zinc-500">{tResult.leaderboardError}</p>
               )}
