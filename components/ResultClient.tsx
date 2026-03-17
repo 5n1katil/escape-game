@@ -7,14 +7,33 @@ import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import type { Translations } from "@/lib/i18n";
 
-const LEADERBOARD_FETCH_URL =
-  "https://n1dedektif-leaderboard-default-rtdb.europe-west1.firebasedatabase.app/leaderboards/escape_room/players.json";
+const FIREBASE_DB_BASE =
+  "https://n1dedektif-leaderboard-default-rtdb.europe-west1.firebasedatabase.app";
 
 export interface LeaderboardEntry {
   name: string;
   score: number;
   time: number;
 }
+
+type GameLeaderboardRow = {
+  name?: string;
+  score?: number;
+  baseScore?: number;
+  time?: number;
+  mistakes?: number;
+  attemptCount?: number;
+  type?: string;
+  game?: string;
+  updatedAt?: number;
+};
+
+type GlobalLeaderboardRow = {
+  name?: string;
+  totalScore?: number;
+  gamesPlayed?: number;
+  updatedAt?: number;
+};
 
 interface ResultClientProps {
   slug: string;
@@ -37,17 +56,47 @@ function formatTime(seconds: number): string {
   return `${m}:${s.toString().padStart(2, "0")}`;
 }
 
-async function fetchTopLeaderboard(limit: number): Promise<LeaderboardEntry[]> {
-  const res = await fetch(LEADERBOARD_FETCH_URL);
+/**
+ * Oyun bazlı leaderboard okuma:
+ * leaderboards/{type}/{gameKey}/{playerKey}
+ */
+async function fetchGameLeaderboard(
+  type: string,
+  gameKey: string,
+  limit: number
+): Promise<LeaderboardEntry[]> {
+  const path = `/leaderboards/${encodeURIComponent(type)}/${encodeURIComponent(
+    gameKey
+  )}.json`;
+  const res = await fetch(`${FIREBASE_DB_BASE}${path}`);
   if (!res.ok) return [];
-  const data: Record<string, { score?: number; time?: number; mistakes?: number }> | null = await res.json();
+  const data: Record<string, GameLeaderboardRow> | null = await res.json();
   if (!data || typeof data !== "object") return [];
-  const entries: LeaderboardEntry[] = Object.entries(data).map(([name, row]) => ({
-    name: name.replace(/_/g, " ").trim() || "—",
-    score: typeof row?.score === "number" ? row.score : 0,
-    time: typeof row?.time === "number" ? row.time : 0,
+  const entries: LeaderboardEntry[] = Object.entries(data).map(([key, row]) => ({
+    name: (row.name ?? key.replace(/_/g, " ")).toString().trim() || "—",
+    score: typeof row.score === "number" ? row.score : 0,
+    time: typeof row.time === "number" ? row.time : 0,
   }));
   entries.sort((a, b) => b.score - a.score || a.time - b.time);
+  return entries.slice(0, limit);
+}
+
+/**
+ * Global total leaderboard okuma:
+ * globalLeaderboard/{playerKey}
+ * Burada score = totalScore.
+ */
+async function fetchGlobalLeaderboard(limit: number): Promise<LeaderboardEntry[]> {
+  const res = await fetch(`${FIREBASE_DB_BASE}/globalLeaderboard.json`);
+  if (!res.ok) return [];
+  const data: Record<string, GlobalLeaderboardRow> | null = await res.json();
+  if (!data || typeof data !== "object") return [];
+  const entries: LeaderboardEntry[] = Object.entries(data).map(([key, row]) => ({
+    name: (row.name ?? key.replace(/_/g, " ")).toString().trim() || "—",
+    score: typeof row.totalScore === "number" ? row.totalScore : 0,
+    time: 0,
+  }));
+  entries.sort((a, b) => b.score - a.score);
   return entries.slice(0, limit);
 }
 
@@ -106,7 +155,9 @@ export default function ResultClient({
     let cancelled = false;
     (async () => {
       try {
-        const top = await fetchTopLeaderboard(5);
+        // Şimdilik oyun-bazlı leaderboard kullanılıyor.
+        // İleride global total leaderboard için fetchGlobalLeaderboard kullanılabilir.
+        const top = await fetchGameLeaderboard("escape_room", slug, 5);
         if (!cancelled) {
           setLeaderboard(top);
           setLeaderboardError(false);
