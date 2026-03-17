@@ -16,6 +16,7 @@ export const db = getDatabase(app);
 
 const LEADERBOARD_BASE_PATH = "leaderboards";
 const PLAYER_STATS_PATH = "playerGameStats";
+const GLOBAL_LEADERBOARD_PATH = "globalLeaderboard";
 
 function getAttemptMultiplier(attemptCount: number): number {
   if (attemptCount <= 1) return 1.0;
@@ -169,6 +170,40 @@ export async function saveScore(
       console.log("[saveScore] success (new best)");
     } else {
       console.log("[saveScore] success (stats updated, leaderboard unchanged)");
+    }
+
+    // --- Global total leaderboard: sum bestFinalScore across all games for this player ---
+    try {
+      const allStatsRef = ref(db, `${PLAYER_STATS_PATH}/${playerKey}`);
+      const allStatsSnap = await get(allStatsRef);
+      if (allStatsSnap.exists()) {
+        const allStats = allStatsSnap.val() as Record<
+          string,
+          { bestFinalScore?: unknown }
+        >;
+        let totalScore = 0;
+        let gamesPlayed = 0;
+        for (const gameId of Object.keys(allStats)) {
+          const entry = allStats[gameId];
+          const best = entry && typeof entry.bestFinalScore === "number" && Number.isFinite(entry.bestFinalScore)
+            ? entry.bestFinalScore
+            : null;
+          if (best !== null) {
+            totalScore += best;
+            gamesPlayed += 1;
+          }
+        }
+
+        const globalRef = ref(db, `${GLOBAL_LEADERBOARD_PATH}/${playerKey}`);
+        await update(globalRef, {
+          name: playerName.trim(),
+          totalScore,
+          gamesPlayed,
+          updatedAt: now,
+        });
+      }
+    } catch (err) {
+      console.warn("[saveScore] global leaderboard update failed", err);
     }
 
     return {
