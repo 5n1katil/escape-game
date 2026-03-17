@@ -55,14 +55,20 @@ export async function saveScore(
   const statsRef = ref(db, statsPath);
 
   try {
-    // Read attemptCount from playerGameStats (NOT from leaderboard record).
-    const snapshot = await get(statsRef);
-    const existing = snapshot.exists()
-      ? (snapshot.val() as { attemptCount?: unknown } | null)
+    // Read player stats for this game (attempts + best values).
+    const statsSnap = await get(statsRef);
+    const statsExisting = statsSnap.exists()
+      ? (statsSnap.val() as {
+          attemptCount?: unknown;
+          bestBaseScore?: unknown;
+          bestFinalScore?: unknown;
+          bestTime?: unknown;
+          bestMistakes?: unknown;
+        } | null)
       : null;
     const oldAttemptCount =
-      typeof existing?.attemptCount === "number" && Number.isFinite(existing.attemptCount)
-        ? existing.attemptCount
+      typeof statsExisting?.attemptCount === "number" && Number.isFinite(statsExisting.attemptCount)
+        ? statsExisting.attemptCount
         : 0;
 
     const attemptCount = oldAttemptCount + 1;
@@ -78,6 +84,56 @@ export async function saveScore(
       finalScore,
     });
 
+    // Read current leaderboard entry to decide if this is a new best.
+    const lbSnap = await get(leaderboardRef);
+    const lbExisting = lbSnap.exists()
+      ? (lbSnap.val() as { score?: unknown; time?: unknown; mistakes?: unknown } | null)
+      : null;
+    const currentBestScore =
+      typeof lbExisting?.score === "number" && Number.isFinite(lbExisting.score)
+        ? lbExisting.score
+        : null;
+    const currentBestTime =
+      typeof lbExisting?.time === "number" && Number.isFinite(lbExisting.time)
+        ? lbExisting.time
+        : null;
+    const currentBestMistakes =
+      typeof lbExisting?.mistakes === "number" && Number.isFinite(lbExisting.mistakes)
+        ? lbExisting.mistakes
+        : null;
+
+    let isNewBest = false;
+    if (currentBestScore === null) {
+      isNewBest = true;
+    } else if (finalScore > currentBestScore) {
+      isNewBest = true;
+    } else if (finalScore === currentBestScore && currentBestTime !== null && time < currentBestTime) {
+      isNewBest = true;
+    }
+
+    // Best fields in stats: update only when we have a new best.
+    const prevBestBase =
+      typeof statsExisting?.bestBaseScore === "number" && Number.isFinite(statsExisting.bestBaseScore)
+        ? statsExisting.bestBaseScore
+        : undefined;
+    const prevBestFinal =
+      typeof statsExisting?.bestFinalScore === "number" && Number.isFinite(statsExisting.bestFinalScore)
+        ? statsExisting.bestFinalScore
+        : undefined;
+    const prevBestTime =
+      typeof statsExisting?.bestTime === "number" && Number.isFinite(statsExisting.bestTime)
+        ? statsExisting.bestTime
+        : undefined;
+    const prevBestMistakes =
+      typeof statsExisting?.bestMistakes === "number" && Number.isFinite(statsExisting.bestMistakes)
+        ? statsExisting.bestMistakes
+        : undefined;
+
+    const bestBaseScore = isNewBest ? score : prevBestBase ?? score;
+    const bestFinalScore = isNewBest ? finalScore : prevBestFinal ?? finalScore;
+    const bestTime = isNewBest ? time : prevBestTime ?? time;
+    const bestMistakes = isNewBest ? mistakes : prevBestMistakes ?? mistakes;
+
     await update(statsRef, {
       playerName: playerName.trim(),
       type: "escape_room",
@@ -89,14 +145,29 @@ export async function saveScore(
       lastMultiplier: multiplier,
       lastPlayedAt: now,
       updatedAt: now,
+      bestBaseScore,
+      bestFinalScore,
+      bestTime,
+      bestMistakes,
     });
 
-    await update(leaderboardRef, {
-      score: finalScore,
-      time,
-      mistakes,
-    });
-    console.log("[saveScore] success");
+    if (isNewBest) {
+      await update(leaderboardRef, {
+        score: finalScore,
+        time,
+        mistakes,
+      });
+      console.log("[saveScore] success (new best)");
+    } else {
+      console.log("[saveScore] success (stats updated, leaderboard unchanged)");
+    }
+
+    return {
+      attemptCount,
+      multiplier,
+      finalScore,
+      isNewBest,
+    };
   } catch (error) {
     console.error("[saveScore] failed", error);
     throw error;
