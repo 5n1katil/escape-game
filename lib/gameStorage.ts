@@ -10,6 +10,27 @@ import {
   updateSession,
 } from "./gameSession";
 
+const PLAYER_KEY_PREFIX = "escape-game-player:";
+
+export function normalizePlayerName(input: string | null | undefined): string {
+  const trimmed = (input ?? "").trim();
+  return trimmed.length > 0 ? trimmed : "Dedektif";
+}
+
+export function getStoredPlayerName(slug: string): string | null {
+  if (typeof window === "undefined") return null;
+  const raw = localStorage.getItem(`${PLAYER_KEY_PREFIX}${slug}`);
+  if (raw === null) return null;
+  const trimmed = raw.trim();
+  return trimmed.length > 0 ? trimmed : null;
+}
+
+export function setStoredPlayerName(slug: string, name: string): void {
+  if (typeof window === "undefined") return;
+  const normalized = normalizePlayerName(name);
+  localStorage.setItem(`${PLAYER_KEY_PREFIX}${slug}`, normalized);
+}
+
 export function getStoredCurrentRoom(slug: string): number | null {
   const session = getSession(slug);
   if (!session) return null;

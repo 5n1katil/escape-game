@@ -2,6 +2,7 @@ import { games, getGameBySlug, getWixLandingUrl } from "@/data/games";
 import { getTranslations } from "@/lib/i18n";
 import { notFound } from "next/navigation";
 import IntroStartButton from "./IntroStartButton";
+import { Suspense } from "react";
 
 interface IntroPageProps {
   params: Promise<{ slug: string }>;
@@ -105,11 +106,13 @@ export default async function IntroPage({ params }: IntroPageProps) {
               </section>
 
               <div className="mt-auto pt-4">
-                <IntroStartButton
-                  slug={slug}
-                  durationSeconds={game.durationMinutes * 60}
-                  firstRoomId={1}
-                />
+                <Suspense fallback={<div className="h-14 w-full animate-pulse rounded-lg bg-zinc-800/50" />}>
+                  <IntroStartButton
+                    slug={slug}
+                    durationSeconds={game.durationMinutes * 60}
+                    firstRoomId={1}
+                  />
+                </Suspense>
               </div>
             </div>
           </div>

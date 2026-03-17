@@ -5,8 +5,13 @@ import {
   createSession,
   getSession,
 } from "@/lib/gameSession";
+import {
+  getStoredPlayerName,
+  normalizePlayerName,
+  setStoredPlayerName,
+} from "@/lib/gameStorage";
 import { getTranslations } from "@/lib/i18n";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
 interface IntroStartButtonProps {
@@ -22,13 +27,22 @@ export default function IntroStartButton({
 }: IntroStartButtonProps) {
   const t = getTranslations();
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [hasSession, setHasSession] = useState(false);
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
     setHasSession(getSession(slug) !== null);
+    const fromQuery = searchParams.get("player");
+    const stored = getStoredPlayerName(slug);
+    if (fromQuery && fromQuery.trim().length > 0) {
+      setStoredPlayerName(slug, normalizePlayerName(fromQuery));
+    } else if (!stored) {
+      // No query param and nothing stored: seed fallback.
+      setStoredPlayerName(slug, "Dedektif");
+    }
     setMounted(true);
-  }, [slug]);
+  }, [slug, searchParams]);
 
   /** Session and 60min timer start only here — not on intro page load. Then go to hub. */
   function handleStart() {

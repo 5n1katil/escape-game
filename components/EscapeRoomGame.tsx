@@ -7,6 +7,8 @@ import {
   getStoredAttempts,
   getStoredEscaped,
   getStoredMaxSolvedRoomIndex,
+  getStoredPlayerName,
+  normalizePlayerName,
   setStoredAttempts,
   setStoredEscaped,
   setStoredMaxSolvedRoomIndex,
@@ -119,7 +121,7 @@ export default function EscapeRoomGame({
       return;
     }
 
-    const playerName = "testDedektifWeb";
+    const playerName = normalizePlayerName(getStoredPlayerName(slug));
     const score = scoreResult?.finalScore ?? 0;
     const time = scoreResult?.remainingTime ?? 0;
     const mistakes = scoreResult?.totalAttempts ?? 0;

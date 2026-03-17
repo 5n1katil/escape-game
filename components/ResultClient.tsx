@@ -2,7 +2,7 @@
 
 import { saveScore } from "@/lib/firebase";
 import { calculateScore, getSession } from "@/lib/gameSession";
-import { getStoredEscaped } from "@/lib/gameStorage";
+import { getStoredEscaped, getStoredPlayerName, normalizePlayerName } from "@/lib/gameStorage";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import type { Translations } from "@/lib/i18n";
@@ -86,8 +86,10 @@ export default function ResultClient({
     scoreSavedRef.current = true;
     (async () => {
       try {
+        const storedPlayer = getStoredPlayerName(slug);
+        const playerName = normalizePlayerName(storedPlayer);
         await saveScore(
-          "testDedektifWeb",
+          playerName,
           scoreResult.finalScore,
           scoreResult.remainingTime,
           scoreResult.totalAttempts
@@ -130,6 +132,7 @@ export default function ResultClient({
 
   const session = getSession(slug);
   const scoreResult = session ? calculateScore(session) : null;
+  const playerName = normalizePlayerName(getStoredPlayerName(slug));
 
   const storyText = endStoryLong ?? tResult.endStory;
 
@@ -148,6 +151,9 @@ export default function ResultClient({
                 {tResult.endTitle}
               </h1>
               <p className="mt-2 text-sm text-zinc-400">{tResult.endStory}</p>
+              <p className="mt-2 text-sm text-zinc-400">
+                Dedektif: <span className="font-medium text-zinc-200">{playerName}</span>
+              </p>
             </header>
 
             {scoreResult && (
