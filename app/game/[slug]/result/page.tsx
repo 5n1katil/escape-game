@@ -36,6 +36,7 @@ export default async function ResultPage({ params }: ResultPageProps) {
     <ResultClient
       slug={slug}
       gameTitle={game.title}
+      durationSeconds={game.durationMinutes * 60}
       wixUrl={wixUrl}
       mainPageUrl="https://www.5n1dedektif.com/"
       tResult={t.result}

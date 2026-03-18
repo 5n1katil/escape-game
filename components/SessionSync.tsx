@@ -1,6 +1,6 @@
 "use client";
 
-import { getSession, updateSession } from "@/lib/gameSession";
+import { getPlayerSession, setStoredCurrentRoom } from "@/lib/gameStorage";
 import { useEffect } from "react";
 
 interface SessionSyncProps {
@@ -11,9 +11,9 @@ interface SessionSyncProps {
 /** Syncs session.currentRoomId when user navigates to a room. */
 export default function SessionSync({ slug, roomId }: SessionSyncProps) {
   useEffect(() => {
-    const session = getSession(slug);
+    const session = getPlayerSession(slug);
     if (session && session.currentRoomId !== roomId) {
-      updateSession(slug, { currentRoomId: roomId });
+      setStoredCurrentRoom(slug, roomId);
     }
   }, [slug, roomId]);
 

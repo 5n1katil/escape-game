@@ -1,8 +1,13 @@
 "use client";
 
 import { saveScore } from "@/lib/firebase";
-import { calculateScore, getSession } from "@/lib/gameSession";
-import { getStoredEscaped, getStoredPlayerName, normalizePlayerName } from "@/lib/gameStorage";
+import {
+  getActivePlayerKey,
+  getCompletedGameResult,
+  getStoredEscaped,
+  restartPlayerSession,
+  type FinalGameResult,
+} from "@/lib/gameStorage";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import type { Translations } from "@/lib/i18n";
@@ -10,9 +15,11 @@ import type { Translations } from "@/lib/i18n";
 const FIREBASE_DB_BASE =
   "https://n1dedektif-leaderboard-default-rtdb.europe-west1.firebasedatabase.app";
 
+/** Leaderboard satırı. time = bitirme süresi (saniye, completionTime). */
 export interface LeaderboardEntry {
   name: string;
   score: number;
+  /** Bitirme süresi (saniye). Firebase "time" alanı. */
   time: number;
 }
 
@@ -46,6 +53,7 @@ interface LeaderboardFilterState {
 interface ResultClientProps {
   slug: string;
   gameTitle: string;
+  durationSeconds: number;
   wixUrl: string;
   /** Ana sayfa URL (sonuç ekranında "Ana Sayfaya Dön" butonu). */
   mainPageUrl?: string;
@@ -122,6 +130,7 @@ async function resolveLeaderboardData(
 export default function ResultClient({
   slug,
   gameTitle,
+  durationSeconds,
   wixUrl,
   mainPageUrl,
   tResult,
@@ -134,6 +143,7 @@ export default function ResultClient({
 }: ResultClientProps) {
   const router = useRouter();
   const [escaped, setEscaped] = useState<boolean | null>(null);
+  const [finalResult, setFinalResult] = useState<FinalGameResult | null | "missing">(null);
   const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[] | null>(null);
   const [leaderboardError, setLeaderboardError] = useState(false);
   const [leaderboardFilter, setLeaderboardFilter] = useState<LeaderboardFilterState>({
@@ -148,31 +158,34 @@ export default function ResultClient({
     setEscaped(isEscaped);
     if (!isEscaped) {
       router.replace(`/game/${slug}/hub`);
+      return;
     }
+    const playerKey = getActivePlayerKey();
+    if (!playerKey) {
+      setFinalResult("missing");
+      return;
+    }
+    const stored = getCompletedGameResult(playerKey, slug);
+    setFinalResult(stored ?? "missing");
   }, [slug, router]);
 
   useEffect(() => {
-    if (!escaped || scoreSavedRef.current) return;
-    const session = getSession(slug);
-    if (!session) return;
-    const scoreResult = calculateScore(session);
+    if (finalResult === null || finalResult === "missing" || scoreSavedRef.current) return;
     scoreSavedRef.current = true;
     (async () => {
       try {
-        const storedPlayer = getStoredPlayerName(slug);
-        const playerName = normalizePlayerName(storedPlayer);
         await saveScore(
-          playerName,
-          slug,
-          scoreResult.finalScore,
-          scoreResult.remainingTime,
-          scoreResult.totalAttempts
+          finalResult.playerName,
+          finalResult.slug,
+          finalResult.score,
+          finalResult.completionTime,
+          finalResult.mistakes
         );
       } catch {
         // ignore
       }
     })();
-  }, [escaped, slug]);
+  }, [finalResult]);
 
   useEffect(() => {
     if (!escaped) return;
@@ -204,14 +217,23 @@ export default function ResultClient({
     );
   }
 
-  const session = getSession(slug);
-  const scoreResult = session ? calculateScore(session) : null;
-  const playerName = normalizePlayerName(getStoredPlayerName(slug));
+  if (finalResult === "missing" || finalResult === null) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-zinc-950 px-4">
+        <p className="text-center text-zinc-400">{tResult.resultNotFound}</p>
+      </div>
+    );
+  }
 
   const storyText = endStoryLong ?? tResult.endStory;
 
   const backUrl = mainPageUrl ?? wixUrl;
   const backLabel = mainPageUrl ? tResult.backToMain : tResult.backToWix;
+
+  function handlePlayAgain() {
+    restartPlayerSession(slug, durationSeconds, 1);
+    router.push(`/game/${slug}/hub`);
+  }
 
   return (
     <div className="min-h-screen bg-zinc-950 px-4 py-12 sm:py-16">
@@ -226,43 +248,41 @@ export default function ResultClient({
               </h1>
               <p className="mt-2 text-sm text-zinc-400">{tResult.endStory}</p>
               <p className="mt-2 text-sm text-zinc-400">
-                Dedektif: <span className="font-medium text-zinc-200">{playerName}</span>
+                Dedektif: <span className="font-medium text-zinc-200">{finalResult.playerName}</span>
               </p>
             </header>
 
-            {scoreResult && (
-              <section
-                className="rounded-xl border border-amber-500/25 bg-amber-950/20 px-4 py-5 sm:px-6 sm:py-6"
-                role="region"
-                aria-label={tRoomResult.title}
-              >
-                <h2 className="text-center text-lg font-semibold text-amber-300 sm:text-xl">
-                  {tRoomResult.title}
-                </h2>
-                <dl className="mt-4 grid gap-3 sm:grid-cols-2">
-                  <div className="flex justify-between rounded-lg bg-zinc-900/50 px-4 py-2 sm:flex-col sm:gap-0">
-                    <dt className="text-sm text-zinc-400">{tRoomResult.finalScore}</dt>
-                    <dd className="text-lg font-bold text-white tabular-nums">{scoreResult.finalScore}</dd>
-                  </div>
-                  <div className="flex justify-between rounded-lg bg-zinc-900/50 px-4 py-2 sm:flex-col sm:gap-0">
-                    <dt className="text-sm text-zinc-400">{tRoomResult.remainingTime}</dt>
-                    <dd className="text-lg font-medium text-zinc-200 tabular-nums">
-                      {formatTime(scoreResult.remainingTime)}
-                    </dd>
-                  </div>
-                  <div className="flex justify-between rounded-lg bg-zinc-900/50 px-4 py-2 sm:flex-col sm:gap-0">
-                    <dt className="text-sm text-zinc-400">{tRoomResult.totalAttempts}</dt>
-                    <dd className="text-lg font-medium text-zinc-200 tabular-nums">{scoreResult.totalAttempts}</dd>
-                  </div>
-                  <div className="flex justify-between rounded-lg bg-zinc-900/50 px-4 py-2 sm:flex-col sm:gap-0">
-                    <dt className="text-sm text-zinc-400">{tRoomResult.firstTryCount}</dt>
-                    <dd className="text-lg font-medium text-zinc-200 tabular-nums">
-                      {scoreResult.roomsSolvedFirstTry}
-                    </dd>
-                  </div>
-                </dl>
-              </section>
-            )}
+            <section
+              className="rounded-xl border border-amber-500/25 bg-amber-950/20 px-4 py-5 sm:px-6 sm:py-6"
+              role="region"
+              aria-label={tRoomResult.title}
+            >
+              <h2 className="text-center text-lg font-semibold text-amber-300 sm:text-xl">
+                {tRoomResult.title}
+              </h2>
+              <dl className="mt-4 grid gap-3 sm:grid-cols-2">
+                <div className="flex justify-between rounded-lg bg-zinc-900/50 px-4 py-2 sm:flex-col sm:gap-0">
+                  <dt className="text-sm text-zinc-400">{tRoomResult.finalScore}</dt>
+                  <dd className="text-lg font-bold text-white tabular-nums">{finalResult.score}</dd>
+                </div>
+                <div className="flex justify-between rounded-lg bg-zinc-900/50 px-4 py-2 sm:flex-col sm:gap-0">
+                  <dt className="text-sm text-zinc-400">{tRoomResult.remainingTime}</dt>
+                  <dd className="text-lg font-medium text-zinc-200 tabular-nums">
+                    {formatTime(finalResult.remainingTime)}
+                  </dd>
+                </div>
+                <div className="flex justify-between rounded-lg bg-zinc-900/50 px-4 py-2 sm:flex-col sm:gap-0">
+                  <dt className="text-sm text-zinc-400">{tRoomResult.totalAttempts}</dt>
+                  <dd className="text-lg font-medium text-zinc-200 tabular-nums">{finalResult.mistakes}</dd>
+                </div>
+                <div className="flex justify-between rounded-lg bg-zinc-900/50 px-4 py-2 sm:flex-col sm:gap-0">
+                  <dt className="text-sm text-zinc-400">{tRoomResult.firstTryCount}</dt>
+                  <dd className="text-lg font-medium text-zinc-200 tabular-nums">
+                    {finalResult.roomsSolvedFirstTry}
+                  </dd>
+                </div>
+              </dl>
+            </section>
 
             <section
               className="rounded-xl border border-zinc-700/50 bg-zinc-900/40 px-4 py-5 sm:px-6"
@@ -314,21 +334,27 @@ export default function ResultClient({
                 <p className="mt-4 text-center text-sm text-zinc-500">{tResult.leaderboardLoading}</p>
               )}
               {!leaderboardError && leaderboard && leaderboard.length > 0 && (
-                <ol className="mt-4 space-y-2">
-                  {leaderboard.map((entry, i) => (
-                    <li
-                      key={entry.name + i}
-                      className="flex items-center justify-between rounded-lg bg-zinc-800/60 px-4 py-2.5 text-left"
-                    >
-                      <span className="font-medium text-zinc-200">
-                        {i + 1}. {entry.name}
-                      </span>
-                      <span className="tabular-nums text-amber-400/90">
-                        {entry.score} · {formatTime(entry.time)}
-                      </span>
-                    </li>
-                  ))}
-                </ol>
+                <>
+                  <div className="mt-4 flex justify-between rounded-t-lg bg-zinc-800/80 px-4 py-2 text-xs font-medium uppercase tracking-wider text-zinc-500">
+                    <span>#</span>
+                    <span>{tResult.leaderboardScoreTimeHeader}</span>
+                  </div>
+                  <ol className="space-y-2">
+                    {leaderboard.map((entry, i) => (
+                      <li
+                        key={entry.name + i}
+                        className="flex items-center justify-between rounded-lg bg-zinc-800/60 px-4 py-2.5 text-left"
+                      >
+                        <span className="font-medium text-zinc-200">
+                          {i + 1}. {entry.name}
+                        </span>
+                        <span className="tabular-nums text-amber-400/90">
+                          {entry.score} · {formatTime(entry.time)}
+                        </span>
+                      </li>
+                    ))}
+                  </ol>
+                </>
               )}
               {!leaderboardError && leaderboard && leaderboard.length === 0 && (
                 <p className="mt-4 text-center text-sm text-zinc-500">{tResult.leaderboardError}</p>
@@ -388,6 +414,13 @@ export default function ResultClient({
               {gizemMalikanesiLabel}
             </a>
           )}
+          <button
+            type="button"
+            onClick={handlePlayAgain}
+            className="inline-flex min-h-[52px] min-w-[220px] flex-shrink-0 items-center justify-center rounded-xl border-2 border-amber-700/60 bg-transparent px-8 py-3.5 text-lg font-semibold text-amber-100/90 transition-colors hover:border-amber-600/80 hover:bg-amber-900/20 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:ring-offset-2 focus:ring-offset-zinc-900 active:scale-[0.98]"
+          >
+            {tResult.playAgain}
+          </button>
           <a
             href={backUrl}
             className="inline-flex min-h-[52px] min-w-[220px] flex-shrink-0 items-center justify-center rounded-xl bg-amber-600 px-8 py-3.5 text-lg font-semibold text-white shadow-lg transition-colors hover:bg-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:ring-offset-2 focus:ring-offset-zinc-900 active:scale-[0.98]"

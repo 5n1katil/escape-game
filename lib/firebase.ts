@@ -25,18 +25,22 @@ function getAttemptMultiplier(attemptCount: number): number {
   return 0.4;
 }
 
+/**
+ * Saves score to Firebase. Leaderboard stores completion time (bitirme süresi).
+ * @param completionTimeSeconds - Bitirme süresi (saniye). Firebase'de "time" anahtarıyla yazılır (geri uyumluluk).
+ */
 export async function saveScore(
   playerName: string,
   gameKey: string,
   score: number,
-  time: number,
+  completionTimeSeconds: number,
   mistakes: number
 ) {
   console.log("[saveScore] called", {
     playerName,
     gameKey,
     score,
-    time,
+    completionTimeSeconds,
     mistakes,
   });
 
@@ -64,10 +68,15 @@ export async function saveScore(
     const statsExisting = statsSnap.exists()
       ? (statsSnap.val() as {
           attemptCount?: unknown;
-          bestBaseScore?: unknown;
-          bestFinalScore?: unknown;
-          bestTime?: unknown;
-          bestMistakes?: unknown;
+          hasCompleted?: unknown;
+          firstCompletionScore?: unknown;
+          firstCompletionTime?: unknown;
+          firstCompletionMistakes?: unknown;
+          firstCompletionAttempt?: unknown;
+          lastBaseScore?: unknown;
+          lastFinalScore?: unknown;
+          lastTime?: unknown;
+          lastPlayedAt?: unknown;
         } | null)
       : null;
     const oldAttemptCount =
@@ -97,46 +106,46 @@ export async function saveScore(
       typeof lbExisting?.score === "number" && Number.isFinite(lbExisting.score)
         ? lbExisting.score
         : null;
-    const currentBestTime =
-      typeof lbExisting?.time === "number" && Number.isFinite(lbExisting.time)
-        ? lbExisting.time
-        : null;
-    const currentBestMistakes =
-      typeof lbExisting?.mistakes === "number" && Number.isFinite(lbExisting.mistakes)
-        ? lbExisting.mistakes
-        : null;
 
-    let isNewBest = false;
-    if (currentBestScore === null) {
-      isNewBest = true;
-    } else if (finalScore > currentBestScore) {
-      isNewBest = true;
-    } else if (finalScore === currentBestScore && currentBestTime !== null && time < currentBestTime) {
-      isNewBest = true;
-    }
+    // İlk başarılı bitiriş mantığı: daha önce tamamlamış mı?
+    const hasCompletedBefore =
+      statsExisting?.hasCompleted === true;
+    const isFirstSuccessfulCompletion = !hasCompletedBefore;
 
-    // Best fields in stats: update only when we have a new best.
-    const prevBestBase =
-      typeof statsExisting?.bestBaseScore === "number" && Number.isFinite(statsExisting.bestBaseScore)
-        ? statsExisting.bestBaseScore
+    // İlk completion alanları: varsa koru, yoksa ilk başarılı tamamlamada doldur.
+    const existingFirstScore =
+      typeof statsExisting?.firstCompletionScore === "number" &&
+      Number.isFinite(statsExisting.firstCompletionScore)
+        ? statsExisting.firstCompletionScore
         : undefined;
-    const prevBestFinal =
-      typeof statsExisting?.bestFinalScore === "number" && Number.isFinite(statsExisting.bestFinalScore)
-        ? statsExisting.bestFinalScore
+    const existingFirstTime =
+      typeof statsExisting?.firstCompletionTime === "number" &&
+      Number.isFinite(statsExisting.firstCompletionTime)
+        ? statsExisting.firstCompletionTime
         : undefined;
-    const prevBestTime =
-      typeof statsExisting?.bestTime === "number" && Number.isFinite(statsExisting.bestTime)
-        ? statsExisting.bestTime
+    const existingFirstMistakes =
+      typeof statsExisting?.firstCompletionMistakes === "number" &&
+      Number.isFinite(statsExisting.firstCompletionMistakes)
+        ? statsExisting.firstCompletionMistakes
         : undefined;
-    const prevBestMistakes =
-      typeof statsExisting?.bestMistakes === "number" && Number.isFinite(statsExisting.bestMistakes)
-        ? statsExisting.bestMistakes
+    const existingFirstAttempt =
+      typeof statsExisting?.firstCompletionAttempt === "number" &&
+      Number.isFinite(statsExisting.firstCompletionAttempt)
+        ? statsExisting.firstCompletionAttempt
         : undefined;
 
-    const bestBaseScore = isNewBest ? score : prevBestBase ?? score;
-    const bestFinalScore = isNewBest ? finalScore : prevBestFinal ?? finalScore;
-    const bestTime = isNewBest ? time : prevBestTime ?? time;
-    const bestMistakes = isNewBest ? mistakes : prevBestMistakes ?? mistakes;
+    const firstCompletionScore = isFirstSuccessfulCompletion
+      ? finalScore
+      : existingFirstScore ?? finalScore;
+    const firstCompletionTime = isFirstSuccessfulCompletion
+      ? completionTimeSeconds
+      : existingFirstTime ?? completionTimeSeconds;
+    const firstCompletionMistakes = isFirstSuccessfulCompletion
+      ? mistakes
+      : existingFirstMistakes ?? mistakes;
+    const firstCompletionAttempt = isFirstSuccessfulCompletion
+      ? attemptCount
+      : existingFirstAttempt ?? attemptCount;
 
     await update(statsRef, {
       playerName: playerName.trim(),
@@ -145,29 +154,31 @@ export async function saveScore(
       attemptCount,
       lastBaseScore: score,
       lastFinalScore: finalScore,
-      lastTime: time,
+      lastTime: completionTimeSeconds,
       lastMultiplier: multiplier,
       lastPlayedAt: now,
       updatedAt: now,
-      bestBaseScore,
-      bestFinalScore,
-      bestTime,
-      bestMistakes,
+      hasCompleted: true,
+      firstCompletionScore,
+      firstCompletionTime,
+      firstCompletionMistakes,
+      firstCompletionAttempt,
     });
 
-    if (isNewBest) {
+    if (isFirstSuccessfulCompletion || currentBestScore === null) {
+      // İlk başarılı tamamlanış: leaderboard'a sadece bir kez yazılır.
+      // score = attempt cezası uygulanmış finalScore, time = completionTimeSeconds (bitirme süresi).
       await update(leaderboardRef, {
         name: playerName.trim(),
         score: finalScore,
-        baseScore: score,
-        time,
+        time: completionTimeSeconds,
         mistakes,
         attemptCount,
         type,
         game: safeGameKey,
         updatedAt: now,
       });
-      console.log("[saveScore] success (new best)");
+      console.log("[saveScore] success (first completion, leaderboard created)");
     } else {
       console.log("[saveScore] success (stats updated, leaderboard unchanged)");
     }
@@ -179,17 +190,29 @@ export async function saveScore(
       if (allStatsSnap.exists()) {
         const allStats = allStatsSnap.val() as Record<
           string,
-          { bestFinalScore?: unknown }
+          { firstCompletionScore?: unknown; bestFinalScore?: unknown }
         >;
         let totalScore = 0;
         let gamesPlayed = 0;
         for (const gameId of Object.keys(allStats)) {
           const entry = allStats[gameId];
-          const best = entry && typeof entry.bestFinalScore === "number" && Number.isFinite(entry.bestFinalScore)
-            ? entry.bestFinalScore
-            : null;
-          if (best !== null) {
-            totalScore += best;
+          // Global leaderboard: her oyundan yalnızca firstCompletionScore kullanılır.
+          const first =
+            entry &&
+            typeof entry.firstCompletionScore === "number" &&
+            Number.isFinite(entry.firstCompletionScore)
+              ? entry.firstCompletionScore
+              : null;
+          // Eski veriler için fallback: bestFinalScore varsa onu kullan.
+          const effective = first !== null
+            ? first
+            : entry &&
+              typeof entry.bestFinalScore === "number" &&
+              Number.isFinite(entry.bestFinalScore)
+                ? entry.bestFinalScore
+                : null;
+          if (effective !== null) {
+            totalScore += effective;
             gamesPlayed += 1;
           }
         }
@@ -210,7 +233,7 @@ export async function saveScore(
       attemptCount,
       multiplier,
       finalScore,
-      isNewBest,
+      isFirstSuccessfulCompletion,
     };
   } catch (error) {
     console.error("[saveScore] failed", error);

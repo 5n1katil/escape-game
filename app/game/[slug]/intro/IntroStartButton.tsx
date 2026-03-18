@@ -1,10 +1,10 @@
 "use client";
 
 import {
-  clearSession,
-  createSession,
-  getSession,
-} from "@/lib/gameSession";
+  hasPlayerSession,
+  restartPlayerSession,
+  startNewPlayerSession,
+} from "@/lib/gameStorage";
 import {
   getStoredPlayerName,
   normalizePlayerName,
@@ -32,7 +32,7 @@ export default function IntroStartButton({
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    setHasSession(getSession(slug) !== null);
+    setHasSession(hasPlayerSession(slug));
     const fromQuery = searchParams.get("player");
     const stored = getStoredPlayerName(slug);
     if (fromQuery && fromQuery.trim().length > 0) {
@@ -46,19 +46,17 @@ export default function IntroStartButton({
 
   /** Session and 60min timer start only here — not on intro page load. Then go to hub. */
   function handleStart() {
-    createSession(slug, durationSeconds, firstRoomId);
+    startNewPlayerSession(slug, durationSeconds, firstRoomId);
     router.push(`/game/${slug}/hub`);
   }
 
   function handleContinue() {
-    const session = getSession(slug);
-    if (!session) return;
+    if (!hasPlayerSession(slug)) return;
     router.push(`/game/${slug}/hub`);
   }
 
   function handleRestart() {
-    clearSession(slug);
-    createSession(slug, durationSeconds, firstRoomId);
+    restartPlayerSession(slug, durationSeconds, firstRoomId);
     router.push(`/game/${slug}/hub`);
   }
 

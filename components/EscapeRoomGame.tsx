@@ -1,19 +1,17 @@
 "use client";
 
-import { saveScore } from "@/lib/firebase";
 import {
   addPenaltySeconds,
   clearGameState,
+  getActivePlayerKey,
+  getCompletedGameResult,
   getStoredAttempts,
   getStoredEscaped,
   getStoredMaxSolvedRoomIndex,
-  getStoredPlayerName,
-  normalizePlayerName,
   setStoredAttempts,
   setStoredEscaped,
   setStoredMaxSolvedRoomIndex,
 } from "@/lib/gameStorage";
-import { calculateScore, getSession } from "@/lib/gameSession";
 import {
   isCorrectAnswer,
   isCorrectImageChoice,
@@ -62,7 +60,6 @@ export default function EscapeRoomGame({
   const [escaped, setEscapedState] = useState(false);
   const [hydrated, setHydrated] = useState(false);
   const [lightboxImage, setLightboxImage] = useState<{ url: string; alt?: string } | null>(null);
-  const scoreSavedRef = useRef(false);
 
   const currentRoom = rooms[roomIndex];
   const isLastRoom = roomIndex === rooms.length - 1;
@@ -95,56 +92,6 @@ export default function EscapeRoomGame({
       document.removeEventListener("keydown", onKeyDown);
     };
   }, [lightboxImage]);
-
-  useEffect(() => {
-    const session = getSession(slug);
-    const scoreResult = session ? calculateScore(session) : null;
-
-    console.log("[score-save] effect run", {
-      escaped,
-      hydrated,
-      slug,
-      hasSession: !!session,
-      hasScoreResult: !!scoreResult,
-    });
-
-    if (!hydrated) {
-      console.warn("[score-save] skipped: not hydrated");
-      return;
-    }
-    if (!escaped) {
-      console.warn("[score-save] skipped: not escaped");
-      return;
-    }
-    if (scoreSavedRef.current) {
-      console.warn("[score-save] skipped: already saved");
-      return;
-    }
-
-    const playerName = normalizePlayerName(getStoredPlayerName(slug));
-    const score = scoreResult?.finalScore ?? 0;
-    const time = scoreResult?.remainingTime ?? 0;
-    const mistakes = scoreResult?.totalAttempts ?? 0;
-
-    if (!session) {
-      console.warn("[score-save] skipped: no session (using fallback 0,0,0 for debug)");
-    }
-    if (!scoreResult) {
-      console.warn("[score-save] no scoreResult (using fallback values for debug)");
-    }
-
-    scoreSavedRef.current = true;
-    console.log("[score-save] attempting save", { playerName, score, time, mistakes });
-
-    (async () => {
-      try {
-        await saveScore(playerName, slug, score, time, mistakes);
-        console.log("[score-save] completed");
-      } catch (e) {
-        console.error("[score-save] error", e);
-      }
-    })();
-  }, [escaped, slug, hydrated]);
 
   function markRoomSolved() {
     const roomIds = rooms.map((r) => r.id);
@@ -241,8 +188,8 @@ export default function EscapeRoomGame({
   }
 
   if (escaped) {
-    const session = getSession(slug);
-    const scoreResult = session ? calculateScore(session) : null;
+    const playerKey = getActivePlayerKey();
+    const finalResult = playerKey ? getCompletedGameResult(playerKey, slug) : null;
 
     function formatTime(seconds: number): string {
       const m = Math.floor(seconds / 60);
@@ -258,7 +205,7 @@ export default function EscapeRoomGame({
         <p className="text-base leading-relaxed text-zinc-300 sm:text-lg">
           {t.escaped.message}
         </p>
-        {scoreResult && (
+        {finalResult && (
           <div
             className="space-y-3 rounded-lg border border-amber-500/20 bg-zinc-900/40 px-4 py-4 text-left"
             role="region"
@@ -271,7 +218,7 @@ export default function EscapeRoomGame({
               <div className="flex justify-between gap-4 sm:flex-col sm:gap-0">
                 <dt className="text-sm text-zinc-400">{t.result.finalScore}</dt>
                 <dd className="text-lg font-bold text-white tabular-nums">
-                  {scoreResult.finalScore}
+                  {finalResult.score}
                 </dd>
               </div>
               <div className="flex justify-between gap-4 sm:flex-col sm:gap-0">
@@ -279,7 +226,7 @@ export default function EscapeRoomGame({
                   {t.result.remainingTime}
                 </dt>
                 <dd className="text-lg font-medium text-zinc-200 tabular-nums">
-                  {formatTime(scoreResult.remainingTime)}
+                  {formatTime(finalResult.remainingTime)}
                 </dd>
               </div>
               <div className="flex justify-between gap-4 sm:flex-col sm:gap-0">
@@ -287,7 +234,7 @@ export default function EscapeRoomGame({
                   {t.result.totalAttempts}
                 </dt>
                 <dd className="text-lg font-medium text-zinc-200 tabular-nums">
-                  {scoreResult.totalAttempts}
+                  {finalResult.mistakes}
                 </dd>
               </div>
               <div className="flex justify-between gap-4 sm:flex-col sm:gap-0">
@@ -295,7 +242,7 @@ export default function EscapeRoomGame({
                   {t.result.firstTryCount}
                 </dt>
                 <dd className="text-lg font-medium text-zinc-200 tabular-nums">
-                  {scoreResult.roomsSolvedFirstTry}
+                  {finalResult.roomsSolvedFirstTry}
                 </dd>
               </div>
             </dl>
@@ -600,6 +547,19 @@ export default function EscapeRoomGame({
           <p className="text-center text-lg font-semibold text-amber-400 sm:text-xl">
             {t.roomAlreadyCompleted}
           </p>
+          {isLastRoom && finalCode && (
+            <div className="mt-4 rounded-lg border border-amber-500/40 bg-amber-950/30 px-4 py-3 text-left">
+              <p className="text-sm font-semibold text-amber-400/90">
+                {t.escapePasswordLabel}
+              </p>
+              <p className="mt-1 font-mono text-lg font-bold tracking-wide text-amber-200">
+                {finalCode}
+              </p>
+              <p className="mt-2 text-sm text-zinc-400">
+                {t.escapePasswordHint}
+              </p>
+            </div>
+          )}
         </section>
       ) : (
         <section aria-label={t.puzzlePromptLabel}>

@@ -3,14 +3,20 @@
 import CountdownTimer from "@/components/CountdownTimer";
 import RestartButton from "@/components/RestartButton";
 import type { Room } from "@/data/rooms";
-import { getSession } from "@/lib/gameSession";
-import { getStoredMaxSolvedRoomIndex } from "@/lib/gameStorage";
+import { calculateScore, getCompletionTime } from "@/lib/gameSession";
+import {
+  getPlayerSession,
+  getStoredMaxSolvedRoomIndex,
+  getStoredPlayerName,
+  normalizePlayerName,
+  setCompletedGameResult,
+  setStoredEscaped,
+} from "@/lib/gameStorage";
 import { isCorrectFinalCode } from "@/lib/rooms";
 import type { Translations } from "@/lib/i18n";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { setStoredEscaped } from "@/lib/gameStorage";
 
 const MAP_IMAGE_PATH = "/games/tapinagin-laneti/images/map.jpg";
 
@@ -60,7 +66,7 @@ export default function HubClient({
   const roomIds = rooms.map((r) => r.id);
 
   const refreshSession = useCallback(() => {
-    const session = getSession(slug);
+    const session = getPlayerSession(slug);
     if (session) {
       setUnlockedIds(session.unlockedRoomIds ?? []);
       setSolvedCount(session.solvedRoomIds?.length ?? 0);
@@ -89,6 +95,23 @@ export default function HubClient({
     const trimmed = finalInput.trim();
     if (!trimmed || !finalCode) return;
     if (isCorrectFinalCode(finalCode, trimmed)) {
+      const session = getPlayerSession(slug);
+      if (session) {
+        const scoreResult = calculateScore(session);
+        const completionTime = getCompletionTime(session);
+        const playerName = normalizePlayerName(getStoredPlayerName(slug));
+        setCompletedGameResult(slug, {
+          score: scoreResult.finalScore,
+          completionTime,
+          remainingTime: scoreResult.remainingTime,
+          mistakes: scoreResult.totalAttempts,
+          playerName,
+          slug,
+          roomsSolvedFirstTry: scoreResult.roomsSolvedFirstTry,
+          roomsSolvedSecondTry: scoreResult.roomsSolvedSecondTry,
+          scoreBreakdown: scoreResult.scoreBreakdown,
+        });
+      }
       setStoredEscaped(slug, true);
       router.push(`/game/${slug}/result`);
     } else {
