@@ -67,9 +67,14 @@ interface ResultClientProps {
 }
 
 function formatTime(seconds: number): string {
-  const m = Math.floor(seconds / 60);
-  const s = seconds % 60;
-  return `${m}:${s.toString().padStart(2, "0")}`;
+  const clamped = Math.max(0, Math.floor(seconds));
+  const h = Math.floor(clamped / 3600);
+  const m = Math.floor((clamped % 3600) / 60);
+  const s = clamped % 60;
+  if (h > 0) {
+    return `${h}:${m.toString().padStart(2, "0")}:${s.toString().padStart(2, "0")}`;
+  }
+  return `${m.toString().padStart(2, "0")}:${s.toString().padStart(2, "0")}`;
 }
 
 /**
@@ -269,6 +274,12 @@ export default function ResultClient({
                   <dt className="text-sm text-zinc-400">{tRoomResult.remainingTime}</dt>
                   <dd className="text-lg font-medium text-zinc-200 tabular-nums">
                     {formatTime(finalResult.remainingTime)}
+                  </dd>
+                </div>
+                <div className="flex justify-between rounded-lg bg-zinc-900/50 px-4 py-2 sm:flex-col sm:gap-0">
+                  <dt className="text-sm text-zinc-400">{tRoomResult.completionTime}</dt>
+                  <dd className="text-lg font-medium text-zinc-200 tabular-nums">
+                    {formatTime(finalResult.completionTime)}
                   </dd>
                 </div>
                 <div className="flex justify-between rounded-lg bg-zinc-900/50 px-4 py-2 sm:flex-col sm:gap-0">

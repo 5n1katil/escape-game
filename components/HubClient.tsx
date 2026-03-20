@@ -3,7 +3,7 @@
 import CountdownTimer from "@/components/CountdownTimer";
 import RestartButton from "@/components/RestartButton";
 import type { Room } from "@/data/rooms";
-import { calculateScore, getCompletionTime } from "@/lib/gameSession";
+import { calculateScore } from "@/lib/gameSession";
 import {
   getPlayerSession,
   getStoredMaxSolvedRoomIndex,
@@ -98,7 +98,7 @@ export default function HubClient({
       const session = getPlayerSession(slug);
       if (session) {
         const scoreResult = calculateScore(session);
-        const completionTime = getCompletionTime(session);
+        const completionTime = Math.max(0, session.durationSeconds - scoreResult.remainingTime);
         const playerName = normalizePlayerName(getStoredPlayerName(slug));
         setCompletedGameResult(slug, {
           score: scoreResult.finalScore,

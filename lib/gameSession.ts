@@ -257,6 +257,7 @@ export function getRemainingTime(session: GameSession): number {
  */
 export function getCompletionTime(session: GameSession): number {
   const remaining = getRemainingTime(session);
-  const penalty = session.penaltySeconds ?? 0;
-  return Math.max(0, session.durationSeconds - penalty - remaining);
+  // Rule: completionTime = totalTime - remainingTime
+  // (wrong guesses already reduce remainingTime via penalty)
+  return Math.max(0, session.durationSeconds - remaining);
 }
