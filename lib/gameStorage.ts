@@ -15,6 +15,7 @@ import {
 const PLAYER_KEY_PREFIX = "escape-game-player:"; // legacy (slug-based)
 const ACTIVE_PLAYER_KEY = "escape-game-active-playerKey";
 const ACTIVE_PLAYER_NAME = "escape-game-active-playerName";
+const ACTIVE_MEMBER_ID = "escape-game-active-memberId";
 const COMPLETED_GAME_RESULT_PREFIX = "completedGameResult:";
 
 export function toPlayerKey(input: string | null | undefined): string {
@@ -36,6 +37,8 @@ export interface FinalGameResult {
   remainingTime: number;
   mistakes: number;
   attempts?: number;
+  memberId?: string | null;
+  avatarUrl?: string | null;
   playerName: string;
   slug: string;
   roomsSolvedFirstTry: number;
@@ -94,6 +97,23 @@ export function getActivePlayerName(): string | null {
   const raw = localStorage.getItem(ACTIVE_PLAYER_NAME);
   const name = (raw ?? "").trim();
   return name.length > 0 ? name : null;
+}
+
+export function getActiveMemberId(): string | null {
+  if (typeof window === "undefined") return null;
+  const raw = localStorage.getItem(ACTIVE_MEMBER_ID);
+  const memberId = (raw ?? "").trim();
+  return memberId.length > 0 ? memberId : null;
+}
+
+export function setActiveMemberId(memberId: string | null | undefined): void {
+  if (typeof window === "undefined") return;
+  const normalized = (memberId ?? "").trim();
+  if (normalized.length > 0) {
+    localStorage.setItem(ACTIVE_MEMBER_ID, normalized);
+  } else {
+    localStorage.removeItem(ACTIVE_MEMBER_ID);
+  }
 }
 
 export function getStoredPlayerName(slug: string): string | null {

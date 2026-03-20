@@ -17,6 +17,7 @@ export const db = getDatabase(app);
 const LEADERBOARD_BASE_PATH = "leaderboards";
 const PLAYER_STATS_PATH = "playerGameStats";
 const GLOBAL_LEADERBOARD_PATH = "globalLeaderboard";
+const USERS_PATH = "users";
 
 /**
  * Saves score to Firebase. Leaderboard stores completion time (bitirme süresi).
@@ -27,7 +28,9 @@ export async function saveScore(
   gameKey: string,
   score: number,
   completionTimeSeconds: number,
-  mistakes: number
+  mistakes: number,
+  memberId?: string | null,
+  avatarUrl?: string | null
 ) {
   console.log("[saveScore] called", {
     playerName,
@@ -35,25 +38,31 @@ export async function saveScore(
     score,
     completionTimeSeconds,
     mistakes,
+    memberId,
+    avatarUrl,
   });
 
   const safePlayerName = playerName.trim().replace(/[.#$/\[\]]/g, "_");
+  const safeMemberId = String(memberId ?? "").trim().replace(/[.#$/\[\]]/g, "_");
   if (safePlayerName !== playerName.trim()) {
     console.log("[saveScore] sanitized name", { from: playerName.trim(), to: safePlayerName });
   }
 
   const safeGameKey = String(gameKey ?? "").trim() || "unknown-game";
-  const playerKey = safePlayerName || "Dedektif";
+  // Primary identity key: memberId, fallback: playerName key for backward compatibility.
+  const identityKey = safeMemberId || safePlayerName || "Dedektif";
   const type = "escape_room";
 
   // Multi-game leaderboard path:
   // leaderboards/{type}/{gameKey}/{playerKey}
-  const leaderboardPath = `${LEADERBOARD_BASE_PATH}/${type}/${safeGameKey}/${playerKey}`;
-  const statsPath = `${PLAYER_STATS_PATH}/${playerKey}/${safeGameKey}`;
-  console.log("[saveScore] writing to paths:", { leaderboardPath, statsPath });
+  const leaderboardPath = `${LEADERBOARD_BASE_PATH}/${type}/${safeGameKey}/${identityKey}`;
+  const statsPath = `${PLAYER_STATS_PATH}/${identityKey}/${safeGameKey}`;
+  const userPath = `${USERS_PATH}/${identityKey}`;
+  console.log("[saveScore] writing to paths:", { leaderboardPath, statsPath, userPath });
 
   const leaderboardRef = ref(db, leaderboardPath);
   const statsRef = ref(db, statsPath);
+  const userRef = ref(db, userPath);
 
   try {
     // Read player stats for this game (attempts + best values).
@@ -140,7 +149,9 @@ export async function saveScore(
       : existingFirstAttempt;
 
     const statsUpdatePayload: Record<string, unknown> = {
+      memberId: safeMemberId || null,
       playerName: playerName.trim(),
+      avatarUrl: avatarUrl ?? null,
       type,
       game: safeGameKey,
       attemptCount,
@@ -162,7 +173,10 @@ export async function saveScore(
       // İlk başarılı tamamlanış: leaderboard'a sadece bir kez yazılır.
       // score = attempt cezası uygulanmış finalScore, time = completionTimeSeconds (bitirme süresi).
       await update(leaderboardRef, {
+        memberId: safeMemberId || null,
         name: playerName.trim(),
+        playerName: playerName.trim(),
+        avatarUrl: avatarUrl ?? null,
         score: finalScore,
         time: completionTimeSeconds,
         mistakes,
@@ -178,9 +192,17 @@ export async function saveScore(
       console.log("[saveScore] success (stats updated, leaderboard unchanged)");
     }
 
+    // Keep user profile node updated (display-only fields).
+    await update(userRef, {
+      memberId: safeMemberId || null,
+      playerName: playerName.trim(),
+      avatarUrl: avatarUrl ?? null,
+      updatedAt: now,
+    });
+
     // --- Global total leaderboard: sum bestFinalScore across all games for this player ---
     try {
-      const allStatsRef = ref(db, `${PLAYER_STATS_PATH}/${playerKey}`);
+      const allStatsRef = ref(db, `${PLAYER_STATS_PATH}/${identityKey}`);
       const allStatsSnap = await get(allStatsRef);
       if (allStatsSnap.exists()) {
         const allStats = allStatsSnap.val() as Record<
@@ -212,9 +234,12 @@ export async function saveScore(
           }
         }
 
-        const globalRef = ref(db, `${GLOBAL_LEADERBOARD_PATH}/${playerKey}`);
+        const globalRef = ref(db, `${GLOBAL_LEADERBOARD_PATH}/${identityKey}`);
         await update(globalRef, {
+          memberId: safeMemberId || null,
           name: playerName.trim(),
+          playerName: playerName.trim(),
+          avatarUrl: avatarUrl ?? null,
           totalScore,
           gamesPlayed,
           updatedAt: now,

@@ -4,6 +4,7 @@ import {
   getActivePlayerKey,
   getCompletedGameResult,
   getPlayerSession,
+  setActiveMemberId,
   getStoredEscaped,
   hasPlayerSession,
   restartPlayerSession,
@@ -39,6 +40,7 @@ export default function IntroStartButton({
 
   useEffect(() => {
     const fromQuery = searchParams.get("player");
+    const memberIdFromQuery = searchParams.get("memberId");
     const stored = getStoredPlayerName(slug);
     if (fromQuery && fromQuery.trim().length > 0) {
       setStoredPlayerName(slug, normalizePlayerName(fromQuery));
@@ -46,6 +48,7 @@ export default function IntroStartButton({
       // No query param and nothing stored: seed fallback.
       setStoredPlayerName(slug, "Dedektif");
     }
+    setActiveMemberId(memberIdFromQuery);
 
     const session = getPlayerSession(slug);
     const playerKey = getActivePlayerKey();

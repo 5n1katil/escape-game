@@ -184,7 +184,9 @@ export default function ResultClient({
           finalResult.slug,
           finalResult.score,
           finalResult.completionTime,
-          finalResult.mistakes
+          finalResult.mistakes,
+          finalResult.memberId ?? null,
+          finalResult.avatarUrl ?? null
         );
       } catch {
         // ignore

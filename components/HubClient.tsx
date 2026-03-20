@@ -5,6 +5,7 @@ import RestartButton from "@/components/RestartButton";
 import type { Room } from "@/data/rooms";
 import { calculateScore } from "@/lib/gameSession";
 import {
+  getActiveMemberId,
   getPlayerSession,
   getStoredMaxSolvedRoomIndex,
   getStoredPlayerName,
@@ -106,6 +107,8 @@ export default function HubClient({
           remainingTime: scoreResult.remainingTime,
           mistakes: scoreResult.totalAttempts,
           attempts: scoreResult.totalAttempts,
+          memberId: getActiveMemberId(),
+          avatarUrl: null,
           playerName,
           slug,
           roomsSolvedFirstTry: scoreResult.roomsSolvedFirstTry,
