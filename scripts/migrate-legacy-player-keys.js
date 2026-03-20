@@ -1,5 +1,6 @@
 /* eslint-disable no-console */
 const admin = require("firebase-admin");
+const fs = require("fs");
 
 function parseFlags(argv) {
   const execute = argv.includes("--execute");
@@ -42,7 +43,18 @@ function getDatabaseUrl() {
 
 function getCredential() {
   if (process.env.FIREBASE_SERVICE_ACCOUNT_JSON) {
-    return admin.credential.cert(JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT_JSON));
+    try {
+      return admin.credential.cert(JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT_JSON));
+    } catch {
+      console.error(
+        "[migration] FIREBASE_SERVICE_ACCOUNT_JSON is not valid JSON.\n" +
+          "Use one of:\n" +
+          "- PowerShell: $env:FIREBASE_SERVICE_ACCOUNT_JSON='{\"type\":\"service_account\",...}'; npm run migrate:legacy-player-keys\n" +
+          "- CMD: set FIREBASE_SERVICE_ACCOUNT_JSON={\"type\":\"service_account\",...} && npm run migrate:legacy-player-keys\n" +
+          "- macOS/Linux: FIREBASE_SERVICE_ACCOUNT_JSON='{\"type\":\"service_account\",...}' npm run migrate:legacy-player-keys"
+      );
+      process.exit(1);
+    }
   }
   if (process.env.GOOGLE_APPLICATION_CREDENTIALS) {
     return admin.credential.applicationDefault();
@@ -50,8 +62,27 @@ function getCredential() {
   return admin.credential.applicationDefault();
 }
 
+function ensureCredentialSourceOrExit() {
+  const hasInlineJson = Boolean(process.env.FIREBASE_SERVICE_ACCOUNT_JSON);
+  const credentialsPath = process.env.GOOGLE_APPLICATION_CREDENTIALS;
+  const hasCredentialsPath = Boolean(credentialsPath && fs.existsSync(credentialsPath));
+
+  if (hasInlineJson || hasCredentialsPath) return;
+
+  console.error(
+    "[migration] Missing Firebase Admin credentials.\n" +
+      "Provide ONE of the following before running:\n" +
+      "- PowerShell: $env:GOOGLE_APPLICATION_CREDENTIALS='C:\\\\absolute\\\\path\\\\service-account.json'; npm run migrate:legacy-player-keys\n" +
+      "- CMD: set GOOGLE_APPLICATION_CREDENTIALS=C:\\absolute\\path\\service-account.json && npm run migrate:legacy-player-keys\n" +
+      "- macOS/Linux: GOOGLE_APPLICATION_CREDENTIALS='/absolute/path/service-account.json' npm run migrate:legacy-player-keys\n" +
+      "- Or inline JSON: FIREBASE_SERVICE_ACCOUNT_JSON='{\"type\":\"service_account\",...}' npm run migrate:legacy-player-keys"
+  );
+  process.exit(1);
+}
+
 function initFirebaseAdmin() {
   if (admin.apps.length > 0) return admin.app();
+  ensureCredentialSourceOrExit();
   return admin.initializeApp({
     credential: getCredential(),
     databaseURL: getDatabaseUrl(),
