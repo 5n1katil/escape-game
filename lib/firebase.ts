@@ -48,17 +48,19 @@ export async function saveScore(
     console.log("[saveScore] sanitized name", { from: playerName.trim(), to: safePlayerName });
   }
 
-  function getMemberIdFromUrl(): string | null {
-    if (typeof window === "undefined") return null;
-    const params = new URLSearchParams(window.location.search);
-    const raw = params.get("memberId");
-    return raw ? raw.trim() : null;
-  }
-
+  const urlParams =
+    typeof window !== "undefined"
+      ? new URLSearchParams(window.location.search)
+      : null;
+  const urlMemberId = urlParams?.get("memberId") ?? null;
+  const localMemberId =
+    typeof window !== "undefined"
+      ? localStorage.getItem("memberId")
+      : null;
   const finalMemberId =
     (memberId && memberId.trim()) ||
-    (typeof window !== "undefined" ? localStorage.getItem("memberId") : null) ||
-    getMemberIdFromUrl() ||
+    (localMemberId && localMemberId.trim()) ||
+    (urlMemberId && urlMemberId.trim()) ||
     null;
 
   const safeGameKey = String(gameKey ?? "").trim() || "unknown-game";
@@ -66,6 +68,8 @@ export async function saveScore(
   const identityKey = finalMemberId || safePlayerName || "Dedektif";
   console.log("SAVE FINAL", {
     passedMemberId: memberId,
+    localMemberId,
+    urlMemberId,
     finalMemberId,
     identityKey,
   });
@@ -191,7 +195,7 @@ export async function saveScore(
       // İlk başarılı tamamlanış: leaderboard'a sadece bir kez yazılır.
       // score = attempt cezası uygulanmış finalScore, time = completionTimeSeconds (bitirme süresi).
       await update(leaderboardRef, {
-        memberId: safeMemberId || null,
+        memberId: finalMemberId ?? null,
         name: playerName.trim(),
         playerName: playerName.trim(),
         avatarUrl: avatarUrl ?? null,
