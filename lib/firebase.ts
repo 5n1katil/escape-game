@@ -51,6 +51,7 @@ export async function saveScore(
   const safeGameKey = String(gameKey ?? "").trim() || "unknown-game";
   // Primary identity key: memberId, fallback: playerName key for backward compatibility.
   const identityKey = safeMemberId || safePlayerName || "Dedektif";
+  console.log("SAVE identityKey:", identityKey, "memberId:", memberId ?? null);
   const type = "escape_room";
 
   // Multi-game leaderboard path:

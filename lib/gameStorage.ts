@@ -99,11 +99,23 @@ export function getActivePlayerName(): string | null {
   return name.length > 0 ? name : null;
 }
 
+export function getMemberIdFromUrl(): string | null {
+  if (typeof window === "undefined") return null;
+  const params = new URLSearchParams(window.location.search);
+  const memberId = (params.get("memberId") ?? "").trim();
+  return memberId.length > 0 ? memberId : null;
+}
+
 export function getActiveMemberId(): string | null {
   if (typeof window === "undefined") return null;
-  const raw = localStorage.getItem(ACTIVE_MEMBER_ID);
-  const memberId = (raw ?? "").trim();
-  return memberId.length > 0 ? memberId : null;
+  const stored = (localStorage.getItem(ACTIVE_MEMBER_ID) ?? "").trim();
+  if (stored.length > 0) return stored;
+  const fromUrl = getMemberIdFromUrl();
+  if (fromUrl) {
+    localStorage.setItem(ACTIVE_MEMBER_ID, fromUrl);
+    return fromUrl;
+  }
+  return null;
 }
 
 export function setActiveMemberId(memberId: string | null | undefined): void {

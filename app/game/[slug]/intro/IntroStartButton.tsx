@@ -41,7 +41,7 @@ export default function IntroStartButton({
   useEffect(() => {
     const fromQuery = searchParams.get("player");
     const memberIdFromQuery = searchParams.get("memberId");
-    console.log("[intro] memberId from URL", { slug, memberIdFromQuery });
+    console.log("INTRO memberId:", memberIdFromQuery);
     const stored = getStoredPlayerName(slug);
     if (fromQuery && fromQuery.trim().length > 0) {
       setStoredPlayerName(slug, normalizePlayerName(fromQuery));

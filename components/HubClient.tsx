@@ -6,6 +6,7 @@ import type { Room } from "@/data/rooms";
 import { calculateScore } from "@/lib/gameSession";
 import {
   getActiveMemberId,
+  getMemberIdFromUrl,
   getPlayerSession,
   getStoredMaxSolvedRoomIndex,
   getStoredPlayerName,
@@ -101,15 +102,15 @@ export default function HubClient({
         const scoreResult = calculateScore(session);
         const completionTime = Math.max(0, session.durationSeconds - scoreResult.remainingTime);
         const playerName = normalizePlayerName(getStoredPlayerName(slug));
-        const activeMemberId = getActiveMemberId();
-        console.log("[hub] active memberId before snapshot", { slug, activeMemberId });
+        const memberId = getActiveMemberId() || getMemberIdFromUrl() || null;
+        console.log("HUB memberId:", memberId);
         setCompletedGameResult(slug, {
           score: scoreResult.finalScore,
           completionTime,
           remainingTime: scoreResult.remainingTime,
           mistakes: scoreResult.totalAttempts,
           attempts: scoreResult.totalAttempts,
-          memberId: activeMemberId,
+          memberId,
           avatarUrl: null,
           playerName,
           slug,
