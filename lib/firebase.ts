@@ -164,7 +164,9 @@ export async function saveScore(
         score: finalScore,
         time: completionTimeSeconds,
         mistakes,
-        attemptCount,
+        // Leaderboard deneme değeri first completion denemesidir; sonraki denemelerde değişmez.
+        attemptCount: firstCompletionAttempt,
+        firstCompletionAttempt,
         type,
         game: safeGameKey,
         updatedAt: now,
