@@ -48,10 +48,27 @@ export async function saveScore(
     console.log("[saveScore] sanitized name", { from: playerName.trim(), to: safePlayerName });
   }
 
+  function getMemberIdFromUrl(): string | null {
+    if (typeof window === "undefined") return null;
+    const params = new URLSearchParams(window.location.search);
+    const raw = params.get("memberId");
+    return raw ? raw.trim() : null;
+  }
+
+  const finalMemberId =
+    (memberId && memberId.trim()) ||
+    (typeof window !== "undefined" ? localStorage.getItem("memberId") : null) ||
+    getMemberIdFromUrl() ||
+    null;
+
   const safeGameKey = String(gameKey ?? "").trim() || "unknown-game";
   // Primary identity key: memberId, fallback: playerName key for backward compatibility.
-  const identityKey = safeMemberId || safePlayerName || "Dedektif";
-  console.log("SAVE identityKey:", identityKey, "memberId:", memberId ?? null);
+  const identityKey = finalMemberId || safePlayerName || "Dedektif";
+  console.log("SAVE FINAL", {
+    passedMemberId: memberId,
+    finalMemberId,
+    identityKey,
+  });
   const type = "escape_room";
 
   // Multi-game leaderboard path:
