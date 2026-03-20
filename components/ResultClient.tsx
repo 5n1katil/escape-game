@@ -99,7 +99,13 @@ async function fetchGameLeaderboard(
     score: typeof row.score === "number" ? row.score : 0,
     time: typeof row.time === "number" ? row.time : 0,
   }));
-  entries.sort((a, b) => b.score - a.score || (a.time ?? 0) - (b.time ?? 0));
+  entries.sort((a, b) => {
+    if (b.score !== a.score) return b.score - a.score;
+    if (a.time === null && b.time === null) return 0;
+    if (a.time === null) return 1;
+    if (b.time === null) return -1;
+    return a.time - b.time;
+  });
   return entries.slice(0, limit);
 }
 
