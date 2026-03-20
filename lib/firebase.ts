@@ -128,18 +128,18 @@ export async function saveScore(
 
     const firstCompletionScore = isFirstSuccessfulCompletion
       ? finalScore
-      : existingFirstScore ?? finalScore;
+      : existingFirstScore;
     const firstCompletionTime = isFirstSuccessfulCompletion
       ? completionTimeSeconds
-      : existingFirstTime ?? completionTimeSeconds;
+      : existingFirstTime;
     const firstCompletionMistakes = isFirstSuccessfulCompletion
       ? mistakes
-      : existingFirstMistakes ?? mistakes;
+      : existingFirstMistakes;
     const firstCompletionAttempt = isFirstSuccessfulCompletion
       ? attemptCount
-      : existingFirstAttempt ?? attemptCount;
+      : existingFirstAttempt;
 
-    await update(statsRef, {
+    const statsUpdatePayload: Record<string, unknown> = {
       playerName: playerName.trim(),
       type,
       game: safeGameKey,
@@ -150,11 +150,13 @@ export async function saveScore(
       lastPlayedAt: now,
       updatedAt: now,
       hasCompleted: true,
-      firstCompletionScore,
-      firstCompletionTime,
-      firstCompletionMistakes,
-      firstCompletionAttempt,
-    });
+    };
+    if (firstCompletionScore !== undefined) statsUpdatePayload.firstCompletionScore = firstCompletionScore;
+    if (firstCompletionTime !== undefined) statsUpdatePayload.firstCompletionTime = firstCompletionTime;
+    if (firstCompletionMistakes !== undefined) statsUpdatePayload.firstCompletionMistakes = firstCompletionMistakes;
+    if (firstCompletionAttempt !== undefined) statsUpdatePayload.firstCompletionAttempt = firstCompletionAttempt;
+
+    await update(statsRef, statsUpdatePayload);
 
     if (isFirstSuccessfulCompletion || currentBestScore === null) {
       // İlk başarılı tamamlanış: leaderboard'a sadece bir kez yazılır.
@@ -165,8 +167,8 @@ export async function saveScore(
         time: completionTimeSeconds,
         mistakes,
         // Leaderboard deneme değeri first completion denemesidir; sonraki denemelerde değişmez.
-        attemptCount: firstCompletionAttempt,
-        firstCompletionAttempt,
+        attemptCount: firstCompletionAttempt ?? attemptCount,
+        firstCompletionAttempt: firstCompletionAttempt ?? attemptCount,
         type,
         game: safeGameKey,
         updatedAt: now,
