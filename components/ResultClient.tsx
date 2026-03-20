@@ -21,8 +21,6 @@ export interface LeaderboardEntry {
   score: number;
   /** Bitirme süresi (saniye). Firebase "time" alanı. */
   time: number;
-  /** Leaderboard deneme değeri: firstCompletionAttempt. */
-  attempt: number;
 }
 
 type GameLeaderboardRow = {
@@ -32,7 +30,6 @@ type GameLeaderboardRow = {
   time?: number;
   mistakes?: number;
   attemptCount?: number;
-  firstCompletionAttempt?: number;
   type?: string;
   game?: string;
   updatedAt?: number;
@@ -100,12 +97,6 @@ async function fetchGameLeaderboard(
     name: (row.name ?? key.replace(/_/g, " ")).toString().trim() || "—",
     score: typeof row.score === "number" ? row.score : 0,
     time: typeof row.time === "number" ? row.time : 0,
-    attempt:
-      typeof row.firstCompletionAttempt === "number"
-        ? row.firstCompletionAttempt
-        : typeof row.attemptCount === "number"
-          ? row.attemptCount
-          : 0,
   }));
   entries.sort((a, b) => b.score - a.score || a.time - b.time);
   return entries.slice(0, limit);
@@ -125,7 +116,6 @@ async function fetchGlobalLeaderboard(limit: number): Promise<LeaderboardEntry[]
     name: (row.name ?? key.replace(/_/g, " ")).toString().trim() || "—",
     score: typeof row.totalScore === "number" ? row.totalScore : 0,
     time: 0,
-    attempt: 0,
   }));
   entries.sort((a, b) => b.score - a.score);
   return entries.slice(0, limit);
@@ -372,9 +362,7 @@ export default function ResultClient({
                           {i + 1}. {entry.name}
                         </span>
                         <span className="tabular-nums text-amber-400/90">
-                          {leaderboardFilter.mode === "game"
-                            ? `${entry.score} · ${formatTime(entry.time)} · ${tResult.leaderboardAttemptLabel}: ${entry.attempt}`
-                            : `${entry.score}`}
+                          {entry.score} · {formatTime(entry.time)}
                         </span>
                       </li>
                     ))}
