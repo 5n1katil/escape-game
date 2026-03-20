@@ -79,7 +79,8 @@ export async function saveScore(
   // leaderboards/{type}/{gameKey}/{playerKey}
   const leaderboardPath = `${LEADERBOARD_BASE_PATH}/${type}/${safeGameKey}/${identityKey}`;
   const statsPath = `${PLAYER_STATS_PATH}/${identityKey}/${safeGameKey}`;
-  const userPath = `${USERS_PATH}/${identityKey}`;
+  const userIdentityKey = finalMemberId || identityKey;
+  const userPath = `${USERS_PATH}/${userIdentityKey}`;
   console.log("[saveScore] writing to paths:", { leaderboardPath, statsPath, userPath });
 
   const leaderboardRef = ref(db, leaderboardPath);
@@ -215,10 +216,23 @@ export async function saveScore(
     }
 
     // Keep user profile node updated (display-only fields).
+    // When memberId exists, this writes under users/{memberId} and auto-creates if missing.
+    const userSnap = await get(userRef);
+    const userExisting = userSnap.exists()
+      ? (userSnap.val() as { createdAt?: unknown; avatarUrl?: unknown } | null)
+      : null;
+    const existingCreatedAt =
+      typeof userExisting?.createdAt === "number" && Number.isFinite(userExisting.createdAt)
+        ? userExisting.createdAt
+        : null;
+    const existingAvatarUrl =
+      typeof userExisting?.avatarUrl === "string" ? userExisting.avatarUrl : null;
+
     await update(userRef, {
-      memberId: safeMemberId || null,
+      memberId: finalMemberId ?? null,
       playerName: playerName.trim(),
-      avatarUrl: avatarUrl ?? null,
+      avatarUrl: avatarUrl ?? existingAvatarUrl ?? null,
+      createdAt: existingCreatedAt ?? now,
       updatedAt: now,
     });
 
