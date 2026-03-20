@@ -20,7 +20,7 @@ export interface LeaderboardEntry {
   name: string;
   score: number;
   /** Bitirme süresi (saniye). Firebase "time" alanı. */
-  time: number;
+  time: number | null;
 }
 
 type GameLeaderboardRow = {
@@ -38,6 +38,7 @@ type GameLeaderboardRow = {
 type GlobalLeaderboardRow = {
   name?: string;
   totalScore?: number;
+  score?: number;
   gamesPlayed?: number;
   updatedAt?: number;
 };
@@ -98,7 +99,7 @@ async function fetchGameLeaderboard(
     score: typeof row.score === "number" ? row.score : 0,
     time: typeof row.time === "number" ? row.time : 0,
   }));
-  entries.sort((a, b) => b.score - a.score || a.time - b.time);
+  entries.sort((a, b) => b.score - a.score || (a.time ?? 0) - (b.time ?? 0));
   return entries.slice(0, limit);
 }
 
@@ -112,11 +113,52 @@ async function fetchGlobalLeaderboard(limit: number): Promise<LeaderboardEntry[]
   if (!res.ok) return [];
   const data: Record<string, GlobalLeaderboardRow> | null = await res.json();
   if (!data || typeof data !== "object") return [];
-  const entries: LeaderboardEntry[] = Object.entries(data).map(([key, row]) => ({
-    name: (row.name ?? key.replace(/_/g, " ")).toString().trim() || "—",
-    score: typeof row.totalScore === "number" ? row.totalScore : 0,
-    time: 0,
-  }));
+
+  async function fetchAverageCompletionTime(playerKey: string): Promise<number | null> {
+    const statsRes = await fetch(
+      `${FIREBASE_DB_BASE}/playerGameStats/${encodeURIComponent(playerKey)}.json`
+    );
+    if (!statsRes.ok) return null;
+    const stats: Record<string, { firstCompletionTime?: unknown; bestTime?: unknown; time?: unknown }> | null =
+      await statsRes.json();
+    if (!stats || typeof stats !== "object") return null;
+
+    let total = 0;
+    let count = 0;
+    for (const row of Object.values(stats)) {
+      const firstCompletionTime =
+        typeof row?.firstCompletionTime === "number" && Number.isFinite(row.firstCompletionTime)
+          ? row.firstCompletionTime
+          : null;
+      const legacyBestTime =
+        typeof row?.bestTime === "number" && Number.isFinite(row.bestTime) ? row.bestTime : null;
+      const legacyTime =
+        typeof row?.time === "number" && Number.isFinite(row.time) ? row.time : null;
+      const effectiveTime = firstCompletionTime ?? legacyBestTime ?? legacyTime;
+      if (effectiveTime !== null) {
+        total += effectiveTime;
+        count += 1;
+      }
+    }
+    if (count === 0) return null;
+    return Math.round(total / count);
+  }
+
+  const entries: LeaderboardEntry[] = await Promise.all(
+    Object.entries(data).map(async ([key, row]) => {
+      const avgTime = await fetchAverageCompletionTime(key);
+      return {
+        name: (row.name ?? key.replace(/_/g, " ")).toString().trim() || "—",
+        score:
+          typeof row.totalScore === "number"
+            ? row.totalScore
+            : typeof row.score === "number"
+              ? row.score
+              : 0,
+        time: avgTime,
+      };
+    })
+  );
   entries.sort((a, b) => b.score - a.score);
   return entries.slice(0, limit);
 }
@@ -365,7 +407,7 @@ export default function ResultClient({
                           {i + 1}. {entry.name}
                         </span>
                         <span className="tabular-nums text-amber-400/90">
-                          {entry.score} · {formatTime(entry.time)}
+                          {entry.score} · {entry.time === null ? "—" : formatTime(entry.time)}
                         </span>
                       </li>
                     ))}
