@@ -41,6 +41,7 @@ export default function IntroStartButton({
   useEffect(() => {
     const fromQuery = searchParams.get("player");
     const memberIdFromQuery = searchParams.get("memberId");
+    console.log("[intro] memberId from URL", { slug, memberIdFromQuery });
     const stored = getStoredPlayerName(slug);
     if (fromQuery && fromQuery.trim().length > 0) {
       setStoredPlayerName(slug, normalizePlayerName(fromQuery));
@@ -49,6 +50,7 @@ export default function IntroStartButton({
       setStoredPlayerName(slug, "Dedektif");
     }
     setActiveMemberId(memberIdFromQuery);
+    console.log("[intro] active memberId persisted", { slug, memberId: memberIdFromQuery ?? null });
 
     const session = getPlayerSession(slug);
     const playerKey = getActivePlayerKey();

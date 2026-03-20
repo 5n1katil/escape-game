@@ -101,13 +101,15 @@ export default function HubClient({
         const scoreResult = calculateScore(session);
         const completionTime = Math.max(0, session.durationSeconds - scoreResult.remainingTime);
         const playerName = normalizePlayerName(getStoredPlayerName(slug));
+        const activeMemberId = getActiveMemberId();
+        console.log("[hub] active memberId before snapshot", { slug, activeMemberId });
         setCompletedGameResult(slug, {
           score: scoreResult.finalScore,
           completionTime,
           remainingTime: scoreResult.remainingTime,
           mistakes: scoreResult.totalAttempts,
           attempts: scoreResult.totalAttempts,
-          memberId: getActiveMemberId(),
+          memberId: activeMemberId,
           avatarUrl: null,
           playerName,
           slug,

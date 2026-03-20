@@ -179,6 +179,10 @@ export default function ResultClient({
     scoreSavedRef.current = true;
     (async () => {
       try {
+        console.log("[result] finalResult.memberId before saveScore", {
+          slug: finalResult.slug,
+          memberId: finalResult.memberId ?? null,
+        });
         await saveScore(
           finalResult.playerName,
           finalResult.slug,
