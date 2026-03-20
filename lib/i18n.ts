@@ -28,6 +28,10 @@ export const translations = {
       startGame: "Oyuna Başla",
       continueGame: "Devam Et",
       restartFromIntro: "Baştan Başlat",
+      rankingModalTitle: "Puanlama ve Sıralama Bilgisi",
+      rankingModalBody1: "Sıralama tablosuna yalnızca ilk başarılı tamamlamada elde edilen puan yazılır.",
+      rankingModalBody2: "Aynı oyunu tekrar oynarsanız sıralama puanınız değişmez. Tekrar oynayışlar pratik amaçlıdır.",
+      rankingModalCta: "Hazırsanız başlayın",
       back: "← Geri",
     },
     room: {
@@ -147,6 +151,10 @@ export const translations = {
       startGame: "Start Game",
       continueGame: "Continue",
       restartFromIntro: "Start Over",
+      rankingModalTitle: "Scoring and Ranking Info",
+      rankingModalBody1: "Only your first successful completion score is written to the leaderboard.",
+      rankingModalBody2: "If you replay the same game, your leaderboard score does not change. Replays are for practice.",
+      rankingModalCta: "Ready? Start now",
       back: "← Back",
     },
     room: {

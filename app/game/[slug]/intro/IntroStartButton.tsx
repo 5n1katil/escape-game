@@ -1,6 +1,10 @@
 "use client";
 
 import {
+  getActivePlayerKey,
+  getCompletedGameResult,
+  getPlayerSession,
+  getStoredEscaped,
   hasPlayerSession,
   restartPlayerSession,
   startNewPlayerSession,
@@ -29,10 +33,11 @@ export default function IntroStartButton({
   const router = useRouter();
   const searchParams = useSearchParams();
   const [hasSession, setHasSession] = useState(false);
+  const [isCompleted, setIsCompleted] = useState(false);
+  const [showRankingModal, setShowRankingModal] = useState(true);
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    setHasSession(hasPlayerSession(slug));
     const fromQuery = searchParams.get("player");
     const stored = getStoredPlayerName(slug);
     if (fromQuery && fromQuery.trim().length > 0) {
@@ -41,6 +46,14 @@ export default function IntroStartButton({
       // No query param and nothing stored: seed fallback.
       setStoredPlayerName(slug, "Dedektif");
     }
+
+    const session = getPlayerSession(slug);
+    const playerKey = getActivePlayerKey();
+    const completedSnapshot = playerKey ? getCompletedGameResult(playerKey, slug) : null;
+    const escapedState = getStoredEscaped(slug) === true || session?.escaped === true;
+
+    setHasSession(hasPlayerSession(slug));
+    setIsCompleted(Boolean(completedSnapshot) || escapedState);
     setMounted(true);
   }, [slug, searchParams]);
 
@@ -67,33 +80,101 @@ export default function IntroStartButton({
   }
 
   if (hasSession) {
+    if (isCompleted) {
+      return (
+        <>
+          {showRankingModal && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 px-4">
+              <div className="w-full max-w-lg rounded-2xl border border-amber-700/50 bg-zinc-900 p-5 shadow-2xl sm:p-6">
+                <h3 className="text-lg font-semibold text-amber-300">{t.intro.rankingModalTitle}</h3>
+                <p className="mt-3 text-sm leading-relaxed text-zinc-300">{t.intro.rankingModalBody1}</p>
+                <p className="mt-2 text-sm leading-relaxed text-zinc-300">{t.intro.rankingModalBody2}</p>
+                <button
+                  type="button"
+                  onClick={() => setShowRankingModal(false)}
+                  className="mt-5 inline-flex min-h-[48px] w-full items-center justify-center rounded-xl bg-amber-600 px-5 py-3 text-base font-semibold text-white transition-colors hover:bg-amber-500 active:scale-[0.98]"
+                >
+                  {t.intro.rankingModalCta}
+                </button>
+              </div>
+            </div>
+          )}
+          <div className="flex flex-col gap-3 sm:flex-row sm:gap-4">
+            <button
+              type="button"
+              onClick={handleRestart}
+              className="flex-1 min-h-[56px] touch-manipulation rounded-xl border-2 border-amber-700/60 bg-transparent px-6 py-4 text-lg font-semibold text-amber-100/90 transition-colors hover:border-amber-600/80 hover:bg-amber-900/20 active:scale-[0.98] sm:min-h-[64px] sm:text-xl"
+            >
+              {t.intro.restartFromIntro}
+            </button>
+          </div>
+        </>
+      );
+    }
+
     return (
-      <div className="flex flex-col gap-3 sm:flex-row sm:gap-4">
-        <button
-          type="button"
-          onClick={handleContinue}
-          className="flex-1 min-h-[56px] touch-manipulation rounded-xl bg-amber-600 px-6 py-4 text-lg font-semibold text-white shadow-lg shadow-amber-900/30 transition-all hover:bg-amber-500 hover:shadow-amber-500/25 active:scale-[0.98] sm:min-h-[64px] sm:text-xl"
-        >
-          {t.intro.continueGame}
-        </button>
-        <button
-          type="button"
-          onClick={handleRestart}
-          className="flex-1 min-h-[56px] touch-manipulation rounded-xl border-2 border-amber-700/60 bg-transparent px-6 py-4 text-lg font-semibold text-amber-100/90 transition-colors hover:border-amber-600/80 hover:bg-amber-900/20 active:scale-[0.98] sm:min-h-[64px] sm:text-xl"
-        >
-          {t.intro.restartFromIntro}
-        </button>
-      </div>
+      <>
+        {showRankingModal && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 px-4">
+            <div className="w-full max-w-lg rounded-2xl border border-amber-700/50 bg-zinc-900 p-5 shadow-2xl sm:p-6">
+              <h3 className="text-lg font-semibold text-amber-300">{t.intro.rankingModalTitle}</h3>
+              <p className="mt-3 text-sm leading-relaxed text-zinc-300">{t.intro.rankingModalBody1}</p>
+              <p className="mt-2 text-sm leading-relaxed text-zinc-300">{t.intro.rankingModalBody2}</p>
+              <button
+                type="button"
+                onClick={() => setShowRankingModal(false)}
+                className="mt-5 inline-flex min-h-[48px] w-full items-center justify-center rounded-xl bg-amber-600 px-5 py-3 text-base font-semibold text-white transition-colors hover:bg-amber-500 active:scale-[0.98]"
+              >
+                {t.intro.rankingModalCta}
+              </button>
+            </div>
+          </div>
+        )}
+        <div className="flex flex-col gap-3 sm:flex-row sm:gap-4">
+          <button
+            type="button"
+            onClick={handleContinue}
+            className="flex-1 min-h-[56px] touch-manipulation rounded-xl bg-amber-600 px-6 py-4 text-lg font-semibold text-white shadow-lg shadow-amber-900/30 transition-all hover:bg-amber-500 hover:shadow-amber-500/25 active:scale-[0.98] sm:min-h-[64px] sm:text-xl"
+          >
+            {t.intro.continueGame}
+          </button>
+          <button
+            type="button"
+            onClick={handleRestart}
+            className="flex-1 min-h-[56px] touch-manipulation rounded-xl border-2 border-amber-700/60 bg-transparent px-6 py-4 text-lg font-semibold text-amber-100/90 transition-colors hover:border-amber-600/80 hover:bg-amber-900/20 active:scale-[0.98] sm:min-h-[64px] sm:text-xl"
+          >
+            {t.intro.restartFromIntro}
+          </button>
+        </div>
+      </>
     );
   }
 
   return (
-    <button
-      type="button"
-      onClick={handleStart}
-      className="w-full min-h-[64px] touch-manipulation rounded-xl bg-amber-600 px-8 py-5 text-xl font-bold text-white shadow-lg shadow-amber-900/40 transition-all hover:bg-amber-500 hover:shadow-amber-500/30 active:scale-[0.98] sm:min-h-[72px] sm:text-2xl"
-    >
-      {t.intro.startGame}
-    </button>
+    <>
+      {showRankingModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 px-4">
+          <div className="w-full max-w-lg rounded-2xl border border-amber-700/50 bg-zinc-900 p-5 shadow-2xl sm:p-6">
+            <h3 className="text-lg font-semibold text-amber-300">{t.intro.rankingModalTitle}</h3>
+            <p className="mt-3 text-sm leading-relaxed text-zinc-300">{t.intro.rankingModalBody1}</p>
+            <p className="mt-2 text-sm leading-relaxed text-zinc-300">{t.intro.rankingModalBody2}</p>
+            <button
+              type="button"
+              onClick={() => setShowRankingModal(false)}
+              className="mt-5 inline-flex min-h-[48px] w-full items-center justify-center rounded-xl bg-amber-600 px-5 py-3 text-base font-semibold text-white transition-colors hover:bg-amber-500 active:scale-[0.98]"
+            >
+              {t.intro.rankingModalCta}
+            </button>
+          </div>
+        </div>
+      )}
+      <button
+        type="button"
+        onClick={handleStart}
+        className="w-full min-h-[64px] touch-manipulation rounded-xl bg-amber-600 px-8 py-5 text-xl font-bold text-white shadow-lg shadow-amber-900/40 transition-all hover:bg-amber-500 hover:shadow-amber-500/30 active:scale-[0.98] sm:min-h-[72px] sm:text-2xl"
+      >
+        {t.intro.startGame}
+      </button>
+    </>
   );
 }
