@@ -73,6 +73,32 @@ export default function IntroStartButton({
     router.push(`/game/${slug}/hub`);
   }
 
+  function renderRankingModal() {
+    if (!showRankingModal) return null;
+    return (
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/65 px-4 backdrop-blur-[2px]">
+        <div className="w-full max-w-2xl rounded-2xl border border-amber-500/40 bg-gradient-to-br from-zinc-900/95 to-zinc-950/95 p-4 shadow-[0_0_45px_rgba(245,158,11,0.25)] ring-1 ring-amber-500/20 sm:p-6">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div className="min-w-0 flex-1">
+              <h3 className="text-lg font-semibold text-amber-300">{t.intro.rankingModalTitle}</h3>
+              <p className="mt-2 text-sm leading-relaxed text-zinc-300">{t.intro.rankingModalBody1}</p>
+              <p className="mt-1.5 text-sm leading-relaxed text-zinc-300">{t.intro.rankingModalBody2}</p>
+            </div>
+            <div className="sm:w-[220px] sm:flex-shrink-0">
+              <button
+                type="button"
+                onClick={() => setShowRankingModal(false)}
+                className="inline-flex min-h-[48px] w-full items-center justify-center rounded-xl bg-amber-600 px-5 py-3 text-base font-semibold text-white shadow-lg shadow-amber-900/35 transition-all hover:bg-amber-500 hover:shadow-amber-500/30 active:scale-[0.98]"
+              >
+                {t.intro.rankingModalCta}
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   if (!mounted) {
     return (
       <div className="h-14 w-full animate-pulse rounded-lg bg-zinc-800/50" />
@@ -83,22 +109,7 @@ export default function IntroStartButton({
     if (isCompleted) {
       return (
         <>
-          {showRankingModal && (
-            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 px-4">
-              <div className="w-full max-w-lg rounded-2xl border border-amber-700/50 bg-zinc-900 p-5 shadow-2xl sm:p-6">
-                <h3 className="text-lg font-semibold text-amber-300">{t.intro.rankingModalTitle}</h3>
-                <p className="mt-3 text-sm leading-relaxed text-zinc-300">{t.intro.rankingModalBody1}</p>
-                <p className="mt-2 text-sm leading-relaxed text-zinc-300">{t.intro.rankingModalBody2}</p>
-                <button
-                  type="button"
-                  onClick={() => setShowRankingModal(false)}
-                  className="mt-5 inline-flex min-h-[48px] w-full items-center justify-center rounded-xl bg-amber-600 px-5 py-3 text-base font-semibold text-white transition-colors hover:bg-amber-500 active:scale-[0.98]"
-                >
-                  {t.intro.rankingModalCta}
-                </button>
-              </div>
-            </div>
-          )}
+          {renderRankingModal()}
           <div className="flex flex-col gap-3 sm:flex-row sm:gap-4">
             <button
               type="button"
@@ -114,22 +125,7 @@ export default function IntroStartButton({
 
     return (
       <>
-        {showRankingModal && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 px-4">
-            <div className="w-full max-w-lg rounded-2xl border border-amber-700/50 bg-zinc-900 p-5 shadow-2xl sm:p-6">
-              <h3 className="text-lg font-semibold text-amber-300">{t.intro.rankingModalTitle}</h3>
-              <p className="mt-3 text-sm leading-relaxed text-zinc-300">{t.intro.rankingModalBody1}</p>
-              <p className="mt-2 text-sm leading-relaxed text-zinc-300">{t.intro.rankingModalBody2}</p>
-              <button
-                type="button"
-                onClick={() => setShowRankingModal(false)}
-                className="mt-5 inline-flex min-h-[48px] w-full items-center justify-center rounded-xl bg-amber-600 px-5 py-3 text-base font-semibold text-white transition-colors hover:bg-amber-500 active:scale-[0.98]"
-              >
-                {t.intro.rankingModalCta}
-              </button>
-            </div>
-          </div>
-        )}
+        {renderRankingModal()}
         <div className="flex flex-col gap-3 sm:flex-row sm:gap-4">
           <button
             type="button"
@@ -152,22 +148,7 @@ export default function IntroStartButton({
 
   return (
     <>
-      {showRankingModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 px-4">
-          <div className="w-full max-w-lg rounded-2xl border border-amber-700/50 bg-zinc-900 p-5 shadow-2xl sm:p-6">
-            <h3 className="text-lg font-semibold text-amber-300">{t.intro.rankingModalTitle}</h3>
-            <p className="mt-3 text-sm leading-relaxed text-zinc-300">{t.intro.rankingModalBody1}</p>
-            <p className="mt-2 text-sm leading-relaxed text-zinc-300">{t.intro.rankingModalBody2}</p>
-            <button
-              type="button"
-              onClick={() => setShowRankingModal(false)}
-              className="mt-5 inline-flex min-h-[48px] w-full items-center justify-center rounded-xl bg-amber-600 px-5 py-3 text-base font-semibold text-white transition-colors hover:bg-amber-500 active:scale-[0.98]"
-            >
-              {t.intro.rankingModalCta}
-            </button>
-          </div>
-        </div>
-      )}
+      {renderRankingModal()}
       <button
         type="button"
         onClick={handleStart}
