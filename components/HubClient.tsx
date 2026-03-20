@@ -105,6 +105,7 @@ export default function HubClient({
           completionTime,
           remainingTime: scoreResult.remainingTime,
           mistakes: scoreResult.totalAttempts,
+          attempts: scoreResult.totalAttempts,
           playerName,
           slug,
           roomsSolvedFirstTry: scoreResult.roomsSolvedFirstTry,

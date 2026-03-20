@@ -18,13 +18,6 @@ const LEADERBOARD_BASE_PATH = "leaderboards";
 const PLAYER_STATS_PATH = "playerGameStats";
 const GLOBAL_LEADERBOARD_PATH = "globalLeaderboard";
 
-function getAttemptMultiplier(attemptCount: number): number {
-  if (attemptCount <= 1) return 1.0;
-  if (attemptCount === 2) return 0.8;
-  if (attemptCount === 3) return 0.6;
-  return 0.4;
-}
-
 /**
  * Saves score to Firebase. Leaderboard stores completion time (bitirme süresi).
  * @param completionTimeSeconds - Bitirme süresi (saniye). Firebase'de "time" anahtarıyla yazılır (geri uyumluluk).
@@ -85,15 +78,14 @@ export async function saveScore(
         : 0;
 
     const attemptCount = oldAttemptCount + 1;
-    const multiplier = getAttemptMultiplier(attemptCount);
-    const finalScore = Math.round(score * multiplier);
+    // Single source of truth: score comes from final snapshot; do not recalculate here.
+    const finalScore = Math.round(score);
     const now = Date.now();
 
-    console.log("[saveScore] attempt penalty", {
+    console.log("[saveScore] snapshot score", {
       oldAttemptCount,
       attemptCount,
-      multiplier,
-      baseScore: score,
+      snapshotScore: score,
       finalScore,
     });
 
@@ -155,7 +147,6 @@ export async function saveScore(
       lastBaseScore: score,
       lastFinalScore: finalScore,
       lastTime: completionTimeSeconds,
-      lastMultiplier: multiplier,
       lastPlayedAt: now,
       updatedAt: now,
       hasCompleted: true,
@@ -231,7 +222,6 @@ export async function saveScore(
 
     return {
       attemptCount,
-      multiplier,
       finalScore,
       isFirstSuccessfulCompletion,
     };

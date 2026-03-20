@@ -35,6 +35,7 @@ export interface FinalGameResult {
   completionTime: number;
   remainingTime: number;
   mistakes: number;
+  attempts?: number;
   playerName: string;
   slug: string;
   roomsSolvedFirstTry: number;

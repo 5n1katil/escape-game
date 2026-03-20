@@ -273,7 +273,9 @@ export default function ResultClient({
                 </div>
                 <div className="flex justify-between rounded-lg bg-zinc-900/50 px-4 py-2 sm:flex-col sm:gap-0">
                   <dt className="text-sm text-zinc-400">{tRoomResult.totalAttempts}</dt>
-                  <dd className="text-lg font-medium text-zinc-200 tabular-nums">{finalResult.mistakes}</dd>
+                  <dd className="text-lg font-medium text-zinc-200 tabular-nums">
+                    {finalResult.attempts ?? finalResult.mistakes}
+                  </dd>
                 </div>
                 <div className="flex justify-between rounded-lg bg-zinc-900/50 px-4 py-2 sm:flex-col sm:gap-0">
                   <dt className="text-sm text-zinc-400">{tRoomResult.firstTryCount}</dt>
