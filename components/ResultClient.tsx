@@ -21,6 +21,7 @@ export interface LeaderboardEntry {
   score: number;
   /** Bitirme süresi (saniye). Firebase "time" alanı. */
   time: number | null;
+  avatarUrl?: string | null;
 }
 
 type GameLeaderboardRow = {
@@ -28,6 +29,7 @@ type GameLeaderboardRow = {
   score?: number;
   baseScore?: number;
   time?: number;
+  avatarUrl?: string | null;
   mistakes?: number;
   attemptCount?: number;
   type?: string;
@@ -39,6 +41,7 @@ type GlobalLeaderboardRow = {
   name?: string;
   totalScore?: number;
   score?: number;
+  avatarUrl?: string | null;
   gamesPlayed?: number;
   updatedAt?: number;
 };
@@ -66,6 +69,9 @@ interface ResultClientProps {
   gizemMalikanesiUrl?: string;
   gizemMalikanesiLabel?: string;
 }
+
+const DEFAULT_DETECTIVE_AVATAR =
+  "data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='64' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='32' fill='%233f3f46'/%3E%3Ctext x='32' y='40' text-anchor='middle' font-size='28' fill='%23fbbf24' font-family='Arial,sans-serif'%3E%F0%9F%95%B5%EF%B8%8F%3C/text%3E%3C/svg%3E";
 
 function formatTime(seconds: number): string {
   const clamped = Math.max(0, Math.floor(seconds));
@@ -98,6 +104,7 @@ async function fetchGameLeaderboard(
     name: (row.name ?? key.replace(/_/g, " ")).toString().trim() || "—",
     score: typeof row.score === "number" ? row.score : 0,
     time: typeof row.time === "number" ? row.time : 0,
+    avatarUrl: typeof row.avatarUrl === "string" ? row.avatarUrl : null,
   }));
   entries.sort((a, b) => {
     if (b.score !== a.score) return b.score - a.score;
@@ -162,6 +169,7 @@ async function fetchGlobalLeaderboard(limit: number): Promise<LeaderboardEntry[]
               ? row.score
               : 0,
         time: avgTime,
+        avatarUrl: typeof row.avatarUrl === "string" ? row.avatarUrl : null,
       };
     })
   );
@@ -409,7 +417,13 @@ export default function ResultClient({
                         key={entry.name + i}
                         className="flex items-center justify-between rounded-lg bg-zinc-800/60 px-4 py-2.5 text-left"
                       >
-                        <span className="font-medium text-zinc-200">
+                        <span className="flex items-center gap-2 font-medium text-zinc-200">
+                          <img
+                            src={entry.avatarUrl || DEFAULT_DETECTIVE_AVATAR}
+                            alt=""
+                            className="h-6 w-6 rounded-full object-cover ring-1 ring-zinc-600/70"
+                            loading="lazy"
+                          />
                           {i + 1}. {entry.name}
                         </span>
                         <span className="tabular-nums text-amber-400/90">
