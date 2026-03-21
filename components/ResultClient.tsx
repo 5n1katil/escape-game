@@ -21,11 +21,13 @@ export interface LeaderboardEntry {
   score: number;
   /** Bitirme süresi (saniye). Firebase "time" alanı. */
   time: number | null;
+  memberId?: string | null;
   avatarUrl?: string | null;
 }
 
 type GameLeaderboardRow = {
   name?: string;
+  memberId?: string | null;
   score?: number;
   baseScore?: number;
   time?: number;
@@ -39,6 +41,7 @@ type GameLeaderboardRow = {
 
 type GlobalLeaderboardRow = {
   name?: string;
+  memberId?: string | null;
   totalScore?: number;
   score?: number;
   avatarUrl?: string | null;
@@ -73,6 +76,40 @@ interface ResultClientProps {
 const DEFAULT_DETECTIVE_AVATAR =
   "data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='64' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='32' fill='%233f3f46'/%3E%3Ctext x='32' y='40' text-anchor='middle' font-size='28' fill='%23fbbf24' font-family='Arial,sans-serif'%3E%F0%9F%95%B5%EF%B8%8F%3C/text%3E%3C/svg%3E";
 
+async function resolveMissingAvatars(entries: LeaderboardEntry[]): Promise<LeaderboardEntry[]> {
+  const missingMemberIds = Array.from(
+    new Set(
+      entries
+        .filter((entry) => !entry.avatarUrl && entry.memberId)
+        .map((entry) => entry.memberId as string)
+    )
+  );
+  if (missingMemberIds.length === 0) return entries;
+
+  const avatarMap: Record<string, string> = {};
+  await Promise.all(
+    missingMemberIds.map(async (memberId) => {
+      try {
+        const res = await fetch(`${FIREBASE_DB_BASE}/users/${encodeURIComponent(memberId)}.json`);
+        if (!res.ok) return;
+        const user = (await res.json()) as { avatarUrl?: unknown } | null;
+        if (user && typeof user.avatarUrl === "string" && user.avatarUrl.trim()) {
+          avatarMap[memberId] = user.avatarUrl;
+        }
+      } catch {
+        // ignore avatar lookup errors; fallback avatar will be used.
+      }
+    })
+  );
+
+  return entries.map((entry) => ({
+    ...entry,
+    avatarUrl:
+      entry.avatarUrl ||
+      (entry.memberId ? avatarMap[entry.memberId] ?? null : null),
+  }));
+}
+
 function formatTime(seconds: number): string {
   const clamped = Math.max(0, Math.floor(seconds));
   const h = Math.floor(clamped / 3600);
@@ -100,20 +137,28 @@ async function fetchGameLeaderboard(
   if (!res.ok) return [];
   const data: Record<string, GameLeaderboardRow> | null = await res.json();
   if (!data || typeof data !== "object") return [];
-  const entries: LeaderboardEntry[] = Object.entries(data).map(([key, row]) => ({
-    name: (row.name ?? key.replace(/_/g, " ")).toString().trim() || "—",
-    score: typeof row.score === "number" ? row.score : 0,
-    time: typeof row.time === "number" ? row.time : 0,
-    avatarUrl: typeof row.avatarUrl === "string" ? row.avatarUrl : null,
-  }));
-  entries.sort((a, b) => {
+  const entries: LeaderboardEntry[] = Object.entries(data).map(([key, row]) => {
+    const rowMemberId =
+      typeof row.memberId === "string" && row.memberId.trim()
+        ? row.memberId.trim()
+        : key;
+    return {
+      name: (row.name ?? key.replace(/_/g, " ")).toString().trim() || "—",
+      score: typeof row.score === "number" ? row.score : 0,
+      time: typeof row.time === "number" ? row.time : 0,
+      memberId: rowMemberId,
+      avatarUrl: typeof row.avatarUrl === "string" ? row.avatarUrl : null,
+    };
+  });
+  const enrichedEntries = await resolveMissingAvatars(entries);
+  enrichedEntries.sort((a, b) => {
     if (b.score !== a.score) return b.score - a.score;
     if (a.time === null && b.time === null) return 0;
     if (a.time === null) return 1;
     if (b.time === null) return -1;
     return a.time - b.time;
   });
-  return entries.slice(0, limit);
+  return enrichedEntries.slice(0, limit);
 }
 
 /**
@@ -169,12 +214,17 @@ async function fetchGlobalLeaderboard(limit: number): Promise<LeaderboardEntry[]
               ? row.score
               : 0,
         time: avgTime,
+        memberId:
+          typeof row.memberId === "string" && row.memberId.trim()
+            ? row.memberId.trim()
+            : key,
         avatarUrl: typeof row.avatarUrl === "string" ? row.avatarUrl : null,
       };
     })
   );
-  entries.sort((a, b) => b.score - a.score);
-  return entries.slice(0, limit);
+  const enrichedEntries = await resolveMissingAvatars(entries);
+  enrichedEntries.sort((a, b) => b.score - a.score);
+  return enrichedEntries.slice(0, limit);
 }
 
 async function resolveLeaderboardData(
