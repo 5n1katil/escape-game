@@ -3,9 +3,16 @@
  */
 import { digitalArafRooms } from "./digitalAraf";
 import { rooms } from "./rooms";
+import { zihinLabirentiRooms } from "./zihinLabirenti";
 
 /** Wix promo page; intro "Geri" goes here. */
 export const WIX_LANDING_BASE = "https://www.5n1dedektif.com";
+
+/**
+ * Bu slug'lar `app/game/{slug}/` altında kendi sayfalarına sahip;
+ * `app/game/[slug]/` içindeki generateStaticParams bunları dışlar (çift rota önlenir).
+ */
+export const GAME_SLUGS_WITH_DEDICATED_ROUTES: readonly string[] = ["zihin-labirenti"];
 
 export type VisualThemeId = "temple" | "cyber";
 
@@ -92,7 +99,39 @@ export const games = [
     mapImagePath: "/images/digital-map.jpg",
     introCoverImagePath: null,
   },
+  {
+    slug: "zihin-labirenti",
+    title: "Zihin Labirenti: Son Veri",
+    wixLandingUrl: `${WIX_LANDING_BASE}/zihin-labirenti`,
+    story:
+      "Prof. Dr. Erhan Sivrizeka’nın bilinci, nöral arayüz deneyiyle dijital bir sisteme aktarıldı. Ben, bu labirentin içine düşen bir operatörüm: onun hafıza fragmentleri ve sınır katmanları arasında ilerliyorum. Altı modül—altı oda—her biri zihnin farklı bir işlem katmanını temsil ediyor. Süre dolmadan çıkış protokolünü tamamlamazsam, veri akışına gömülüp kaybolacağım.",
+    rules: [
+      "Oyuna başlamadan önce kağıt ve kaleminizi hazırlayın.",
+      "Haritadaki modülleri sırayla ziyaret edin.",
+      "Her modülde görev metni ve seçenekler yer alır; önce metni okuyun.",
+      "Doğru yanıtla bir sonraki modülün kilidi açılır.",
+      "Tüm modüller tamamlandıktan sonra ana çıkış kodunu girin.",
+      "Toplam süreniz 60 dakikadır.",
+    ],
+    durationMinutes: 60,
+    roomCount: zihinLabirentiRooms.length,
+    finalCode: "test",
+    endStoryLong:
+      "Son veri paketi ekranda çözüldü. Sinyal gürültüsü kesildi; terminal loşlaştı. Sivrizeka’nın dijital izi silindi mi, yoksa başka bir sunucuda mı kopyalandı—bilmiyorum. Çıkış kapısı açıldı. Gerçek dünya soğuk ve netti. Şimdilik… özgürüm.",
+    hubStory:
+      "Koyu lacivert bir koridor, tavanda akan cyan veri hatları. Bu yer nörobilim laboratuvarı ile siber uzayın arasında; Sivrizeka’nın zihninin haritası gibi.\n\nAltı modül sıralı görünüyor. Yanlış dallanma beni izole edebilir; doğru sıra ve yanıtlarla ilerlemeliyim.\n\nGeri dönüş kapısı kilitlendi. Tek çıkış: tüm modülleri çözmek.",
+    visualTheme: "cyber",
+    mapImagePath: "/images/zihin-map.jpg",
+    introCoverImagePath: null,
+  },
 ] as const satisfies readonly GameConfig[];
+
+/** Dinamik `[slug]` segmenti için SSG param listesi. */
+export function getSlugsForDynamicGameSegment(): { slug: string }[] {
+  return games
+    .filter((g) => !GAME_SLUGS_WITH_DEDICATED_ROUTES.includes(g.slug))
+    .map((g) => ({ slug: g.slug }));
+}
 
 export type Game = (typeof games)[number];
 
@@ -109,5 +148,6 @@ export function getWixLandingUrl(slug: string): string {
 export function getRoomsForGame(slug: string) {
   if (slug === "tapinagin-laneti") return rooms;
   if (slug === "digital-araf") return digitalArafRooms;
+  if (slug === "zihin-labirenti") return zihinLabirentiRooms;
   return [];
 }

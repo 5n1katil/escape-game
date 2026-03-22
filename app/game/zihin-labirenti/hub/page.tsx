@@ -1,19 +1,12 @@
 import GameStateGate from "@/components/GameStateGate";
 import HubClient from "@/components/HubClient";
-import { getGameBySlug, getRoomsForGame, getSlugsForDynamicGameSegment, type GameConfig } from "@/data/games";
+import { getGameBySlug, getRoomsForGame, type GameConfig } from "@/data/games";
 import { getTranslations } from "@/lib/i18n";
 import { notFound } from "next/navigation";
+import { ZIHIN_LABIRENTI_SLUG } from "../constants";
 
-interface HubPageProps {
-  params: Promise<{ slug: string }>;
-}
-
-export function generateStaticParams() {
-  return getSlugsForDynamicGameSegment();
-}
-
-export default async function HubPage({ params }: HubPageProps) {
-  const { slug } = await params;
+export default async function ZihinLabirentiHubPage() {
+  const slug = ZIHIN_LABIRENTI_SLUG;
   const game = getGameBySlug(slug);
   const rooms = getRoomsForGame(slug);
   const t = getTranslations();

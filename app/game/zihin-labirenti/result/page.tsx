@@ -1,18 +1,11 @@
-import { getGameBySlug, getSlugsForDynamicGameSegment, getWixLandingUrl, type GameConfig } from "@/data/games";
+import ResultClient from "@/components/ResultClient";
+import { getGameBySlug, getWixLandingUrl, type GameConfig } from "@/data/games";
 import { getTranslations } from "@/lib/i18n";
 import { notFound } from "next/navigation";
-import ResultClient from "@/components/ResultClient";
+import { ZIHIN_LABIRENTI_SLUG } from "../constants";
 
-interface ResultPageProps {
-  params: Promise<{ slug: string }>;
-}
-
-export function generateStaticParams() {
-  return getSlugsForDynamicGameSegment();
-}
-
-export default async function ResultPage({ params }: ResultPageProps) {
-  const { slug } = await params;
+export default async function ZihinLabirentiResultPage() {
+  const slug = ZIHIN_LABIRENTI_SLUG;
   const game = getGameBySlug(slug);
   const t = getTranslations();
 
