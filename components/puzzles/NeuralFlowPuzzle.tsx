@@ -66,22 +66,29 @@ function pathConnectsInputToOutput(grid: CellState[][]): boolean {
   return false;
 }
 
-/** Brute-force hardcoded 5x5 grid. All 25 cells explicitly defined. Path: (0,0)→(1,0)→(2,0)→(2,1)→...→(4,4). Scrambled. */
+/**
+ * Hardcoded 5×5 — all 25 cells explicit. rot = 0|1|2|3 → 0°,90°,180°,270°.
+ * Solution path (when rotated correctly): (0,0)→(1,0)→(2,0)→(2,1)→(2,2)→(2,3)→(2,4)→(3,4)→(4,4).
+ * Below state is scrambled; path cells use kinds that can align to that corridor.
+ */
 const INITIAL_GRID: CellState[][] = [
+  // row 0 — (0,0) path: straight
   [
     { kind: "straight", rot: 1 },
-    { kind: "L", rot: 2 },
-    { kind: "T", rot: 3 },
-    { kind: "cross", rot: 0 },
+    { kind: "cross", rot: 3 },
+    { kind: "T", rot: 2 },
     { kind: "L", rot: 1 },
+    { kind: "straight", rot: 2 },
   ],
+  // row 1 — (1,0) path: straight
   [
     { kind: "straight", rot: 2 },
-    { kind: "cross", rot: 2 },
-    { kind: "L", rot: 0 },
-    { kind: "T", rot: 1 },
-    { kind: "straight", rot: 3 },
+    { kind: "L", rot: 3 },
+    { kind: "cross", rot: 1 },
+    { kind: "T", rot: 0 },
+    { kind: "L", rot: 2 },
   ],
+  // row 2 — path across (2,0)…(2,4)
   [
     { kind: "L", rot: 3 },
     { kind: "straight", rot: 0 },
@@ -89,26 +96,33 @@ const INITIAL_GRID: CellState[][] = [
     { kind: "straight", rot: 0 },
     { kind: "L", rot: 1 },
   ],
+  // row 3 — (3,4) path: straight
   [
-    { kind: "T", rot: 0 },
-    { kind: "L", rot: 2 },
-    { kind: "cross", rot: 1 },
-    { kind: "straight", rot: 2 },
+    { kind: "T", rot: 3 },
+    { kind: "cross", rot: 0 },
+    { kind: "L", rot: 1 },
+    { kind: "straight", rot: 3 },
     { kind: "straight", rot: 1 },
   ],
+  // row 4 — (4,4) path: straight
   [
-    { kind: "L", rot: 2 },
-    { kind: "straight", rot: 1 },
-    { kind: "T", rot: 2 },
     { kind: "L", rot: 0 },
+    { kind: "straight", rot: 3 },
+    { kind: "T", rot: 1 },
+    { kind: "cross", rot: 2 },
     { kind: "straight", rot: 2 },
   ],
 ];
 
-/** Bulletproof SVG paths — thick cyan lines with glow. */
-function TileSvg({ kind, rot, uniqueId }: { kind: TileKind; rot: number; uniqueId: string }) {
-  const filterId = `${uniqueId}-glow`;
+if (
+  INITIAL_GRID.length !== SIZE ||
+  INITIAL_GRID.some((row) => row.length !== SIZE)
+) {
+  throw new Error("NeuralFlowPuzzle: INITIAL_GRID must be 5×5");
+}
 
+/** SVG paths — no url(#filter): feDropShadow-only filters hide strokes in some browsers. CSS glow instead. */
+function TileSvg({ kind, rot }: { kind: TileKind; rot: number }) {
   const dMap: Record<TileKind, string> = {
     straight: "M 50 0 L 50 100",
     L: "M 50 0 L 50 50 L 100 50",
@@ -116,41 +130,50 @@ function TileSvg({ kind, rot, uniqueId }: { kind: TileKind; rot: number; uniqueI
     cross: "M 50 0 L 50 100 M 0 50 L 100 50",
   };
 
-  const pathProps = {
-    fill: "none" as const,
-    stroke: "#22d3ee" as const,
-    strokeWidth: 10,
-    strokeLinecap: "round" as const,
-    strokeLinejoin: "round" as const,
-    filter: `url(#${filterId})`,
-  };
+  const d = dMap[kind] ?? dMap.cross;
 
   return (
-    <svg viewBox="0 0 100 100" className="h-full w-full" aria-hidden preserveAspectRatio="xMidYMid meet">
-      <defs>
-        <filter id={filterId} x="-50%" y="-50%" width="200%" height="200%">
-          <feDropShadow dx="0" dy="0" stdDeviation="2" floodColor="#22d3ee" floodOpacity="0.8" />
-        </filter>
-      </defs>
+    <svg
+      viewBox="0 0 100 100"
+      className="h-full w-full drop-shadow-[0_0_6px_rgba(34,211,238,0.95)] drop-shadow-[0_0_12px_rgba(6,182,212,0.5)]"
+      aria-hidden
+      preserveAspectRatio="xMidYMid meet"
+    >
       <g
         transform={`rotate(${rot * 90} 50 50)`}
         className="transition-transform duration-300 ease-out"
       >
-        <path d={dMap[kind] ?? dMap.cross} {...pathProps} />
+        <path
+          d={d}
+          fill="none"
+          stroke="#22d3ee"
+          strokeWidth={11}
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
       </g>
     </svg>
   );
 }
 
-/** Deep clone for immutable updates. */
+/** Deep clone — always 5×5 from INITIAL_GRID shape. */
 function cloneGrid(grid: CellState[][]): CellState[][] {
-  return grid.map((row) => row.map((cell) => ({ kind: cell.kind, rot: cell.rot })));
+  return grid.map((row) =>
+    row.map((cell) => ({
+      kind: cell.kind,
+      rot: ((cell.rot % 4) + 4) % 4,
+    }))
+  );
+}
+
+function createInitialGridFromSeed(): CellState[][] {
+  return cloneGrid(INITIAL_GRID);
 }
 
 export default function NeuralFlowPuzzle({ onSolve, onWrong }: NeuralFlowPuzzleProps) {
   const baseId = useId().replace(/:/g, "");
 
-  const [grid, setGrid] = useState<CellState[][]>(() => cloneGrid(INITIAL_GRID));
+  const [grid, setGrid] = useState<CellState[][]>(() => createInitialGridFromSeed());
   const [error, setError] = useState<string | null>(null);
   const [solved, setSolved] = useState(false);
 
@@ -219,10 +242,7 @@ export default function NeuralFlowPuzzle({ onSolve, onWrong }: NeuralFlowPuzzleP
         >
           {Array.from({ length: SIZE }, (_, r) =>
             Array.from({ length: SIZE }, (_, c) => {
-              const cell = grid[r]?.[c];
-              const safeCell: CellState = cell
-                ? { kind: cell.kind, rot: cell.rot }
-                : { kind: "cross", rot: 0 };
+              const cell = grid[r][c];
               const tileId = `${baseId}-${r}-${c}`;
               return (
                 <button
@@ -234,7 +254,7 @@ export default function NeuralFlowPuzzle({ onSolve, onWrong }: NeuralFlowPuzzleP
                   className="relative aspect-square min-h-0 min-w-0 touch-manipulation rounded-md border border-cyan-500/20 bg-slate-950/95 shadow-inner shadow-black/40 transition-[border-color,box-shadow] hover:border-cyan-400/55 hover:shadow-[0_0_16px_rgba(34,211,238,0.2)] active:scale-[0.97] disabled:pointer-events-none disabled:opacity-60"
                   aria-label={`Nöral segment ${r + 1}-${c + 1}, döndürmek için tıklayın`}
                 >
-                  <TileSvg kind={safeCell.kind} rot={safeCell.rot} uniqueId={tileId} />
+                  <TileSvg kind={cell.kind} rot={cell.rot} />
                 </button>
               );
             })
