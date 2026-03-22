@@ -14,11 +14,48 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 export const db = getDatabase(app);
 
+/** RTDB REST kökü — kurallar leaderboard ile uyumlu okuma için (SDK get() bazen farklı yetki görür). */
+const RTDB_REST_BASE = firebaseConfig.databaseURL;
+
 const LEADERBOARD_BASE_PATH = "leaderboards";
 const PLAYER_STATS_PATH = "playerGameStats";
 const GLOBAL_LEADERBOARD_PATH = "globalLeaderboard";
 /** Sadece okuma — Wix tarafı yazar; saveScore buradan avatarUrl çeker. */
 const USERS_READ_PATH = "users";
+
+/**
+ * Wix / RTDB `users/{memberId}` kaydından avatar URL okur (REST — ResultClient ile aynı erişim modeli).
+ * Alan adları: avatarUrl, photo, profileImage, picture, imageUrl.
+ */
+export async function fetchUserAvatarFromRtdb(
+  memberId: string | null | undefined
+): Promise<string | null> {
+  const raw = String(memberId ?? "").trim();
+  if (!raw) return null;
+  const userKey = raw.replace(/[.#$/\[\]]/g, "_");
+  const url = `${RTDB_REST_BASE}/${USERS_READ_PATH}/${encodeURIComponent(userKey)}.json`;
+  try {
+    const res = await fetch(url);
+    if (!res.ok) return null;
+    const data: unknown = await res.json();
+    if (!data || typeof data !== "object") return null;
+    const o = data as Record<string, unknown>;
+    const candidates = [
+      o.avatarUrl,
+      o.photo,
+      o.profileImage,
+      o.picture,
+      o.imageUrl,
+    ];
+    for (const c of candidates) {
+      if (typeof c === "string" && c.trim()) return c.trim();
+    }
+    return null;
+  } catch (e) {
+    console.warn("[fetchUserAvatarFromRtdb] failed", e);
+    return null;
+  }
+}
 
 /**
  * Saves score to Firebase. Leaderboard stores completion time (bitirme süresi).
@@ -112,22 +149,27 @@ export async function saveScore(
     const finalScore = Math.round(score);
     const now = Date.now();
 
-    /** Wix’in yazdığı profil; yalnızca GET. Yoksa snapshot’tan gelen avatarUrl kullanılır. */
+    /** Wix profili: önce REST (leaderboard ile aynı erişim), yoksa parametre snapshot. */
     let resolvedAvatarUrl: string | null =
       typeof avatarUrl === "string" && avatarUrl.trim() ? avatarUrl.trim() : null;
     if (finalMemberId?.trim()) {
-      try {
-        const userKey = finalMemberId.trim().replace(/[.#$/\[\]]/g, "_");
-        const userReadRef = ref(db, `${USERS_READ_PATH}/${userKey}`);
-        const userSnap = await get(userReadRef);
-        if (userSnap.exists()) {
-          const u = userSnap.val() as { avatarUrl?: unknown };
-          if (typeof u?.avatarUrl === "string" && u.avatarUrl.trim()) {
-            resolvedAvatarUrl = u.avatarUrl.trim();
+      const fromRest = await fetchUserAvatarFromRtdb(finalMemberId);
+      if (fromRest) {
+        resolvedAvatarUrl = fromRest;
+      } else {
+        try {
+          const userKey = finalMemberId.trim().replace(/[.#$/\[\]]/g, "_");
+          const userReadRef = ref(db, `${USERS_READ_PATH}/${userKey}`);
+          const userSnap = await get(userReadRef);
+          if (userSnap.exists()) {
+            const u = userSnap.val() as { avatarUrl?: unknown };
+            if (typeof u?.avatarUrl === "string" && u.avatarUrl.trim()) {
+              resolvedAvatarUrl = u.avatarUrl.trim();
+            }
           }
+        } catch (e) {
+          console.warn("[saveScore] users/{memberId} SDK avatar read failed", e);
         }
-      } catch (e) {
-        console.warn("[saveScore] users/{memberId} avatar read failed", e);
       }
     }
 

@@ -1,9 +1,9 @@
 "use client";
 
-import { saveScore } from "@/lib/firebase";
+import { fetchUserAvatarFromRtdb, saveScore } from "@/lib/firebase";
 import {
-  getActivePlayerKey,
   getCompletedGameResult,
+  getPlayerKeyForSlug,
   getStoredEscaped,
   restartPlayerSession,
   type FinalGameResult,
@@ -80,23 +80,75 @@ interface ResultClientProps {
 const DEFAULT_DETECTIVE_AVATAR =
   "https://cdn-icons-png.flaticon.com/512/3135/3135715.png";
 
-/** Avatar saveScore ile leaderboard satırına yazılır; UI sadece row.avatarUrl kullanır. */
-function avatarFromLeaderboardRow(url: string | null | undefined): string {
-  const t = typeof url === "string" ? url.trim() : "";
-  return t || DEFAULT_DETECTIVE_AVATAR;
+/** Wix CDN URL'leri encodeURI ile bozulmasın. */
+function safeAvatarImgSrc(url: string): string {
+  const t = url.trim();
+  if (
+    t.startsWith("https://") ||
+    t.startsWith("http://") ||
+    t.startsWith("/") ||
+    t.startsWith("data:")
+  ) {
+    return t;
+  }
+  return encodeURI(t);
 }
 
-/** Aktif oyuncu: önce aynı memberId’li leaderboard satırı (saveScore sonrası güncel), yoksa snapshot. */
+function avatarFromLeaderboardRow(url: string | null | undefined): string {
+  const s = typeof url === "string" ? url.trim() : "";
+  return s || DEFAULT_DETECTIVE_AVATAR;
+}
+
+function normPlayerLabel(s: string | null | undefined): string {
+  return (s ?? "").trim().toLowerCase().replace(/\s+/g, " ");
+}
+
+/** Liderlik satırı + RTDB'den tamamlanan avatar eşlemesi. */
+function leaderboardEntryAvatarUrl(
+  entry: LeaderboardEntry,
+  avatarByMemberId: Record<string, string>
+): string {
+  const mid = entry.memberId?.trim() ?? "";
+  const fromRow = typeof entry.avatarUrl === "string" ? entry.avatarUrl.trim() : "";
+  const fromFetch = mid ? avatarByMemberId[mid] : "";
+  return avatarFromLeaderboardRow(fromRow || fromFetch || null);
+}
+
+/**
+ * Aktif oyuncu: memberId → satır; yoksa isim eşlemesi; sonra snapshot + users/ fetch cache.
+ */
 function activePlayerAvatarUrl(
   result: FinalGameResult,
-  leaderboard: LeaderboardEntry[] | null
+  leaderboard: LeaderboardEntry[] | null,
+  avatarByMemberId: Record<string, string>
 ): string {
-  const mid = result.memberId?.trim();
-  if (mid && leaderboard?.length) {
-    const row = leaderboard.find((e) => e.memberId?.trim() === mid);
-    if (row) return avatarFromLeaderboardRow(row.avatarUrl);
+  const mid = result.memberId?.trim() ?? "";
+  const fromMap = mid ? avatarByMemberId[mid]?.trim() : "";
+  const snap = typeof result.avatarUrl === "string" ? result.avatarUrl.trim() : "";
+
+  if (leaderboard?.length) {
+    if (mid) {
+      const row = leaderboard.find((e) => e.memberId?.trim() === mid);
+      if (row) {
+        const u = leaderboardEntryAvatarUrl(row, avatarByMemberId);
+        if (u !== DEFAULT_DETECTIVE_AVATAR) return u;
+      }
+    }
+    const pn = normPlayerLabel(result.playerName);
+    const rowByName = leaderboard.find(
+      (e) =>
+        normPlayerLabel(e.playerName) === pn ||
+        normPlayerLabel(e.name) === pn
+    );
+    if (rowByName) {
+      const u = leaderboardEntryAvatarUrl(rowByName, avatarByMemberId);
+      if (u !== DEFAULT_DETECTIVE_AVATAR) return u;
+    }
   }
-  return avatarFromLeaderboardRow(result.avatarUrl);
+
+  if (fromMap) return fromMap;
+  if (snap) return snap;
+  return DEFAULT_DETECTIVE_AVATAR;
 }
 
 function formatTime(seconds: number): string {
@@ -260,6 +312,8 @@ export default function ResultClient({
     gameKey: slug,
   });
   const [leaderboardRefreshKey, setLeaderboardRefreshKey] = useState(0);
+  /** memberId → RTDB users/ ile tamamlanan avatar (eski leaderboard satırları için). */
+  const [avatarByMemberId, setAvatarByMemberId] = useState<Record<string, string>>({});
   const scoreSavedRef = useRef(false);
 
   useEffect(() => {
@@ -269,11 +323,7 @@ export default function ResultClient({
       router.replace(`/game/${slug}/hub`);
       return;
     }
-    const playerKey = getActivePlayerKey();
-    if (!playerKey) {
-      setFinalResult("missing");
-      return;
-    }
+    const playerKey = getPlayerKeyForSlug(slug);
     const stored = getCompletedGameResult(playerKey, slug);
     setFinalResult(stored ?? "missing");
   }, [slug, router]);
@@ -322,6 +372,51 @@ export default function ResultClient({
     };
   }, [escaped, leaderboardFilter, leaderboardRefreshKey]);
 
+  useEffect(() => {
+    if (!leaderboard?.length) return;
+    let cancelled = false;
+    const need = leaderboard.filter((e) => !e.avatarUrl?.trim() && e.memberId?.trim());
+    if (need.length === 0) return;
+    void (async () => {
+      const pairs = await Promise.all(
+        need.map(async (e) => {
+          const id = e.memberId!.trim();
+          const url = await fetchUserAvatarFromRtdb(id);
+          return [id, url] as const;
+        })
+      );
+      if (cancelled) return;
+      setAvatarByMemberId((prev) => {
+        const next = { ...prev };
+        for (const [id, url] of pairs) {
+          if (url) next[id] = url;
+        }
+        return next;
+      });
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [leaderboard]);
+
+  useEffect(() => {
+    if (finalResult === null || finalResult === "missing") return;
+    const mid = finalResult.memberId?.trim();
+    if (!mid || finalResult.avatarUrl?.trim()) return;
+    let cancelled = false;
+    void (async () => {
+      const url = await fetchUserAvatarFromRtdb(mid);
+      if (cancelled || !url) return;
+      setAvatarByMemberId((prev) => {
+        if (prev[mid]) return prev;
+        return { ...prev, [mid]: url };
+      });
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [finalResult]);
+
   if (escaped === null || !escaped) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-zinc-950">
@@ -340,7 +435,11 @@ export default function ResultClient({
 
   const storyText = endStoryLong ?? tResult.endStory;
 
-  const activePlayerAvatarSrc = activePlayerAvatarUrl(finalResult, leaderboard);
+  const activePlayerAvatarSrc = activePlayerAvatarUrl(
+    finalResult,
+    leaderboard,
+    avatarByMemberId
+  );
 
   const backUrl = mainPageUrl ?? wixUrl;
   const backLabel = mainPageUrl ? tResult.backToMain : tResult.backToWix;
@@ -364,7 +463,7 @@ export default function ResultClient({
               <p className="mt-2 text-sm text-zinc-400">{tResult.endStory}</p>
               <p className="mt-2 flex items-center gap-2 text-sm text-zinc-400">
                 <img
-                  src={encodeURI(activePlayerAvatarSrc)}
+                  src={safeAvatarImgSrc(activePlayerAvatarSrc)}
                   alt=""
                   className="h-9 w-9 shrink-0 rounded-full border border-amber-500/45 object-cover"
                   loading="lazy"
@@ -474,12 +573,12 @@ export default function ResultClient({
                   <ol className="space-y-2">
                     {leaderboard.map((entry, i) => (
                       <li
-                        key={entry.name + i}
+                        key={(entry.memberId ?? entry.name) + i}
                         className="flex items-center justify-between rounded-lg bg-zinc-800/60 px-4 py-2.5 text-left"
                       >
                         <span className="flex items-center gap-2 font-medium text-zinc-200">
                           <img
-                            src={encodeURI(avatarFromLeaderboardRow(entry.avatarUrl))}
+                            src={safeAvatarImgSrc(leaderboardEntryAvatarUrl(entry, avatarByMemberId))}
                             alt=""
                             className="h-8 w-8 shrink-0 rounded-full border border-amber-500/45 object-cover"
                             loading="lazy"

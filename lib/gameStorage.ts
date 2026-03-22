@@ -16,6 +16,8 @@ const PLAYER_KEY_PREFIX = "escape-game-player:"; // legacy (slug-based)
 const ACTIVE_PLAYER_KEY = "escape-game-active-playerKey";
 const ACTIVE_PLAYER_NAME = "escape-game-active-playerName";
 const ACTIVE_MEMBER_ID = "escape-game-active-memberId";
+/** Wix iframe query: avatarUrl veya avatar — tamamlanma snapshot'ına yazılır. */
+const ACTIVE_AVATAR_URL = "escape-game-active-avatarUrl";
 const COMPLETED_GAME_RESULT_PREFIX = "completedGameResult:";
 
 export function toPlayerKey(input: string | null | undefined): string {
@@ -23,7 +25,8 @@ export function toPlayerKey(input: string | null | undefined): string {
   return safe.length > 0 ? safe : "Dedektif";
 }
 
-function getPlayerKeyForSlug(slug: string): string {
+/** Tamamlanma / session anahtarı: aktif playerKey veya isimden türetilen anahtar (setCompletedGameResult ile aynı). */
+export function getPlayerKeyForSlug(slug: string): string {
   return getActivePlayerKey() ?? toPlayerKey(getStoredPlayerName(slug));
 }
 
@@ -125,6 +128,23 @@ export function setActiveMemberId(memberId: string | null | undefined): void {
     localStorage.setItem(ACTIVE_MEMBER_ID, normalized);
   } else {
     localStorage.removeItem(ACTIVE_MEMBER_ID);
+  }
+}
+
+export function getActiveAvatarUrl(): string | null {
+  if (typeof window === "undefined") return null;
+  const u = (localStorage.getItem(ACTIVE_AVATAR_URL) ?? "").trim();
+  return u.length > 0 ? u : null;
+}
+
+/** Intro query'den veya Wix'ten gelen profil resmi URL'i. */
+export function setActiveAvatarUrl(url: string | null | undefined): void {
+  if (typeof window === "undefined") return;
+  const t = (url ?? "").trim();
+  if (t.length > 0) {
+    localStorage.setItem(ACTIVE_AVATAR_URL, t);
+  } else {
+    localStorage.removeItem(ACTIVE_AVATAR_URL);
   }
 }
 

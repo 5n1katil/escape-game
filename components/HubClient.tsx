@@ -3,8 +3,10 @@
 import CountdownTimer from "@/components/CountdownTimer";
 import RestartButton from "@/components/RestartButton";
 import type { Room } from "@/data/rooms";
+import { fetchUserAvatarFromRtdb } from "@/lib/firebase";
 import { calculateScore } from "@/lib/gameSession";
 import {
+  getActiveAvatarUrl,
   getActiveMemberId,
   getMemberIdFromUrl,
   getPlayerSession,
@@ -82,6 +84,7 @@ export default function HubClient({
   const [finalError, setFinalError] = useState<string | null>(null);
   const [mounted, setMounted] = useState(false);
   const [mapError, setMapError] = useState(false);
+  const [finalSubmitting, setFinalSubmitting] = useState(false);
   const leftColumnRef = useRef<HTMLDivElement>(null);
 
   const roomIds = rooms.map((r) => r.id);
@@ -110,19 +113,25 @@ export default function HubClient({
   const allSolved = mounted && solvedCount >= 6;
   const showFinalCode = allSolved && finalCode;
 
-  function handleFinalSubmit(e: React.FormEvent) {
+  async function handleFinalSubmit(e: React.FormEvent) {
     e.preventDefault();
     setFinalError(null);
     const trimmed = finalInput.trim();
-    if (!trimmed || !finalCode) return;
+    if (!trimmed || !finalCode || finalSubmitting) return;
     if (isCorrectFinalCode(finalCode, trimmed)) {
       const session = getPlayerSession(slug);
-      if (session) {
+      if (!session) return;
+      setFinalSubmitting(true);
+      try {
         const scoreResult = calculateScore(session);
         const completionTime = Math.max(0, session.durationSeconds - scoreResult.remainingTime);
         const playerName = normalizePlayerName(getStoredPlayerName(slug));
         const memberId = getActiveMemberId() || getMemberIdFromUrl() || null;
-        console.log("HUB memberId:", memberId);
+        let avatarUrl = getActiveAvatarUrl();
+        if (!avatarUrl?.trim() && memberId) {
+          avatarUrl = await fetchUserAvatarFromRtdb(memberId);
+        }
+        console.log("HUB memberId:", memberId, "avatar resolved:", Boolean(avatarUrl?.trim()));
         setCompletedGameResult(slug, {
           score: scoreResult.finalScore,
           completionTime,
@@ -130,16 +139,18 @@ export default function HubClient({
           mistakes: scoreResult.totalAttempts,
           attempts: scoreResult.totalAttempts,
           memberId,
-          avatarUrl: null,
+          avatarUrl: avatarUrl?.trim() || null,
           playerName,
           slug,
           roomsSolvedFirstTry: scoreResult.roomsSolvedFirstTry,
           roomsSolvedSecondTry: scoreResult.roomsSolvedSecondTry,
           scoreBreakdown: scoreResult.scoreBreakdown,
         });
+        setStoredEscaped(slug, true);
+        router.push(`/game/${slug}/result`);
+      } finally {
+        setFinalSubmitting(false);
       }
-      setStoredEscaped(slug, true);
-      router.push(`/game/${slug}/result`);
     } else {
       setFinalError(t.finalCodeWrong);
     }
@@ -189,13 +200,13 @@ export default function HubClient({
             return (
               <div
                 key={roomId}
-                className="pointer-events-none absolute flex min-h-[44px] min-w-[44px] flex-col items-center justify-center gap-1 rounded-md border-2 border-purple-800/60 bg-zinc-950/92 shadow-[0_0_14px_rgba(251,191,36,0.12)]"
+                className="pointer-events-none absolute flex min-h-[44px] min-w-[44px] flex-col items-center justify-center gap-1 rounded-md border-2 border-purple-500/70 bg-zinc-900 ring-1 ring-purple-400/35 shadow-[0_0_20px_rgba(168,85,247,0.22),0_0_12px_rgba(251,191,36,0.14)]"
                 style={style}
                 title="Kilitli"
                 aria-hidden
               >
-                <MapLockIcon className="h-10 w-10 shrink-0 text-amber-300/80" />
-                <span className="text-sm font-bold tabular-nums text-amber-200/70">{roomId}</span>
+                <MapLockIcon className="h-10 w-10 shrink-0 text-amber-100 drop-shadow-[0_0_6px_rgba(251,191,36,0.45)]" />
+                <span className="text-sm font-bold tabular-nums text-amber-100 drop-shadow-sm">{roomId}</span>
               </div>
             );
           }
@@ -380,7 +391,7 @@ export default function HubClient({
                 </div>
                 <button
                   type="submit"
-                  disabled={!finalInput.trim()}
+                  disabled={!finalInput.trim() || finalSubmitting}
                   className="w-full rounded-lg bg-amber-600 py-3 text-lg font-semibold text-white transition-colors hover:bg-amber-500 disabled:cursor-not-allowed disabled:opacity-50"
                 >
                   {t.finalCodeSubmit}

@@ -1,9 +1,10 @@
 "use client";
 
 import {
-  getActivePlayerKey,
   getCompletedGameResult,
+  getPlayerKeyForSlug,
   getPlayerSession,
+  setActiveAvatarUrl,
   setActiveMemberId,
   getStoredEscaped,
   hasPlayerSession,
@@ -41,6 +42,8 @@ export default function IntroStartButton({
   useEffect(() => {
     const fromQuery = searchParams.get("player");
     const memberIdFromQuery = searchParams.get("memberId");
+    const avatarFromQuery =
+      searchParams.get("avatarUrl") ?? searchParams.get("avatar") ?? null;
     console.log("INTRO memberId:", memberIdFromQuery);
     const stored = getStoredPlayerName(slug);
     if (fromQuery && fromQuery.trim().length > 0) {
@@ -50,11 +53,12 @@ export default function IntroStartButton({
       setStoredPlayerName(slug, "Dedektif");
     }
     setActiveMemberId(memberIdFromQuery);
+    setActiveAvatarUrl(avatarFromQuery);
     console.log("[intro] active memberId persisted", { slug, memberId: memberIdFromQuery ?? null });
 
     const session = getPlayerSession(slug);
-    const playerKey = getActivePlayerKey();
-    const completedSnapshot = playerKey ? getCompletedGameResult(playerKey, slug) : null;
+    const playerKey = getPlayerKeyForSlug(slug);
+    const completedSnapshot = getCompletedGameResult(playerKey, slug);
     const escapedState = getStoredEscaped(slug) === true || session?.escaped === true;
 
     setHasSession(hasPlayerSession(slug));
