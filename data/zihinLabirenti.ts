@@ -70,14 +70,14 @@ export const zihinLabirentiRooms: Room[] = [
     description: "Zihin Labirenti — 4. modül: frekans hizalama",
     type: "text",
     puzzleType: "slider",
-    question: "Üç kanalı hedef frekansa kilitleyin.",
+    question: "Dört kanalı hedef frekansa kilitleyin.",
     answer: "50",
     hint:
-      "Beta'ya X dersen, Alfa 2X olur. Teta ise (X + 2X) yani 3X olur. Toplamları (X + 2X + 3X) = 120. Buradan denklemi çözüp doğru frekansları kaydırıcılarda ayarla.",
+      "Beta'ya X dersen, Alfa 3X olur. Teta = (X+3X) = 4X olur. Delta ise Teta'nın yarısı, yani 2X olur. Hepsini topla: X + 3X + 4X + 2X = 150. Buradan X'i (Beta) bul ve diğerlerini hesapla.",
     story:
-      "Etik güvenlik duvarını ezip geçtim. Ama sistem bunu algıladı! Zihnimin dijital sisteme entegrasyonu aşırı yüklenme (overload) hatası veriyor.\n\nSistem uyarısı: 'Kritik Nöral Uyumsuzluk. Bant genişliği sınırı aşıldı. Sistemin toplam kapasitesi olan 120 MHz'e göre dalgaları dengeleyin.'\n\nHayatta kalmak için nöral frekanslarımı (Alfa, Beta ve Teta dalgalarını) Ebedi Korteks'in ana denge formülüne göre tam olarak ayarlamalıyım. Eğer yanlış bir frekans gönderirsem, sistem güvenlik protokolü gereği beni cezalandıracak ve zamanımı tüketecek!",
+      "Etik güvenlik duvarını ezip geçtim. Ama sistem bunu algıladı! Zihnimin dijital sisteme entegrasyonu aşırı yüklenme (overload) hatası veriyor.\n\nSistem uyarısı: 'Kritik Nöral Uyumsuzluk. Bant genişliği sınırı aşıldı. Sistemin yeni toplam kapasitesi olan 150 MHz'e göre dalgaları dengeleyin.'\n\nHayatta kalmak için nöral frekanslarımı (Alfa, Beta, Teta ve DELTA dalgalarını) Ebedi Korteks'in ana denge formülüne göre tam olarak ayarlamalıyım. Denklem çok daha karmaşıklaştı. Eğer yanlış bir frekans gönderirsem, zamanım tükenecek!",
     puzzlePrompt:
-      "Sistemin toplam frekans kapasitesi 120 MHz'dir. Kararlılık formülü şöyledir:\n- Alfa frekansı, Beta frekansının tam 2 katı olmalıdır.\n- Teta frekansı ise Alfa ve Beta'nın toplamına eşit olmalıdır.\nDeğerleri ayarlayıp Senkronizasyon'u başlatın.",
+      "Sistemin toplam frekans kapasitesi 150 MHz'dir. Kararlılık formülü şöyledir:\n1) Alfa frekansı, Beta frekansının tam 3 katı olmalıdır.\n2) Teta frekansı ise Alfa ve Beta'nın toplamına eşit olmalıdır.\n3) Delta frekansı, Teta'nın tam yarısı olmalıdır.\nDeğerleri ayarlayıp Senkronizasyon'u başlatın.",
     storyImages: [
       { url: "/games/zihin-labirenti/images/oda-4.png", alt: "4. oda görseli" },
     ],

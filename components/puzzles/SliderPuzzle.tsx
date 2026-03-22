@@ -8,13 +8,14 @@ export interface SliderPuzzleProps {
   onWrong?: () => void;
 }
 
-const LABELS = ["Alfa", "Beta", "Teta"] as const;
-const TARGETS: [number, number, number] = [40, 20, 60];
+const LABELS = ["Alfa", "Beta", "Teta", "Delta"] as const;
+const TARGETS: [number, number, number, number] = [45, 15, 60, 30];
+const TOTAL_MHZ = 150;
 
 export default function SliderPuzzle({ onSolve, onWrong }: SliderPuzzleProps) {
   const { ui } = useGameUi();
   const er = ui.escapeRoom;
-  const [values, setValues] = useState([22, 78, 35]);
+  const [values, setValues] = useState([30, 25, 50, 45]);
   const [error, setError] = useState<string | null>(null);
 
   function handleSubmit() {
@@ -22,7 +23,8 @@ export default function SliderPuzzle({ onSolve, onWrong }: SliderPuzzleProps) {
     const ok =
       values[0] === TARGETS[0] &&
       values[1] === TARGETS[1] &&
-      values[2] === TARGETS[2];
+      values[2] === TARGETS[2] &&
+      values[3] === TARGETS[3];
 
     if (ok) {
       onSolve();
@@ -37,7 +39,7 @@ export default function SliderPuzzle({ onSolve, onWrong }: SliderPuzzleProps) {
   return (
     <div className="space-y-6 rounded-xl border border-cyan-500/35 bg-slate-950/90 p-4 shadow-[0_0_40px_rgba(6,182,212,0.08)] sm:p-6">
       <p className="text-center text-sm text-cyan-200/90">
-        Nöral frekansları 120 MHz toplam kapasiteye göre dengeleyin.
+        Nöral frekansları {TOTAL_MHZ} MHz toplam kapasiteye göre dengeleyin.
       </p>
       <div className="space-y-5">
         {LABELS.map((label, i) => (

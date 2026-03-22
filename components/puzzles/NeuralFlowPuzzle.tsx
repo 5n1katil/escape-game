@@ -100,35 +100,17 @@ function scrambleRotations(): number[][] {
 const STROKE_COLOR = "#22d3ee";
 const STROKE_WIDTH = 12;
 
-/** Shared SVG defs — one glow filter for all tiles. */
-function NeuralFlowDefs({ idPrefix }: { idPrefix: string }) {
-  const glowId = `${idPrefix}-glow`;
-  return (
-    <svg aria-hidden className="absolute h-0 w-0 overflow-hidden" focusable={false}>
-      <defs>
-        <filter id={glowId} x="-80%" y="-80%" width="260%" height="260%" colorInterpolationFilters="sRGB">
-          <feGaussianBlur in="SourceGraphic" stdDeviation="3" result="blur" />
-          <feMerge>
-            <feMergeNode in="blur" />
-            <feMergeNode in="SourceGraphic" />
-          </feMerge>
-        </filter>
-      </defs>
-    </svg>
-  );
-}
-
-/** SVG pipe segments in unit space 0–100, center 50; drawn for rotation 0 base shapes. */
+/** SVG pipe segments — each tile has its own defs to guarantee rendering. */
 function TileSvg({
   kind,
   rot,
-  idPrefix,
+  uniqueId,
 }: {
   kind: TileKind;
   rot: number;
-  idPrefix: string;
+  uniqueId: string;
 }) {
-  const glowId = `${idPrefix}-glow`;
+  const glowId = `${uniqueId}-glow`;
   const pathProps = {
     fill: "none" as const,
     stroke: STROKE_COLOR,
@@ -152,6 +134,7 @@ function TileSvg({
       ];
       break;
     case "cross":
+    default:
       paths = [
         <path key="v" d="M 50 8 L 50 92" {...pathProps} />,
         <path key="h" d="M 8 50 L 92 50" {...pathProps} />,
@@ -161,6 +144,15 @@ function TileSvg({
 
   return (
     <svg viewBox="0 0 100 100" className="h-full w-full" aria-hidden preserveAspectRatio="xMidYMid meet">
+      <defs>
+        <filter id={glowId} x="-80%" y="-80%" width="260%" height="260%" colorInterpolationFilters="sRGB">
+          <feGaussianBlur in="SourceGraphic" stdDeviation="3" result="blur" />
+          <feMerge>
+            <feMergeNode in="blur" />
+            <feMergeNode in="SourceGraphic" />
+          </feMerge>
+        </filter>
+      </defs>
       <g
         transform={`rotate(${rot * 90} 50 50)`}
         className="transition-transform duration-300 ease-out"
@@ -210,7 +202,6 @@ export default function NeuralFlowPuzzle({ onSolve, onWrong }: NeuralFlowPuzzleP
 
   return (
     <div className="space-y-5 rounded-xl border border-cyan-500/35 bg-slate-950/90 p-3 shadow-[0_0_40px_rgba(6,182,212,0.08)] sm:p-5">
-      <NeuralFlowDefs idPrefix={baseId} />
       <div className="relative mx-auto w-full max-w-md">
         {/* Input node — top-left */}
         <div
@@ -240,11 +231,12 @@ export default function NeuralFlowPuzzle({ onSolve, onWrong }: NeuralFlowPuzzleP
         >
           {Array.from({ length: SIZE }, (_, r) =>
             Array.from({ length: SIZE }, (_, c) => {
-              const kind = kinds[r][c];
-              const rot = rots[r][c];
+              const kind: TileKind = kinds[r]?.[c] ?? "cross";
+              const rot = rots[r]?.[c] ?? 0;
+              const tileId = `${baseId}-${r}-${c}`;
               return (
                 <button
-                  key={`${r}-${c}`}
+                  key={tileId}
                   type="button"
                   role="gridcell"
                   onClick={() => rotateCell(r, c)}
@@ -252,7 +244,7 @@ export default function NeuralFlowPuzzle({ onSolve, onWrong }: NeuralFlowPuzzleP
                   className="relative aspect-square min-h-0 min-w-0 touch-manipulation rounded-md border border-cyan-500/20 bg-slate-950/95 shadow-inner shadow-black/40 transition-[border-color,box-shadow] hover:border-cyan-400/55 hover:shadow-[0_0_16px_rgba(34,211,238,0.2)] active:scale-[0.97] disabled:pointer-events-none disabled:opacity-60"
                   aria-label={`Nöral segment ${r + 1}-${c + 1}, döndürmek için tıklayın`}
                 >
-                  <TileSvg kind={kind} rot={rot} idPrefix={baseId} />
+                  <TileSvg kind={kind} rot={rot} uniqueId={tileId} />
                 </button>
               );
             })
