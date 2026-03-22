@@ -1,7 +1,6 @@
 /**
  * Game metadata. Auth/payment gate will be inserted before intro in the route flow.
  */
-import { digitalArafRooms } from "./digitalAraf";
 import { rooms } from "./rooms";
 import { zihinLabirentiRooms } from "./zihinLabirenti";
 
@@ -33,7 +32,7 @@ export type GameConfig = {
   introAudioUrl?: string;
   hubStory: string;
   hubStoryAudioUrl?: string;
-  /** Tapınak amber / Dijital Araf siberpunk-cyan */
+  /** Tapınak amber / Siber temalı oyunlar (cyan-neon) */
   visualTheme: VisualThemeId;
   /** Hub + oda ekranı harita görseli */
   mapImagePath: string;
@@ -73,31 +72,6 @@ export const games = [
     mapImagePath: "/images/temple-map.jpg",
     introCoverImagePath:
       "/games/tapinagin-laneti/images/" + encodeURIComponent("Tapınağın Laneti.png"),
-  },
-  {
-    slug: "digital-araf",
-    title: "Dijital Araf",
-    wixLandingUrl: `${WIX_LANDING_BASE}/digital-araf`,
-    story:
-      "Prof. Dr. Erhan Sivrizeka’nın bilinç yapısı, deney protokolü kapsamında nöral arayüzle dijitale aktarıldı. Ben, bu sisteme düşen bir ziyaretçiyim: Araf adı verilen ara katmanda, onun hafızasının kırıkları ve sınırları arasında ilerliyorum. Altı modül—altı oda—her biri zihnin farklı bir katmanını simgeliyor. Süre dolmadan çıkış protokolünü tamamlamazsam, veri akışına gömülüp kaybolacağım.",
-    rules: [
-      "Oyuna başlamadan önce kağıt ve kaleminizi hazırlayın.",
-      "Haritadaki modülleri sırayla ziyaret edin.",
-      "Her modülde bir görev metni ve seçenekler yer alır; önce metni okuyun.",
-      "Doğru yanıtla bir sonraki modülün kilidi açılır.",
-      "Tüm modüller tamamlandıktan sonra ana çıkış kodunu girin.",
-      "Toplam süreniz 60 dakikadır.",
-    ],
-    durationMinutes: 60,
-    roomCount: digitalArafRooms.length,
-    finalCode: "test",
-    endStoryLong:
-      "Son protokol satırı ekranda yanıp söndü. Bant genişliği daraldı, gürültü kesildi. Sivrizeka’nın dijital yankısı uzaklaştı; geride yalnızca sessiz bir terminal kaldı. Çıkış kapısı açıldı—gerçek dünyaya dönüş mü, yoksa başka bir simülasyon katmanı mı, emin değilim. Ama şimdilik… özgürüm.",
-    hubStory:
-      "Soğuk mavi ışık koridoru boyunca ilerliyorum. Duvarlar veri akışı desenleriyle kaplı; her adımda nöron ağlarına benzeyen çizgiler kıpırdıyor. Bu yer, bir bilgisayarın içi gibi ama nefes alıyor—Sivrizeka’nın zihninin kalıntıları burada.\n\nAltı modül görünüyor. Her biri farklı bir bilişsel işlevi temsil ediyor olmalı. Yanlış seçim yaparsam sistem beni izole edebilir; doğru sırayla ve doğru yanıtlarla ilerlemeliyim.\n\nGeri dönüş portu kapandı. Tek yol ileri: Araf’tan çıkmak için tüm modülleri çözmek.",
-    visualTheme: "cyber",
-    mapImagePath: "/images/digital-map.jpg",
-    introCoverImagePath: null,
   },
   {
     slug: "zihin-labirenti",
@@ -147,7 +121,6 @@ export function getWixLandingUrl(slug: string): string {
 
 export function getRoomsForGame(slug: string) {
   if (slug === "tapinagin-laneti") return rooms;
-  if (slug === "digital-araf") return digitalArafRooms;
   if (slug === "zihin-labirenti") return zihinLabirentiRooms;
   return [];
 }
