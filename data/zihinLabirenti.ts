@@ -108,10 +108,12 @@ export const zihinLabirentiRooms: Room[] = [
     puzzleType: "text",
     question: "Son çıkış şifresini girin.",
     answer: "ebedi",
-    hint: "Projenin özü tek kelimede.",
+    hint:
+      "1. Oda'da (Sisteme Giriş) aklında kalan o kritik şifreyi hatırla. Amacının ne olduğunu anlatan o kelime...",
     story:
-      "Final Çıkış Kodu Testi. Şifre: ebedi\n\nTüm modüller tamam. Ana çıkış protokolü yalnızca doğru anahtar kelimeyi kabul eder.",
-    puzzlePrompt: "Çıkış şifresini yazıp gönderin.",
+      "Bütün nöral ağlar senkronize edildi. Önümde Ebedi Korteks'in devasa, ışıldayan ana kapısı duruyor. Sistem bilincimi tamamen dijitalleştirmek için son şifreyi, her şeyin başladığı o parolayı istiyor.\n\nEğer yanlış kodu girersem, sistem beni bir virüs olarak algılayıp kalıcı olarak silecek. Fiziksel bedenim çoktan öldü. Dönüş yok.",
+    puzzlePrompt:
+      "Son Çıkış Kodu Protokolü: Ebedi Korteks'e geçiş yapmak için doğru şifreyi girin:",
     storyImages: [
       { url: "/games/zihin-labirenti/images/oda-6.png", alt: "6. oda görseli" },
     ],

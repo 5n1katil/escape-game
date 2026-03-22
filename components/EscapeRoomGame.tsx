@@ -22,6 +22,7 @@ import MatrixPuzzle from "@/components/puzzles/MatrixPuzzle";
 import NeuralFlowPuzzle from "@/components/puzzles/NeuralFlowPuzzle";
 import SliderPuzzle from "@/components/puzzles/SliderPuzzle";
 import TerminalPuzzle from "@/components/puzzles/TerminalPuzzle";
+import TextPuzzle from "@/components/puzzles/TextPuzzle";
 import type { Room } from "@/data/rooms";
 import type { Translations } from "@/lib/i18n";
 import { useRouter } from "next/navigation";
@@ -428,6 +429,26 @@ export default function EscapeRoomGame({
       return (
         <div className="space-y-4">
           <NeuralFlowPuzzle
+            onSolve={() => {
+              setError(null);
+              markRoomSolved();
+            }}
+            onWrong={handleWrongAnswer}
+          />
+          {error && (
+            <p role="alert" className="text-sm text-red-400">
+              {error}
+            </p>
+          )}
+        </div>
+      );
+    }
+
+    if (pt === "text" && currentRoom.answer) {
+      return (
+        <div className="space-y-4">
+          <TextPuzzle
+            answer={currentRoom.answer}
             onSolve={() => {
               setError(null);
               markRoomSolved();
