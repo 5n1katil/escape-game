@@ -20,12 +20,10 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 
-const MAP_IMAGE_PATH = "/games/tapinagin-laneti/images/map.jpg";
+/** Tapınak haritası (public/images/temple-map.jpg — oyun map ile senkron tutulur). */
+const MAP_IMAGE_PATH = "/images/temple-map.jpg";
 
-/**
- * Harita üzerinde oda tıklama alanları.
- * Koordinatlar viewBox "0 0 100 100" ile aynı yüzde uzayında (x=left, y=top, genişlik/yükseklik).
- */
+/** Harita üzerinde oda tıklama alanları (yüzde: top, left, width, height). */
 const MAP_SEGMENTS: { id: number; top: number; left: number; width: number; height: number }[] = [
   { id: 1, top: 8, left: 4, width: 26, height: 40 },
   { id: 2, top: 8, left: 36, width: 26, height: 40 },
@@ -34,8 +32,6 @@ const MAP_SEGMENTS: { id: number; top: number; left: number; width: number; heig
   { id: 5, top: 55, left: 36, width: 26, height: 40 },
   { id: 6, top: 55, left: 69, width: 26, height: 40 },
 ];
-
-const MAP_SVG_VIEWBOX = "0 0 100 100";
 
 interface HubClientProps {
   slug: string;
@@ -142,95 +138,65 @@ export default function HubClient({
   const maxSolved = getStoredMaxSolvedRoomIndex(slug, roomIds);
   const activeRoomId = roomIds[maxSolved + 1] ?? null;
 
-  /** SVG + foreignObject: görsel ve hit-area aynı viewBox’ta ölçeklenir; küçük ekranda kayma olmaz. */
+  const segmentStyle = (seg: (typeof MAP_SEGMENTS)[0]) => ({
+    top: `${seg.top}%`,
+    left: `${seg.left}%`,
+    width: `${seg.width}%`,
+    height: `${seg.height}%`,
+  });
+
+  /** Tam ekran hissi: resim z-0, şeffaf yüzde kutular z-10 (kilitli / açık mantığı aynı). */
   const mapContent = !mapError ? (
-    <svg
-      viewBox={MAP_SVG_VIEWBOX}
-      preserveAspectRatio="xMidYMid meet"
-      className="block h-full w-full max-h-full max-w-full"
+    <div
+      className="relative z-0 h-full min-h-[200px] w-full overflow-hidden bg-zinc-900"
       role="img"
       aria-label="Tapınak haritası - odalara tıklayarak gidebilirsiniz"
     >
-      <image
-        href={MAP_IMAGE_PATH}
-        x={0}
-        y={0}
-        width={100}
-        height={100}
-        preserveAspectRatio="xMidYMid meet"
+      <img
+        src={MAP_IMAGE_PATH}
+        alt=""
+        className="absolute inset-0 z-0 h-full w-full object-cover"
         onError={() => setMapError(true)}
       />
-      {MAP_SEGMENTS.map((seg) => {
-        const roomId = seg.id;
-        const room = rooms.find((r) => r.id === roomId);
-        const unlocked = unlockedIds.includes(roomId);
-        const roomIndex = rooms.findIndex((r) => r.id === roomId);
-        const solved = roomIndex >= 0 && roomIndex <= maxSolved;
-        const active = unlocked && !solved && roomId === activeRoomId;
-        if (!unlocked || !room) {
-          return (
-            <foreignObject
-              key={roomId}
-              x={seg.left}
-              y={seg.top}
-              width={seg.width}
-              height={seg.height}
-            >
-              {/* foreignObject içi XHTML kökü; xmlns SVG spesine göre gerekli */}
-              {/* eslint-disable-next-line @typescript-eslint/no-explicit-any -- xmlns div'de tanımlı değil */}
+      <div className="absolute inset-0 z-10">
+        {MAP_SEGMENTS.map((seg) => {
+          const roomId = seg.id;
+          const room = rooms.find((r) => r.id === roomId);
+          const unlocked = unlockedIds.includes(roomId);
+          const roomIndex = rooms.findIndex((r) => r.id === roomId);
+          const solved = roomIndex >= 0 && roomIndex <= maxSolved;
+          const active = unlocked && !solved && roomId === activeRoomId;
+          const style = segmentStyle(seg);
+          if (!unlocked || !room) {
+            return (
               <div
-                {...({ xmlns: "http://www.w3.org/1999/xhtml" } as any)}
-                className="pointer-events-none flex h-full w-full items-center justify-center opacity-70"
+                key={roomId}
+                className="pointer-events-none absolute flex items-center justify-center rounded-md border border-purple-500/10 bg-transparent opacity-60"
+                style={style}
+                title="Kilitli"
+                aria-hidden
               >
-                <span className="flex h-10 w-10 min-h-[44px] min-w-[44px] items-center justify-center rounded-full bg-zinc-800/90 text-base text-zinc-500 shadow-inner">
-                  🔒
-                </span>
+                <span className="text-2xl font-bold text-zinc-500">{roomId}</span>
               </div>
-            </foreignObject>
-          );
-        }
-        return (
-          <foreignObject
-            key={roomId}
-            x={seg.left}
-            y={seg.top}
-            width={seg.width}
-            height={seg.height}
-          >
-            {/* eslint-disable-next-line @typescript-eslint/no-explicit-any -- xmlns div'de tanımlı değil */}
-            <div
-              {...({ xmlns: "http://www.w3.org/1999/xhtml" } as any)}
-              className="box-border flex h-full w-full items-center justify-center"
+            );
+          }
+          return (
+            <Link
+              key={roomId}
+              href={`/game/${slug}/room/${roomId}`}
+              className={`absolute flex min-h-[44px] min-w-[44px] items-center justify-center rounded-md border border-purple-500/20 bg-transparent text-2xl font-bold text-white transition-colors duration-200 touch-manipulation hover:border-purple-500 hover:bg-purple-500/10 ${
+                active ? "ring-2 ring-amber-400/80 ring-offset-2 ring-offset-zinc-950/90" : ""
+              } ${solved ? "border-emerald-500/35" : ""}`}
+              style={style}
+              aria-label={`${room.title} - ${t.goToRoom}`}
+              title={room.title}
             >
-              <Link
-                href={`/game/${slug}/room/${roomId}`}
-                className={`flex h-full w-full cursor-pointer items-center justify-center rounded transition-all duration-200 touch-manipulation ${
-                  active
-                    ? "ring-2 ring-amber-400/80 ring-offset-2 ring-offset-zinc-900/80 shadow-[0_0_16px_rgba(251,191,36,0.35)]"
-                    : solved
-                      ? "hover:ring-2 hover:ring-emerald-400/40"
-                      : "hover:ring-2 hover:ring-amber-400/50 hover:shadow-[0_0_12px_rgba(251,191,36,0.2)]"
-                }`}
-                aria-label={`${room.title} - ${t.goToRoom}`}
-                title={room.title}
-              >
-                <span
-                  className={`flex h-10 w-10 min-h-[44px] min-w-[44px] items-center justify-center rounded-full text-lg font-bold backdrop-blur-sm ${
-                    solved
-                      ? "bg-emerald-900/70 text-emerald-300 shadow-[0_0_12px_rgba(52,211,153,0.25)]"
-                      : active
-                        ? "bg-amber-500/30 text-amber-200 ring-1 ring-amber-400/50"
-                        : "bg-black/50 text-amber-400"
-                  }`}
-                >
-                  {solved ? "✓" : roomId}
-                </span>
-              </Link>
-            </div>
-          </foreignObject>
-        );
-      })}
-    </svg>
+              {roomId}
+            </Link>
+          );
+        })}
+      </div>
+    </div>
   ) : (
     <div className="flex h-full min-h-[200px] w-full items-center justify-center bg-zinc-900/50 text-5xl text-zinc-600" aria-hidden>
       🗺️
@@ -271,13 +237,13 @@ export default function HubClient({
             </h1>
           </section>
 
-          {/* Mobilde: harita üstte; SVG viewBox ile ölçeklenir */}
+          {/* Mobilde: metin panelinden önce; img + şeffaf yüzde kutular (SVG yok) */}
           <section className="w-full shrink-0 overflow-hidden rounded-lg border border-zinc-800/50 bg-zinc-900/40 md:hidden">
             <h2 className="border-b border-zinc-700/50 px-4 py-3 text-sm font-semibold uppercase tracking-wider text-amber-500/90">
               {t.map}
             </h2>
             <div className="bg-zinc-900/50 p-2">
-              <div className="mx-auto aspect-[4/3] w-full min-h-[200px] max-h-[min(50vh,420px)]">
+              <div className="relative mx-auto aspect-[4/3] w-full min-h-[200px] max-h-[min(50vh,420px)]">
                 {mapContent}
               </div>
             </div>
@@ -411,11 +377,11 @@ export default function HubClient({
           )}
         </div>
 
-        {/* Sağ: tam satır yüksekliği, sticky; harita SVG ile sabit ölçek */}
-        <aside className="hidden min-h-0 md:flex md:h-full md:w-[38%] md:shrink-0 lg:w-[42%] xl:max-w-[520px]">
+        {/* Sağ: relative + h-full; harita img object-cover, önde şeffaf yüzde kutular */}
+        <aside className="relative hidden min-h-0 md:flex md:h-full md:w-[38%] md:shrink-0 lg:w-[42%] xl:max-w-[520px]">
           <div className="sticky top-0 flex h-full min-h-0 w-full flex-col border-l border-zinc-800/50 bg-zinc-950/95">
-            <div className="flex min-h-0 flex-1 items-center justify-center overflow-hidden p-4 lg:p-6">
-              <div className="h-full w-full min-h-0 max-h-full">{mapContent}</div>
+            <div className="relative flex min-h-0 flex-1 overflow-hidden p-3 lg:p-5">
+              {mapContent}
             </div>
           </div>
         </aside>
