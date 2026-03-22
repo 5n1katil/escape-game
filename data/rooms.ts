@@ -19,6 +19,7 @@ export const PUZZLE_TYPES = [
   "terminal",
   "slider",
   "matrix",
+  "neural-flow",
 ] as const;
 
 export type PuzzleType = (typeof PUZZLE_TYPES)[number];
@@ -42,7 +43,7 @@ export interface Room {
   /** Hikâye bölümünde gösterilecek görseller (papirüs, duvar vb.). */
   storyImages?: { url: string; alt?: string }[];
   /**
-   * terminal / slider / matrix: özel bileşen render edilir.
+   * terminal / slider / matrix / neural-flow: özel bileşen render edilir.
    * text / multiple-choice: isteğe bağlı; çoğunlukla `type` ile belirlenir.
    */
   puzzleType?: PuzzleType;

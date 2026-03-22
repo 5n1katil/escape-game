@@ -87,13 +87,15 @@ export const zihinLabirentiRooms: Room[] = [
     title: "5. Oda: Sinaps Matrisi Testi",
     description: "Zihin Labirenti — 5. modül: sinaps ağı",
     type: "text",
-    puzzleType: "matrix",
-    question: "Matrisdeki sönük düğümleri aydınlatın.",
-    answer: "matrix",
-    hint: "Yalnızca kapalı hücrelere dokunun.",
+    puzzleType: "neural-flow",
+    question: "Nöral akış ağını senkronize edin.",
+    answer: "neural-flow",
+    hint:
+      "Her bir düğüm karesine tıklayarak onu 90 derece döndür. Girişten çıkışa giden sürekli, mavi ışıklı bir hat oluşturmaya odaklan. Bağlantı uçlarının birbirini tuttuğundan emin ol, yoksa ağ senkronize olmayacaktır.",
     story:
-      "Sinaps Matrisi Testi.\n\nAğda rastgele düşük sinyalli düğümler var. Hepsi aktif olunca geçit açılır.",
-    puzzlePrompt: "3×3 ızgarada sönük hücreleri tıklayarak tamamını aktif edin.",
+      "Transferde son aşama... Ama ana sunucunun veri yolu parçalanmış! Kritik hata kodu: 'Ana Veri İletim Hattı Bozuk. Entegrasyon Donduruldu.'\n\nHafıza çekirdeğine giden ana sinaps ağı tamamen dağılmış. Zihnimin bu dijital deryada kaybolmaması için veri akışını manuel olarak yeniden inşa etmeliyim. Giriş düğümünden çıkış düğümüne kesintisiz, senkronize bir nöral yol oluşturamazsam, bilincim bu arafta sonsuza dek parçalanıp yok olacak. Bu benim final testim!",
+    puzzlePrompt:
+      "Neural Flow Protokolü: Parçalanmış nöral yol segmentlerini (düğüm karelerini) döndürerek (tıklayarak) Giriş Düğümünden (Sol-Üst) Çıkış Düğümüne (Sağ-Alt) kesintisiz bir bağlantı oluşturun. Ağı Senkronize Et butonuna basın.",
     storyImages: [
       { url: "/games/zihin-labirenti/images/oda-5.png", alt: "5. oda görseli" },
     ],

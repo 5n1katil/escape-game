@@ -19,6 +19,7 @@ import {
   isCorrectMultipleChoice,
 } from "@/lib/rooms";
 import MatrixPuzzle from "@/components/puzzles/MatrixPuzzle";
+import NeuralFlowPuzzle from "@/components/puzzles/NeuralFlowPuzzle";
 import SliderPuzzle from "@/components/puzzles/SliderPuzzle";
 import TerminalPuzzle from "@/components/puzzles/TerminalPuzzle";
 import type { Room } from "@/data/rooms";
@@ -413,6 +414,25 @@ export default function EscapeRoomGame({
               setError(null);
               markRoomSolved();
             }}
+          />
+          {error && (
+            <p role="alert" className="text-sm text-red-400">
+              {error}
+            </p>
+          )}
+        </div>
+      );
+    }
+
+    if (pt === "neural-flow") {
+      return (
+        <div className="space-y-4">
+          <NeuralFlowPuzzle
+            onSolve={() => {
+              setError(null);
+              markRoomSolved();
+            }}
+            onWrong={handleWrongAnswer}
           />
           {error && (
             <p role="alert" className="text-sm text-red-400">
