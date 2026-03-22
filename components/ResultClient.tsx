@@ -23,10 +23,13 @@ export interface LeaderboardEntry {
   time: number | null;
   memberId?: string | null;
   avatarUrl?: string | null;
+  /** Firebase leaderboard satırındaki playerName (isim eşlemesi için). */
+  playerName?: string | null;
 }
 
 type GameLeaderboardRow = {
   name?: string;
+  playerName?: string | null;
   memberId?: string | null;
   score?: number;
   baseScore?: number;
@@ -41,6 +44,7 @@ type GameLeaderboardRow = {
 
 type GlobalLeaderboardRow = {
   name?: string;
+  playerName?: string | null;
   memberId?: string | null;
   totalScore?: number;
   score?: number;
@@ -79,6 +83,8 @@ const DEFAULT_DETECTIVE_AVATAR =
 type UsersAvatarLookups = {
   byMemberId: Record<string, string>;
   byPlayerName: Record<string, string>;
+  /** Harita anahtarı kaçırırsa: trim + tr-TR küçük harf ile doğrusal tam eşleşme */
+  nameMatchRows: { displayName: string; url: string }[];
 };
 
 type FirebaseUserRow = {
@@ -88,8 +94,19 @@ type FirebaseUserRow = {
   avatarUrl?: string | null;
 };
 
-function normalizePlayerLookupKey(value: string): string {
-  return value.trim().toLowerCase().replace(/[.#$/\[\]]/g, "_");
+/**
+ * Oyuncu adı eşlemesi: sadece trim + Türkçe yerel küçük harf.
+ * İngilizce toLowerCase() ı/İ hatalarına yol açmaz; ş/ğ vb. korunur.
+ */
+function playerDisplayNameLookupKey(value: string): string {
+  return value.trim().toLocaleLowerCase("tr-TR");
+}
+
+function registerMemberIdKeys(map: Record<string, string>, id: string, url: string) {
+  const t = id.trim();
+  if (!t) return;
+  map[t] = url;
+  map[t.toLowerCase()] = url;
 }
 
 function pathKeyLooksLikeMemberId(key: string): boolean {
@@ -107,11 +124,12 @@ function pathKeyLooksLikeMemberId(key: string): boolean {
 async function fetchUsersAvatarLookups(): Promise<UsersAvatarLookups> {
   const byMemberId: Record<string, string> = {};
   const byPlayerName: Record<string, string> = {};
+  const nameMatchRows: { displayName: string; url: string }[] = [];
   try {
     const res = await fetch(`${FIREBASE_DB_BASE}/users.json`);
-    if (!res.ok) return { byMemberId, byPlayerName };
+    if (!res.ok) return { byMemberId, byPlayerName, nameMatchRows };
     const data = (await res.json()) as Record<string, FirebaseUserRow> | null;
-    if (!data || typeof data !== "object") return { byMemberId, byPlayerName };
+    if (!data || typeof data !== "object") return { byMemberId, byPlayerName, nameMatchRows };
 
     for (const [pathKey, row] of Object.entries(data)) {
       if (!row || typeof row !== "object") continue;
@@ -119,27 +137,46 @@ async function fetchUsersAvatarLookups(): Promise<UsersAvatarLookups> {
         typeof row.avatarUrl === "string" && row.avatarUrl.trim() ? row.avatarUrl.trim() : null;
       if (!url) continue;
 
-      byMemberId[pathKey] = url;
+      registerMemberIdKeys(byMemberId, pathKey, url);
       const mid =
         typeof row.memberId === "string" && row.memberId.trim() ? row.memberId.trim() : null;
-      if (mid) byMemberId[mid] = url;
+      if (mid) registerMemberIdKeys(byMemberId, mid, url);
 
       const pn = typeof row.playerName === "string" ? row.playerName.trim() : "";
       const nm = typeof row.name === "string" ? row.name.trim() : "";
-      const displayName = pn || nm;
-      if (displayName) {
-        byPlayerName[normalizePlayerLookupKey(displayName)] = url;
+      const seenNameKeys = new Set<string>();
+      for (const displayName of [pn, nm].filter(Boolean)) {
+        const nk = playerDisplayNameLookupKey(displayName);
+        byPlayerName[nk] = url;
+        if (!seenNameKeys.has(nk)) {
+          seenNameKeys.add(nk);
+          nameMatchRows.push({ displayName, url });
+        }
       }
 
       if (pathKey && !pathKeyLooksLikeMemberId(pathKey)) {
-        byPlayerName[normalizePlayerLookupKey(pathKey.replace(/_/g, " "))] = url;
-        byPlayerName[normalizePlayerLookupKey(pathKey)] = url;
+        const spaced = pathKey.replace(/_/g, " ");
+        byPlayerName[playerDisplayNameLookupKey(spaced)] = url;
+        byPlayerName[playerDisplayNameLookupKey(pathKey)] = url;
       }
     }
   } catch {
     // ignore; caller falls back to default avatar
   }
-  return { byMemberId, byPlayerName };
+  return { byMemberId, byPlayerName, nameMatchRows };
+}
+
+function findAvatarByDisplayNameTr(lookups: UsersAvatarLookups, rawName: string): string | null {
+  const trimmed = rawName.trim();
+  if (!trimmed) return null;
+  const key = playerDisplayNameLookupKey(trimmed);
+  const fromMap = lookups.byPlayerName[key];
+  if (fromMap) return fromMap;
+  const want = playerDisplayNameLookupKey(trimmed);
+  for (const { displayName, url } of lookups.nameMatchRows) {
+    if (playerDisplayNameLookupKey(displayName) === want) return url;
+  }
+  return null;
 }
 
 function resolveAvatarUrl(
@@ -148,6 +185,8 @@ function resolveAvatarUrl(
     rowAvatarUrl?: string | null;
     memberId?: string | null;
     displayName: string;
+    /** Ek aday isimler (ör. leaderboard playerName vs name) */
+    alternateNames?: (string | null | undefined)[];
   }
 ): string {
   const fromRow =
@@ -158,10 +197,18 @@ function resolveAvatarUrl(
 
   const mid =
     typeof opts.memberId === "string" && opts.memberId.trim() ? opts.memberId.trim() : null;
-  if (mid && lookups.byMemberId[mid]) return lookups.byMemberId[mid];
+  if (mid) {
+    const fromId =
+      lookups.byMemberId[mid] ?? lookups.byMemberId[mid.toLowerCase()] ?? null;
+    if (fromId) return fromId;
+  }
 
-  const nameKey = normalizePlayerLookupKey(opts.displayName);
-  if (nameKey && lookups.byPlayerName[nameKey]) return lookups.byPlayerName[nameKey];
+  const nameCandidates = [opts.displayName, ...(opts.alternateNames ?? [])];
+  for (const candidate of nameCandidates) {
+    if (typeof candidate !== "string" || !candidate.trim()) continue;
+    const hit = findAvatarByDisplayNameTr(lookups, candidate);
+    if (hit) return hit;
+  }
 
   return DEFAULT_DETECTIVE_AVATAR;
 }
@@ -198,8 +245,13 @@ async function fetchGameLeaderboard(
       typeof row.memberId === "string" && row.memberId.trim()
         ? row.memberId.trim()
         : key;
+    const pn = typeof row.playerName === "string" ? row.playerName.trim() : "";
+    const nm = typeof row.name === "string" ? row.name.trim() : "";
+    const name =
+      nm || pn || key.replace(/_/g, " ").trim() || "—";
     return {
-      name: (row.name ?? key.replace(/_/g, " ")).toString().trim() || "—",
+      name,
+      playerName: pn || nm || null,
       score: typeof row.score === "number" ? row.score : 0,
       time: typeof row.time === "number" ? row.time : 0,
       memberId: rowMemberId,
@@ -260,8 +312,13 @@ async function fetchGlobalLeaderboard(limit: number): Promise<LeaderboardEntry[]
   const entries: LeaderboardEntry[] = await Promise.all(
     Object.entries(data).map(async ([key, row]) => {
       const avgTime = await fetchAverageCompletionTime(key);
+      const pn = typeof row.playerName === "string" ? row.playerName.trim() : "";
+      const nm = typeof row.name === "string" ? row.name.trim() : "";
+      const name =
+        nm || pn || key.replace(/_/g, " ").trim() || "—";
       return {
-        name: (row.name ?? key.replace(/_/g, " ")).toString().trim() || "—",
+        name,
+        playerName: pn || nm || null,
         score:
           typeof row.totalScore === "number"
             ? row.totalScore
@@ -319,6 +376,7 @@ export default function ResultClient({
   const [usersAvatarLookups, setUsersAvatarLookups] = useState<UsersAvatarLookups>({
     byMemberId: {},
     byPlayerName: {},
+    nameMatchRows: [],
   });
   const scoreSavedRef = useRef(false);
 
@@ -559,6 +617,7 @@ export default function ResultClient({
                                 rowAvatarUrl: entry.avatarUrl,
                                 memberId: entry.memberId ?? null,
                                 displayName: entry.name,
+                                alternateNames: [entry.playerName],
                               })
                             )}
                             alt=""
