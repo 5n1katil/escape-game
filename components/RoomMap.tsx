@@ -199,6 +199,16 @@ export default function RoomMap({
             const canNavigate = state !== "locked";
             const roomHref = `/game/${slug}/room/${room.id}`;
             const tClass = rowTitleClass(state);
+            const rowAria = `${room.title}: ${state === "solved" ? "Çözüldü" : state === "current" ? "Mevcut oda" : "Açık"} - Odaya git`;
+
+            const currentRowFrame =
+              canNavigate && state === "current"
+                ? "rounded-lg bg-amber-500/5 ring-1 ring-amber-500/35"
+                : "";
+
+            const navigableRowExtras = canNavigate
+              ? `items-start touch-manipulation outline-none focus-visible:ring-2 focus-visible:ring-amber-500/60 focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-900 min-h-[44px] py-0.5 ${currentRowFrame}`
+              : "";
 
             const rowInner = (
               <>
@@ -206,7 +216,7 @@ export default function RoomMap({
                   className={`flex shrink-0 flex-col items-center ${fill ? (framed ? "w-11" : "w-10") : strip ? "w-8" : "w-11 sm:w-12"}`}
                 >
                   <span
-                    className={cellClass(state, canNavigate, !fill)}
+                    className={cellClass(state, false, !fill)}
                     title={
                       state === "locked"
                         ? "Kilitli"
@@ -235,20 +245,12 @@ export default function RoomMap({
                 <div
                   className={`min-w-0 flex-1 border-b border-zinc-800/40 pl-1 pr-2 ${
                     fill ? (framed ? "py-2.5 sm:py-3" : "py-2.5 sm:py-3") : strip ? "py-1.5" : "py-1.5 sm:py-2"
-                  } ${
-                    state === "current"
-                      ? "rounded-r-md bg-amber-500/5 ring-1 ring-amber-500/30 ring-offset-0 ring-offset-transparent"
-                      : ""
                   }`}
                 >
                   {canNavigate ? (
-                    <Link
-                      href={roomHref}
-                      className={`block rounded-sm transition-all duration-200 hover:text-amber-100 ${tClass}`}
-                      aria-label={`${room.title}: ${state === "solved" ? "Çözüldü" : state === "current" ? "Mevcut oda" : "Açık"} - Odaya git`}
-                    >
+                    <span className={`block min-w-0 transition-colors duration-200 ${tClass}`}>
                       {room.title}
-                    </Link>
+                    </span>
                   ) : (
                     <span className={`block ${tClass}`} aria-label={`${room.title}: Kilitli`}>
                       {room.title}
@@ -258,12 +260,22 @@ export default function RoomMap({
               </>
             );
 
+            if (canNavigate) {
+              return (
+                <Link
+                  key={room.id}
+                  href={roomHref}
+                  role="listitem"
+                  className={`${rowShellClass(state, canNavigate)} ${navigableRowExtras}`}
+                  aria-label={rowAria}
+                >
+                  {rowInner}
+                </Link>
+              );
+            }
+
             return (
-              <div
-                key={room.id}
-                role="listitem"
-                className={rowShellClass(state, canNavigate)}
-              >
+              <div key={room.id} role="listitem" className={rowShellClass(state, canNavigate)}>
                 {rowInner}
               </div>
             );
