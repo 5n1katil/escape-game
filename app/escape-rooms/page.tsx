@@ -35,11 +35,15 @@ export default function EscapeRoomsPage() {
               <Link
                 key={game.slug}
                 href={`/game/${game.slug}/intro`}
-                className="group flex flex-col overflow-hidden rounded-xl border border-zinc-800/50 bg-zinc-900/40 transition-all hover:border-amber-500/30 hover:bg-zinc-900/60 active:scale-[0.99]"
+                className={`group flex flex-col overflow-hidden rounded-xl border border-zinc-800/50 bg-zinc-900/40 transition-all hover:bg-zinc-900/60 active:scale-[0.99] ${
+                  game.visualTheme === "cyber"
+                    ? "hover:border-cyan-500/35"
+                    : "hover:border-amber-500/30"
+                }`}
               >
                 <div className="aspect-video w-full bg-zinc-800/50">
                   <div className="flex h-full w-full items-center justify-center text-zinc-600">
-                    <span className="text-4xl">🏛️</span>
+                    <span className="text-4xl">{game.visualTheme === "cyber" ? "🧠" : "🏛️"}</span>
                   </div>
                 </div>
                 <div className="flex flex-1 flex-col gap-3 p-4 sm:p-5">
@@ -53,7 +57,13 @@ export default function EscapeRoomsPage() {
                     <span className="text-xs text-zinc-500">
                       {game.roomCount} oda · {game.durationMinutes} dk
                     </span>
-                    <span className="rounded-lg bg-amber-600 px-4 py-2 text-sm font-medium text-white transition-colors group-hover:bg-amber-500">
+                    <span
+                      className={`rounded-lg px-4 py-2 text-sm font-medium text-white transition-colors ${
+                        game.visualTheme === "cyber"
+                          ? "bg-cyan-600 group-hover:bg-cyan-500"
+                          : "bg-amber-600 group-hover:bg-amber-500"
+                      }`}
+                    >
                       {t.escapeRooms.play}
                     </span>
                   </div>

@@ -1,4 +1,5 @@
-import { games, getGameBySlug, getWixLandingUrl } from "@/data/games";
+import { games, getGameBySlug, getWixLandingUrl, type GameConfig } from "@/data/games";
+import { getThemeUi } from "@/lib/gameVisualTheme";
 import { getTranslations } from "@/lib/i18n";
 import { notFound } from "next/navigation";
 import IntroStartButton from "./IntroStartButton";
@@ -19,15 +20,14 @@ export default async function IntroPage({ params }: IntroPageProps) {
 
   if (!game) notFound();
 
-  const coverImagePath =
-    slug === "tapinagin-laneti"
-      ? "/games/tapinagin-laneti/images/" + encodeURIComponent("Tapınağın Laneti.png")
-      : null;
+  const g = game as GameConfig;
+  const skin = getThemeUi(g.visualTheme);
+  const introUi = skin.intro;
+
+  const coverImagePath = g.introCoverImagePath ?? null;
 
   const introAudioUrl =
-    typeof (game as { introAudioUrl?: string }).introAudioUrl === "string"
-      ? (game as { introAudioUrl: string }).introAudioUrl
-      : null;
+    typeof g.introAudioUrl === "string" ? g.introAudioUrl : null;
 
   return (
     <div className="relative h-screen overflow-hidden bg-zinc-950">
@@ -35,7 +35,7 @@ export default async function IntroPage({ params }: IntroPageProps) {
         {/* Geri butonu: mobilde sağda, masaüstünde solda */}
         <a
           href={getWixLandingUrl(slug)}
-          className="absolute right-4 left-auto top-4 z-20 inline-flex min-h-[48px] min-w-[48px] touch-manipulation items-center justify-center gap-2 rounded-xl border border-amber-700/50 bg-amber-950/80 px-4 py-2.5 text-base font-medium text-amber-200 shadow-lg backdrop-blur-sm transition-colors hover:border-amber-600/60 hover:bg-amber-900/70 hover:text-amber-100 active:scale-[0.98] sm:right-auto sm:left-6 sm:top-6 sm:min-h-[44px] sm:px-4"
+          className={`absolute right-4 left-auto top-4 z-20 inline-flex min-h-[48px] min-w-[48px] touch-manipulation items-center justify-center gap-2 px-4 py-2.5 text-base font-medium shadow-lg backdrop-blur-sm sm:right-auto sm:left-6 sm:top-6 sm:min-h-[44px] sm:px-4 ${introUi.backButton}`}
           aria-label={t.intro.back}
         >
           <span className="text-xl leading-none" aria-hidden>←</span>
@@ -54,22 +54,24 @@ export default async function IntroPage({ params }: IntroPageProps) {
                   className="h-full w-full object-cover object-center"
                 />
               ) : (
-                <span className="flex h-full w-full items-center justify-center text-9xl opacity-40">🏛️</span>
+                <span className="flex h-full w-full items-center justify-center text-9xl opacity-40">
+                  {g.visualTheme === "cyber" ? "🧠" : "🏛️"}
+                </span>
               )}
             </div>
           </div>
 
           {/* Metin: mobilde altta kaydırılabilir, masaüstünde sağda */}
-          <div className="order-2 flex min-h-0 min-w-0 flex-col overflow-y-auto overflow-x-hidden bg-gradient-to-b from-amber-950/80 via-amber-950/60 to-amber-950/90 md:order-2 md:h-full">
+          <div className={`order-2 flex min-h-0 min-w-0 flex-col overflow-y-auto overflow-x-hidden md:order-2 md:h-full ${introUi.panelGradient}`}>
             <div className="flex min-h-0 flex-1 flex-col px-4 py-6 sm:px-5 sm:py-8">
-              <h1 className="mb-3 text-2xl font-bold tracking-tight text-amber-100 sm:text-3xl md:text-4xl">
-                {game.title}
+              <h1 className={`mb-3 sm:text-3xl md:text-4xl ${introUi.h1}`}>
+                {g.title}
               </h1>
 
               <div className="mb-4 sm:mb-5">
                 {introAudioUrl ? (
-                  <div className="rounded-lg border border-amber-700/40 bg-amber-900/30 px-3 py-2.5">
-                    <p className="mb-2 text-sm font-medium text-amber-200/90">{t.intro.audio}</p>
+                  <div className={introUi.audioBox}>
+                    <p className={introUi.audioLabel}>{t.intro.audio}</p>
                     <audio
                       controls
                       src={encodeURI(introAudioUrl)}
@@ -78,28 +80,28 @@ export default async function IntroPage({ params }: IntroPageProps) {
                     />
                   </div>
                 ) : (
-                  <div className="flex items-center gap-2 rounded-lg border border-amber-700/40 bg-amber-900/30 px-3 py-2">
+                  <div className={`flex items-center gap-2 px-3 py-2 ${introUi.audioRow}`}>
                     <span className="text-lg">🔊</span>
-                    <span className="text-sm text-amber-200/80">{t.intro.audio}</span>
+                    <span className={introUi.audioRowText}>{t.intro.audio}</span>
                   </div>
                 )}
               </div>
 
               <section className="mb-5">
-                <h2 className="mb-2 text-sm font-semibold uppercase tracking-wider text-amber-400/90 sm:text-base">
+                <h2 className={`mb-2 sm:text-base ${introUi.sectionHeading}`}>
                   {t.intro.story}
                 </h2>
-                <div className="whitespace-pre-line text-base leading-relaxed text-amber-100/90 sm:text-base">
-                  {game.story}
+                <div className={introUi.bodyText}>
+                  {g.story}
                 </div>
               </section>
 
               <section className="mb-5">
-                <h2 className="mb-2 text-sm font-semibold uppercase tracking-wider text-amber-400/90 sm:text-base">
+                <h2 className={`mb-2 sm:text-base ${introUi.sectionHeading}`}>
                   {t.intro.rules}
                 </h2>
-                <ul className="list-inside list-disc space-y-1.5 text-base leading-relaxed text-amber-100/90 sm:text-base">
-                  {game.rules.map((rule, i) => (
+                <ul className={introUi.rulesList}>
+                  {g.rules.map((rule, i) => (
                     <li key={i}>{rule}</li>
                   ))}
                 </ul>
@@ -109,7 +111,7 @@ export default async function IntroPage({ params }: IntroPageProps) {
                 <Suspense fallback={<div className="h-14 w-full animate-pulse rounded-lg bg-zinc-800/50" />}>
                   <IntroStartButton
                     slug={slug}
-                    durationSeconds={game.durationMinutes * 60}
+                    durationSeconds={g.durationMinutes * 60}
                     firstRoomId={1}
                   />
                 </Suspense>

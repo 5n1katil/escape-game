@@ -1,5 +1,6 @@
 "use client";
 
+import { useGameUi } from "@/components/GameVisualThemeProvider";
 import type { Room } from "@/data/rooms";
 import {
   getPlayerSession,
@@ -63,6 +64,8 @@ export interface TempleMapProps {
   className?: string;
   /** contain modunda img için ek sınıf (örn. max yükseklik) */
   containImgClassName?: string;
+  /** Varsayılan: tapınak haritası */
+  mapImageSrc?: string;
 }
 
 /**
@@ -76,7 +79,10 @@ export default function TempleMap({
   imageFit,
   className = "",
   containImgClassName = "max-h-[min(72vh,560px)]",
+  mapImageSrc = TEMPLE_MAP_IMAGE_PATH,
 }: TempleMapProps) {
+  const { ui } = useGameUi();
+  const tm = ui.templeMap;
   const [unlockedIds, setUnlockedIds] = useState<number[]>([]);
   const [mounted, setMounted] = useState(false);
   const [mapError, setMapError] = useState(false);
@@ -119,20 +125,11 @@ export default function TempleMap({
   const maxSolved = getStoredMaxSolvedRoomIndex(slug, roomIds);
   const activeRoomId = roomIds[maxSolved + 1] ?? null;
 
-  const lockedOverlayClass =
-    "pointer-events-none absolute flex min-h-[44px] min-w-[44px] flex-col items-center justify-center gap-0.5 rounded-md border-2 border-purple-400/65 bg-black/48 ring-1 ring-amber-400/30 shadow-[inset_0_0_20px_rgba(0,0,0,0.15)] backdrop-blur-[2px] sm:gap-1";
-
-  const lockedIconClass =
-    "h-8 w-8 shrink-0 text-amber-100 drop-shadow-[0_0_10px_rgba(251,191,36,0.65)] sm:h-9 sm:w-9";
-
-  const lockedNumClass =
-    "text-sm font-extrabold tabular-nums text-amber-100 drop-shadow-[0_1px_4px_rgba(0,0,0,0.9)] sm:text-base";
-
-  const openBaseClass =
-    "map-room-open absolute flex min-h-[44px] min-w-[44px] items-center justify-center rounded-md border-2 border-amber-300/95 bg-black/25 text-2xl font-black tabular-nums text-white touch-manipulation outline-none transition-all duration-300 hover:animate-none hover:!border-amber-500 hover:!bg-amber-500/30 hover:shadow-[0_0_25px_rgba(245,158,11,0.9)] focus-visible:animate-none focus-visible:!border-amber-500 focus-visible:!bg-amber-500/30 focus-visible:shadow-[0_0_25px_rgba(245,158,11,0.9)] focus-visible:ring-2 focus-visible:ring-amber-400 focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-950 sm:text-3xl";
-
-  const openActiveExtra =
-    "ring-2 ring-amber-300 ring-offset-2 ring-offset-zinc-950/80 z-[1]";
+  const lockedOverlayClass = tm.lockedOverlay;
+  const lockedIconClass = tm.lockedIcon;
+  const lockedNumClass = tm.lockedNum;
+  const openBaseClass = tm.openBase;
+  const openActiveExtra = tm.openActive;
 
   if (mapError) {
     return (
@@ -190,12 +187,12 @@ export default function TempleMap({
   if (imageFit === "contain") {
     return (
       <div
-        className={`relative w-full overflow-hidden rounded-lg bg-zinc-900 ring-1 ring-amber-900/35 ${className}`}
+        className={`relative w-full overflow-hidden rounded-lg bg-zinc-900 ring-1 ${tm.containRing} ${className}`}
         role="img"
-        aria-label="Tapınak haritası - odalara tıklayarak gidebilirsiniz"
+        aria-label="Oyun haritası - odalara tıklayarak gidebilirsiniz"
       >
         <img
-          src={TEMPLE_MAP_IMAGE_PATH}
+          src={mapImageSrc}
           alt=""
           className={`relative z-0 mx-auto block h-auto w-full object-contain object-center ${containImgClassName}`}
           onError={() => setMapError(true)}
@@ -211,10 +208,10 @@ export default function TempleMap({
     <div
       className={`relative z-0 h-full min-h-[200px] w-full overflow-hidden bg-zinc-900 ${className}`}
       role="img"
-      aria-label="Tapınak haritası - odalara tıklayarak gidebilirsiniz"
+      aria-label="Oyun haritası - odalara tıklayarak gidebilirsiniz"
     >
       <img
-        src={TEMPLE_MAP_IMAGE_PATH}
+        src={mapImageSrc}
         alt=""
         className="absolute inset-0 z-0 h-full w-full object-cover"
         onError={() => setMapError(true)}

@@ -1,5 +1,6 @@
 "use client";
 
+import { useGameUi } from "@/components/GameVisualThemeProvider";
 import { getStoredMaxSolvedRoomIndex } from "@/lib/gameStorage";
 import type { Room } from "@/data/rooms";
 import Link from "next/link";
@@ -44,6 +45,8 @@ export default function RoomMap({
   compactStrip = false,
   embeddedInFrame = false,
 }: RoomMapProps) {
+  const { ui } = useGameUi();
+  const rm = ui.roomMap;
   const slim = density === "slim";
   const sidebar = density === "sidebar";
   const strip = sidebar && compactStrip;
@@ -98,21 +101,20 @@ export default function RoomMap({
       state === "locked"
         ? "cursor-default border-zinc-700 bg-zinc-800/50 text-zinc-600 opacity-60"
         : state === "current"
-          ? "border-amber-500 bg-amber-500/20 text-amber-400 ring-2 ring-amber-500/40"
+          ? rm.currentCell
           : state === "solved"
             ? "border-emerald-700/60 bg-emerald-950/40 text-emerald-400"
-            : "border-amber-500/60 bg-amber-950/30 text-amber-400/90"
+            : rm.availableCell
     } ${canNavigate ? "cursor-pointer" : ""}`;
   }
 
-  const hubLinkClass =
-    "mt-4 flex w-full min-h-[44px] items-center justify-center rounded-lg border border-amber-700/50 bg-amber-950/30 px-3 py-2.5 text-center text-sm font-medium text-amber-200/90 transition-colors duration-200 hover:bg-amber-900/40 hover:text-amber-100";
+  const hubLinkClass = `mt-4 flex w-full min-h-[44px] items-center justify-center rounded-lg border px-3 py-2.5 text-center text-sm font-medium transition-colors duration-200 ${rm.hubLink}`;
 
   if (sidebar) {
     const rowTitleClass = (state: RoomState) => {
       if (strip) {
         if (state === "current") {
-          return "text-left text-sm font-bold leading-snug tracking-normal break-words line-clamp-2 text-amber-100";
+          return `text-left text-sm font-bold leading-snug tracking-normal break-words line-clamp-2 ${rm.stripCurrentTitle}`;
         }
         if (state === "locked") {
           return "text-left text-xs font-medium leading-snug tracking-normal break-words line-clamp-2 text-zinc-500";
@@ -122,7 +124,7 @@ export default function RoomMap({
       if (fill) {
         const clamp = framed ? "line-clamp-3" : "line-clamp-2";
         if (state === "current") {
-          return `text-left text-base font-bold leading-snug tracking-normal break-words ${clamp} text-amber-100`;
+          return `text-left text-base font-bold leading-snug tracking-normal break-words ${clamp} ${rm.fillCurrentTitle}`;
         }
         if (state === "locked") {
           return `text-left text-sm font-medium leading-snug tracking-normal break-words ${clamp} text-zinc-500`;
@@ -146,20 +148,20 @@ export default function RoomMap({
         return `${base} gap-2 hover:border-zinc-600/35 hover:bg-zinc-800/30 hover:shadow-[inset_0_0_0_1px_rgba(82,82,91,0.25)]`;
       }
       if (state === "current") {
-        return `${base} gap-2 hover:border-amber-500/45 hover:bg-amber-500/[0.08] hover:shadow-[0_0_22px_rgba(245,158,11,0.18)]`;
+        return `${base} gap-2 ${rm.rowHoverCurrent}`;
       }
       if (state === "solved") {
         return `${base} gap-2 hover:border-emerald-500/40 hover:bg-emerald-950/35 hover:shadow-[0_0_18px_rgba(16,185,129,0.14)]`;
       }
-      return `${base} gap-2 hover:border-amber-500/40 hover:bg-amber-950/40 hover:shadow-[0_0_20px_rgba(245,158,11,0.16)] hover:translate-x-px`;
+      return `${base} gap-2 ${rm.rowHoverAvailable}`;
     }
 
     return (
       <aside
         className={`flex flex-col rounded-xl ${
           framed
-            ? "h-full min-h-0 min-w-0 flex-1 rounded-lg border border-amber-900/30 bg-zinc-900/40 box-border px-3 py-3 sm:px-4 sm:py-3.5"
-            : `border border-zinc-800/60 bg-zinc-900/50 ring-1 ring-amber-950/30 ${
+            ? `h-full min-h-0 min-w-0 flex-1 rounded-lg border ${rm.asideFramed} bg-zinc-900/40 box-border px-3 py-3 sm:px-4 sm:py-3.5`
+            : `border border-zinc-800/60 bg-zinc-900/50 ring-1 ${rm.asideRing} ${
                 fill
                   ? "h-full min-h-0 min-w-0 flex-1 overflow-hidden px-3 py-3 sm:px-4 sm:py-4"
                   : strip
@@ -170,7 +172,7 @@ export default function RoomMap({
         aria-label="Oda ilerleme durumu"
       >
         <h3
-          className={`text-center font-semibold uppercase tracking-wider text-amber-500/90 ${
+          className={`text-center font-semibold uppercase tracking-wider ${rm.progressTitle} ${
             fill
               ? "mb-2 shrink-0 text-xs tracking-[0.2em] sm:mb-2.5 sm:text-[0.8125rem]"
               : strip
@@ -203,11 +205,11 @@ export default function RoomMap({
 
             const currentRowFrame =
               canNavigate && state === "current"
-                ? "rounded-lg bg-amber-500/5 ring-1 ring-amber-500/35"
+                ? rm.currentRowFrame
                 : "";
 
             const navigableRowExtras = canNavigate
-              ? `items-start touch-manipulation outline-none focus-visible:ring-2 focus-visible:ring-amber-500/60 focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-900 min-h-[44px] py-0.5 ${currentRowFrame}`
+              ? `items-start touch-manipulation outline-none ${rm.navigableFocus} min-h-[44px] py-0.5 ${currentRowFrame}`
               : "";
 
             const rowInner = (
@@ -286,7 +288,7 @@ export default function RoomMap({
           href={`/game/${slug}/hub`}
           className={
             fill || strip
-              ? "mt-3 flex w-full shrink-0 items-center justify-center rounded-lg border border-amber-700/50 bg-amber-950/30 px-3 py-2 text-center text-xs font-medium text-amber-200/90 transition-all duration-200 hover:border-amber-600/60 hover:bg-amber-900/45 hover:text-amber-50 hover:shadow-[0_0_18px_rgba(245,158,11,0.12)] sm:text-sm"
+              ? `mt-3 flex w-full shrink-0 items-center justify-center rounded-lg px-3 py-2 text-center text-xs font-medium transition-all duration-200 sm:text-sm ${rm.hubLinkCompact}`
               : hubLinkClass
           }
         >
@@ -299,12 +301,12 @@ export default function RoomMap({
   return (
     <aside
       className={`flex flex-col rounded-xl border border-zinc-800/60 bg-zinc-900/50 ${
-        slim ? "px-2.5 py-3 ring-1 ring-amber-950/40" : "px-4 py-4"
+        slim ? `px-2.5 py-3 ring-1 ${rm.slimAsideRing}` : "px-4 py-4"
       }`}
       aria-label="Oda ilerleme durumu"
     >
       <h3
-        className={`text-center font-semibold uppercase tracking-wider text-amber-500/90 ${
+        className={`text-center font-semibold uppercase tracking-wider ${rm.progressTitle} ${
           slim ? "mb-2 text-[10px] tracking-[0.2em]" : "mb-4 text-sm"
         }`}
       >
@@ -328,10 +330,10 @@ export default function RoomMap({
                   state === "locked"
                     ? "cursor-default border-zinc-700 bg-zinc-800/50 text-zinc-600 opacity-60"
                     : state === "current"
-                      ? "border-amber-500 bg-amber-500/20 text-amber-400 ring-2 ring-amber-500/40"
+                      ? rm.defaultCurrentCell
                       : state === "solved"
                         ? "border-emerald-700/60 bg-emerald-950/40 text-emerald-400"
-                        : "border-amber-500/60 bg-amber-950/30 text-amber-400/90"
+                        : rm.defaultAvailableCell
                 } ${canNavigate ? "cursor-pointer" : ""}`}
                 title={
                   state === "locked"
@@ -361,7 +363,7 @@ export default function RoomMap({
           const itemClasses = `flex w-full flex-col items-center gap-0.5 ${
             slim ? "px-1 py-1.5" : "px-2 py-2"
           } ${
-            state === "current" ? "bg-amber-500/10 ring-1 ring-amber-500/30 rounded-lg" : ""
+            state === "current" ? `${rm.defaultCurrentBg} rounded-lg` : ""
           } ${canNavigate ? "transition-colors hover:bg-zinc-800/60 rounded-lg touch-manipulation" : ""}`;
 
           return (
@@ -400,10 +402,10 @@ export default function RoomMap({
 
       <Link
         href={`/game/${slug}/hub`}
-        className={`mt-3 flex w-full items-center justify-center rounded-lg border border-amber-700/50 bg-amber-950/30 text-center font-medium text-amber-200/90 transition-colors hover:bg-amber-900/40 hover:text-amber-100 ${
+        className={`mt-3 flex w-full items-center justify-center rounded-lg text-center font-medium transition-colors ${
           slim
-            ? "min-h-[40px] px-2 py-2 text-[11px] leading-tight"
-            : "mt-4 min-h-[44px] px-3 py-2 text-sm"
+            ? `min-h-[40px] px-2 py-2 text-[11px] leading-tight ${rm.defaultHubLinkBottom}`
+            : `mt-4 min-h-[44px] px-3 py-2 text-sm ${rm.defaultHubLinkBottom}`
         }`}
       >
         Ana Ekrana Dön

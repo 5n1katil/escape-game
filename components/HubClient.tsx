@@ -1,6 +1,7 @@
 "use client";
 
 import CountdownTimer from "@/components/CountdownTimer";
+import { useGameUi } from "@/components/GameVisualThemeProvider";
 import RestartButton from "@/components/RestartButton";
 import TempleMap from "@/components/TempleMap";
 import type { Room } from "@/data/rooms";
@@ -36,6 +37,7 @@ interface HubClientProps {
   /** Mobilde yapışkan sayaç çubuğu (Room ile aynı “Kalan zaman” etiketi). */
   timerHudLabel: string;
   durationMinutes: number;
+  mapImageSrc: string;
 }
 
 export default function HubClient({
@@ -49,7 +51,10 @@ export default function HubClient({
   timerAriaLabel,
   timerHudLabel,
   durationMinutes,
+  mapImageSrc,
 }: HubClientProps) {
+  const { ui } = useGameUi();
+  const h = ui.hub;
   const router = useRouter();
   const [unlockedIds, setUnlockedIds] = useState<number[]>([]);
   const [solvedCount, setSolvedCount] = useState(0);
@@ -82,7 +87,7 @@ export default function HubClient({
     return () => window.removeEventListener("escape-game-room-solved", onSolved as EventListener);
   }, [refreshSession]);
 
-  const allSolved = mounted && solvedCount >= 6;
+  const allSolved = mounted && solvedCount >= rooms.length;
   const showFinalCode = allSolved && finalCode;
 
   async function handleFinalSubmit(e: React.FormEvent) {
@@ -131,7 +136,7 @@ export default function HubClient({
   if (!mounted) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-zinc-950">
-        <div className="h-10 w-10 animate-spin rounded-full border-2 border-amber-500 border-t-transparent" />
+        <div className={`h-10 w-10 animate-spin rounded-full border-2 ${ui.spinner}`} />
       </div>
     );
   }
@@ -145,7 +150,7 @@ export default function HubClient({
       <div className="absolute left-4 right-4 top-4 z-20 flex items-center justify-between sm:left-6 sm:right-6 sm:top-6">
         <Link
           href={`/game/${slug}/intro`}
-          className="flex min-h-[44px] min-w-[44px] items-center justify-center rounded-lg text-sm text-zinc-500 transition-colors hover:text-amber-500 sm:px-2"
+          className={`flex min-h-[44px] min-w-[44px] items-center justify-center rounded-lg text-sm text-zinc-500 transition-colors sm:px-2 ${h.backLink}`}
         >
           {t.backToIntro}
         </Link>
@@ -175,7 +180,7 @@ export default function HubClient({
           <h1 className="px-2 pb-1 pt-2 text-center text-lg font-bold tracking-tight text-white drop-shadow-md sm:text-xl md:hidden">
             {gameTitle}
           </h1>
-          <section className="hidden flex-row flex-wrap items-center justify-center gap-3 rounded-xl border border-amber-900/45 bg-zinc-900/50 px-4 py-3 sm:gap-4 sm:px-5 sm:py-3.5 md:flex">
+          <section className={`hidden flex-row flex-wrap items-center justify-center gap-3 rounded-xl border ${h.desktopCountSection} bg-zinc-900/50 px-4 py-3 sm:gap-4 sm:px-5 sm:py-3.5 md:flex`}>
             <CountdownTimer
               slug={slug}
               initialMinutes={durationMinutes}
@@ -188,8 +193,8 @@ export default function HubClient({
           </section>
 
           {/* Mobilde: metin panelinden önce; img + şeffaf yüzde kutular (SVG yok) */}
-          <section className="w-full shrink-0 overflow-hidden rounded-lg border border-amber-900/40 bg-zinc-900/40 md:hidden">
-            <h2 className="border-b border-amber-900/35 px-4 py-3 text-sm font-semibold uppercase tracking-wider text-amber-500/90">
+          <section className={`w-full shrink-0 overflow-hidden rounded-lg border ${h.mobileMapWrap} bg-zinc-900/40 md:hidden`}>
+            <h2 className={`border-b ${h.mobileMapTitleBar} px-4 py-3 text-sm font-semibold uppercase tracking-wider ${h.sectionTitle}`}>
               {t.map}
             </h2>
             <div className="bg-zinc-900/50 p-2">
@@ -199,12 +204,13 @@ export default function HubClient({
                 goToRoomLabel={t.goToRoom}
                 imageFit="contain"
                 containImgClassName="max-h-[min(50vh,420px)]"
+                mapImageSrc={mapImageSrc}
               />
             </div>
           </section>
 
-          <section className="w-full rounded-lg border border-amber-900/35 bg-zinc-900/30 px-4 py-3 sm:px-6 sm:py-4">
-            <h2 className="mb-2 text-sm font-semibold uppercase tracking-wider text-amber-500/90">
+          <section className={`w-full rounded-lg border ${h.storySectionBorder} bg-zinc-900/30 px-4 py-3 sm:px-6 sm:py-4`}>
+            <h2 className={`mb-2 text-sm font-semibold uppercase tracking-wider ${h.sectionTitle}`}>
               {t.story}
             </h2>
             {storyAudioUrl && (
@@ -221,10 +227,10 @@ export default function HubClient({
           </section>
 
           <section
-            className="w-full rounded-lg border border-amber-900/35 bg-zinc-900/40 px-4 py-3 sm:px-6 sm:py-4"
+            className={`w-full rounded-lg border ${h.roomsSectionBorder} bg-zinc-900/40 px-4 py-3 sm:px-6 sm:py-4`}
             aria-label="Oda ilerleme durumu"
           >
-            <h2 className="mb-3 text-sm font-semibold uppercase tracking-wider text-amber-500/90">
+            <h2 className={`mb-3 text-sm font-semibold uppercase tracking-wider ${h.sectionTitle}`}>
               {t.rooms}
             </h2>
             <p className="mb-3 text-xs text-zinc-500">
@@ -240,7 +246,7 @@ export default function HubClient({
                   unlocked
                     ? solved
                       ? "border-emerald-700/50 bg-emerald-950/20 cursor-pointer hover:bg-emerald-950/30 transition-colors"
-                      : "border-amber-800/40 bg-zinc-800/50 cursor-pointer hover:border-amber-600/35 hover:bg-zinc-800 transition-colors"
+                      : h.roomOpenItem
                     : "border-zinc-700/50 bg-zinc-800/30 opacity-60 cursor-default"
                 }`;
                 const content = (
@@ -250,7 +256,7 @@ export default function HubClient({
                         solved
                           ? "bg-emerald-900/50 text-emerald-400"
                           : unlocked
-                            ? "bg-amber-900/30 text-amber-400"
+                            ? h.roomOpenBadge
                             : "bg-zinc-800 text-zinc-500"
                       }`}
                     >
@@ -260,7 +266,7 @@ export default function HubClient({
                       {room.title}
                     </span>
                     {unlocked && !solved && (
-                      <span className="ml-auto text-xs text-amber-500/70">{t.goToRoom}</span>
+                      <span className={`ml-auto text-xs ${h.roomGoLabel}`}>{t.goToRoom}</span>
                     )}
                     {solved && (
                       <span className="ml-auto text-xs text-emerald-400/80">Çözüldü · {t.goToRoom}</span>
@@ -289,8 +295,8 @@ export default function HubClient({
           </section>
 
           {showFinalCode && (
-            <section className="w-full rounded-lg border border-amber-700/40 bg-amber-950/30 px-4 py-5 sm:px-6">
-              <h2 className="mb-3 text-sm font-semibold uppercase tracking-wider text-amber-400">
+            <section className={`w-full rounded-lg border ${h.finalWrap} px-4 py-5 sm:px-6`}>
+              <h2 className={`mb-3 text-sm font-semibold uppercase tracking-wider ${h.finalTitle}`}>
                 {t.allRoomsSolved}
               </h2>
               <form onSubmit={handleFinalSubmit} className="space-y-3">
@@ -305,7 +311,7 @@ export default function HubClient({
                     onChange={(e) => setFinalInput(e.target.value)}
                     placeholder={t.finalCodePlaceholder}
                     autoComplete="off"
-                    className="w-full rounded-lg border-2 border-zinc-600/50 bg-black/40 px-4 py-3 text-zinc-100 shadow-inner shadow-black/25 placeholder:text-zinc-400 focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500/80 focus:ring-offset-2 focus:ring-offset-amber-950/50"
+                    className={`w-full rounded-lg border-2 border-zinc-600/50 bg-black/40 px-4 py-3 text-zinc-100 shadow-inner shadow-black/25 placeholder:text-zinc-400 ${h.finalInput}`}
                   />
                   {finalError && (
                     <p className="mt-2 text-sm text-red-400" role="alert">
@@ -316,7 +322,7 @@ export default function HubClient({
                 <button
                   type="submit"
                   disabled={!finalInput.trim() || finalSubmitting}
-                  className="w-full rounded-lg bg-amber-600 py-3 text-lg font-semibold text-white shadow-md shadow-amber-900/35 transition-all duration-300 hover:bg-amber-500 hover:shadow-lg hover:shadow-amber-500/25 disabled:cursor-not-allowed disabled:opacity-50 disabled:shadow-none"
+                  className={`w-full rounded-lg ${h.finalSubmit}`}
                 >
                   {t.finalCodeSubmit}
                 </button>
@@ -325,7 +331,7 @@ export default function HubClient({
                 <button
                   type="button"
                   onClick={() => leftColumnRef.current?.scrollTo({ top: 0, behavior: "smooth" })}
-                  className="w-full rounded-lg border border-amber-700/50 bg-amber-950/40 py-2.5 text-sm font-medium text-amber-200/90 transition-colors hover:bg-amber-900/50"
+                  className={`w-full rounded-lg py-2.5 text-sm font-medium transition-colors ${h.finalSecondary}`}
                 >
                   {t.backToTemple}
                 </button>
@@ -336,7 +342,7 @@ export default function HubClient({
 
         {/* Sağ: relative + h-full; harita img object-cover, önde şeffaf yüzde kutular */}
         <aside className="relative hidden min-h-0 md:flex md:h-full md:w-[38%] md:shrink-0 lg:w-[42%] xl:max-w-[520px]">
-          <div className="sticky top-0 flex h-full min-h-0 w-full flex-col border-l border-amber-900/40 bg-zinc-950/95">
+          <div className={`sticky top-0 flex h-full min-h-0 w-full flex-col border-l ${h.asideBorder} bg-zinc-950/95`}>
             <div className="relative flex min-h-0 flex-1 overflow-hidden p-3 lg:p-5">
               <TempleMap
                 slug={slug}
@@ -344,6 +350,7 @@ export default function HubClient({
                 goToRoomLabel={t.goToRoom}
                 imageFit="cover"
                 className="min-h-0 flex-1 rounded-md"
+                mapImageSrc={mapImageSrc}
               />
             </div>
           </div>

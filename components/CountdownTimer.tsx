@@ -1,5 +1,6 @@
 "use client";
 
+import { useGameUi } from "@/components/GameVisualThemeProvider";
 import { getStoredRemainingTime } from "@/lib/gameStorage";
 import { useEffect, useState } from "react";
 
@@ -23,6 +24,14 @@ export default function CountdownTimer({
   variant,
   label,
 }: CountdownTimerProps) {
+  const { themeId, ui } = useGameUi();
+  const cd = ui.countdown;
+  const mobileGlow =
+    themeId === "cyber" ? "0 0 20px rgba(34, 211, 238, 0.35)" : "0 0 20px rgba(245, 158, 11, 0.35)";
+  const tacticalGlow =
+    themeId === "cyber" ? "0 0 28px rgba(34, 211, 238, 0.4)" : "0 0 28px rgba(245, 158, 11, 0.4)";
+  const tacticalWideGlow =
+    themeId === "cyber" ? "0 0 22px rgba(34, 211, 238, 0.35)" : "0 0 22px rgba(245, 158, 11, 0.35)";
   const effectiveVariant = variant ?? (compact ? "compact" : "default");
   const defaultSeconds = initialMinutes * 60;
   const [secondsLeft, setSecondsLeft] = useState(defaultSeconds);
@@ -65,20 +74,20 @@ export default function CountdownTimer({
   if (effectiveVariant === "mobileBar") {
     return (
       <div
-        className="flex w-full min-w-0 items-center justify-between gap-3 border-b border-amber-500/40 bg-black/70 px-3 py-2.5 shadow-[0_4px_24px_rgba(0,0,0,0.5)] backdrop-blur-md sm:px-4"
+        className={`flex w-full min-w-0 items-center justify-between gap-3 ${cd.mobileBar}`}
         aria-live="polite"
         aria-label={ariaLabel}
       >
         {label ? (
-          <span className="shrink-0 text-[10px] font-extrabold uppercase leading-tight tracking-[0.12em] text-amber-400 sm:text-xs sm:tracking-[0.16em]">
+          <span className={cd.mobileLabel}>
             {label}
           </span>
         ) : (
           <span className="sr-only">{ariaLabel}</span>
         )}
         <span
-          className="font-mono text-3xl font-black tabular-nums tracking-tight text-amber-400 drop-shadow-[0_0_14px_rgba(251,191,36,0.55)] sm:text-4xl"
-          style={{ textShadow: "0 0 20px rgba(245, 158, 11, 0.35)" }}
+          className={cd.mobileTime}
+          style={{ textShadow: mobileGlow }}
         >
           {timeStr}
         </span>
@@ -89,18 +98,18 @@ export default function CountdownTimer({
   if (effectiveVariant === "tactical") {
     return (
       <div
-        className="w-full shrink-0 rounded-xl border-2 border-amber-500/50 bg-black/60 px-3 py-4 shadow-[0_0_36px_rgba(245,158,11,0.18),inset_0_1px_0_rgba(251,191,36,0.08)] sm:px-4 sm:py-5"
+        className={cd.compactBox}
         aria-live="polite"
         aria-label={ariaLabel}
       >
         {label ? (
-          <p className="text-center text-[11px] font-extrabold uppercase tracking-[0.2em] text-amber-400/95 sm:text-xs sm:tracking-[0.22em]">
+          <p className={cd.compactLabel}>
             {label}
           </p>
         ) : null}
         <p
-          className={`text-center font-mono text-5xl font-black tabular-nums tracking-tight text-amber-400 drop-shadow-[0_0_15px_rgba(251,191,36,0.6)] lg:text-6xl ${label ? "mt-2 sm:mt-3" : ""}`}
-          style={{ textShadow: "0 0 28px rgba(245, 158, 11, 0.4)" }}
+          className={`${cd.compactTime} ${label ? "mt-2 sm:mt-3" : ""}`}
+          style={{ textShadow: tacticalGlow }}
         >
           {timeStr}
         </p>
@@ -111,18 +120,18 @@ export default function CountdownTimer({
   if (effectiveVariant === "tacticalWide") {
     return (
       <div
-        className="w-full shrink-0 rounded-xl border-2 border-amber-500/45 bg-black/55 px-3 py-2.5 shadow-[0_0_28px_rgba(245,158,11,0.14),inset_0_1px_0_rgba(251,191,36,0.08)] sm:px-4 sm:py-3"
+        className={cd.hubBox}
         aria-live="polite"
         aria-label={ariaLabel}
       >
         {label ? (
-          <p className="text-center text-[10px] font-extrabold uppercase tracking-[0.2em] text-amber-400/95 sm:text-[11px] sm:tracking-[0.2em]">
+          <p className={cd.hubLabel}>
             {label}
           </p>
         ) : null}
         <p
-          className={`text-center font-mono text-4xl font-black tabular-nums tracking-tight text-amber-400 drop-shadow-[0_0_14px_rgba(251,191,36,0.55)] sm:text-5xl lg:text-[2.75rem] ${label ? "mt-1 sm:mt-1.5" : ""}`}
-          style={{ textShadow: "0 0 22px rgba(245, 158, 11, 0.35)" }}
+          className={`${cd.hubTime} ${label ? "mt-1 sm:mt-1.5" : ""}`}
+          style={{ textShadow: tacticalWideGlow }}
         >
           {timeStr}
         </p>

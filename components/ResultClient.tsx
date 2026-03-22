@@ -1,5 +1,6 @@
 "use client";
 
+import { useGameUi } from "@/components/GameVisualThemeProvider";
 import { fetchUserAvatarFromRtdb, saveScore } from "@/lib/firebase";
 import {
   getCompletedGameResult,
@@ -301,6 +302,8 @@ export default function ResultClient({
   gizemMalikanesiUrl,
   gizemMalikanesiLabel,
 }: ResultClientProps) {
+  const { ui } = useGameUi();
+  const rt = ui.result;
   const router = useRouter();
   const [escaped, setEscaped] = useState<boolean | null>(null);
   const [finalResult, setFinalResult] = useState<FinalGameResult | null | "missing">(null);
@@ -420,7 +423,7 @@ export default function ResultClient({
   if (escaped === null || !escaped) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-zinc-950">
-        <div className="h-10 w-10 animate-spin rounded-full border-2 border-amber-500 border-t-transparent" />
+        <div className={`h-10 w-10 animate-spin rounded-full border-2 ${rt.spinner}`} />
       </div>
     );
   }
@@ -456,8 +459,8 @@ export default function ResultClient({
         <div className="flex flex-col gap-8 md:flex-row md:gap-10 lg:gap-12">
           <div className="flex flex-1 flex-col space-y-6 md:max-w-md md:flex-none sm:space-y-8">
             <header>
-              <p className="text-sm font-medium uppercase tracking-wider text-amber-500/90">{gameTitle}</p>
-              <h1 className="mt-2 text-2xl font-bold text-amber-400 sm:text-3xl">
+              <p className={rt.gameTitleBar}>{gameTitle}</p>
+              <h1 className={rt.mainTitle}>
                 {tResult.endTitle}
               </h1>
               <p className="mt-2 text-sm text-zinc-400">{tResult.endStory}</p>
@@ -465,7 +468,7 @@ export default function ResultClient({
                 <img
                   src={safeAvatarImgSrc(activePlayerAvatarSrc)}
                   alt=""
-                  className="h-9 w-9 shrink-0 rounded-full border border-amber-500/45 object-cover"
+                  className={`h-9 w-9 shrink-0 rounded-full border object-cover ${rt.avatarBorder}`}
                   loading="lazy"
                 />
                 <span>
@@ -476,11 +479,11 @@ export default function ResultClient({
             </header>
 
             <section
-              className="rounded-xl border border-amber-500/25 bg-amber-950/20 px-4 py-5 sm:px-6 sm:py-6"
+              className={rt.scoreCard}
               role="region"
               aria-label={tRoomResult.title}
             >
-              <h2 className="text-center text-lg font-semibold text-amber-300 sm:text-xl">
+              <h2 className={rt.scoreTitle}>
                 {tRoomResult.title}
               </h2>
               <dl className="mt-4 grid gap-3 sm:grid-cols-2">
@@ -519,7 +522,7 @@ export default function ResultClient({
               className="rounded-xl border border-zinc-700/50 bg-zinc-900/40 px-4 py-5 sm:px-6"
               aria-label={tResult.leaderboardTitle}
             >
-              <h2 className="text-center text-base font-semibold text-amber-500/90 sm:text-lg">
+              <h2 className={rt.breakdownTitle}>
                 {tResult.leaderboardTitle}
               </h2>
               <div className="mt-3 flex justify-center gap-2 text-xs sm:mt-4 sm:text-sm">
@@ -535,8 +538,8 @@ export default function ResultClient({
                   }
                   className={`rounded-full px-3 py-1.5 transition-colors ${
                     leaderboardFilter.mode === "game"
-                      ? "bg-amber-600 text-white"
-                      : "bg-zinc-800 text-zinc-300 hover:bg-zinc-700"
+                      ? rt.tabActive
+                      : `${rt.tabInactive} hover:bg-zinc-700`
                   }`}
                 >
                   Oyun Skoru
@@ -551,8 +554,8 @@ export default function ResultClient({
                   }
                   className={`rounded-full px-3 py-1.5 transition-colors ${
                     leaderboardFilter.mode === "global"
-                      ? "bg-amber-600 text-white"
-                      : "bg-zinc-800 text-zinc-300 hover:bg-zinc-700"
+                      ? rt.tabActive
+                      : `${rt.tabInactive} hover:bg-zinc-700`
                   }`}
                 >
                   Toplam Puan
@@ -580,12 +583,12 @@ export default function ResultClient({
                           <img
                             src={safeAvatarImgSrc(leaderboardEntryAvatarUrl(entry, avatarByMemberId))}
                             alt=""
-                            className="h-8 w-8 shrink-0 rounded-full border border-amber-500/45 object-cover"
+                            className={`h-8 w-8 shrink-0 rounded-full border object-cover ${rt.lbAvatarBorder}`}
                             loading="lazy"
                           />
                           {i + 1}. {entry.name}
                         </span>
-                        <span className="tabular-nums text-amber-400/90">
+                        <span className={rt.rowScore}>
                           {entry.score} · {entry.time === null ? "—" : formatTime(entry.time)}
                         </span>
                       </li>
@@ -618,7 +621,7 @@ export default function ResultClient({
           className="w-full rounded-xl border border-zinc-700/50 bg-zinc-900/40 px-5 py-6 sm:px-8 sm:py-8 md:px-10"
           aria-label={tResult.endStoryHeading}
         >
-          <h2 className="text-base font-semibold text-amber-500/90 sm:text-lg">
+          <h2 className={rt.sectionTitle}>
             {tResult.endStoryHeading}
           </h2>
           {endAudioUrl && (
@@ -654,13 +657,13 @@ export default function ResultClient({
           <button
             type="button"
             onClick={handlePlayAgain}
-            className="inline-flex min-h-[52px] min-w-[220px] flex-shrink-0 items-center justify-center rounded-xl border-2 border-amber-700/60 bg-transparent px-8 py-3.5 text-lg font-semibold text-amber-100/90 transition-colors hover:border-amber-600/80 hover:bg-amber-900/20 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:ring-offset-2 focus:ring-offset-zinc-900 active:scale-[0.98]"
+            className={rt.btnGhost}
           >
             {tResult.playAgain}
           </button>
           <a
             href={backUrl}
-            className="inline-flex min-h-[52px] min-w-[220px] flex-shrink-0 items-center justify-center rounded-xl bg-amber-600 px-8 py-3.5 text-lg font-semibold text-white shadow-lg transition-colors hover:bg-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:ring-offset-2 focus:ring-offset-zinc-900 active:scale-[0.98]"
+            className={rt.btnPrimary}
           >
             {backLabel}
           </a>

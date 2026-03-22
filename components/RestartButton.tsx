@@ -1,5 +1,6 @@
 "use client";
 
+import { useGameUi } from "@/components/GameVisualThemeProvider";
 import { clearGameState } from "@/lib/gameStorage";
 
 interface RestartButtonProps {
@@ -8,6 +9,7 @@ interface RestartButtonProps {
 }
 
 export default function RestartButton({ slug, label }: RestartButtonProps) {
+  const { ui } = useGameUi();
   function handleClick() {
     clearGameState(slug);
     window.location.reload();
@@ -17,7 +19,7 @@ export default function RestartButton({ slug, label }: RestartButtonProps) {
     <button
       type="button"
       onClick={handleClick}
-      className="min-h-[44px] min-w-[44px] touch-manipulation rounded-lg text-sm text-zinc-500 transition-colors hover:text-amber-500 hover:bg-zinc-800/50 active:bg-zinc-800/70 sm:px-3"
+      className={`min-h-[44px] min-w-[44px] touch-manipulation rounded-lg text-sm text-zinc-500 transition-colors hover:bg-zinc-800/50 active:bg-zinc-800/70 sm:px-3 ${ui.linkMutedHover}`}
     >
       {label}
     </button>

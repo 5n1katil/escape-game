@@ -1,10 +1,38 @@
 /**
  * Game metadata. Auth/payment gate will be inserted before intro in the route flow.
  */
+import { digitalArafRooms } from "./digitalAraf";
 import { rooms } from "./rooms";
 
 /** Wix promo page; intro "Geri" goes here. */
 export const WIX_LANDING_BASE = "https://www.5n1dedektif.com";
+
+export type VisualThemeId = "temple" | "cyber";
+
+export type GameConfig = {
+  slug: string;
+  title: string;
+  wixLandingUrl?: string;
+  story: string;
+  rules: readonly string[];
+  durationMinutes: number;
+  roomCount: number;
+  finalCode: string;
+  endStoryLong: string;
+  endAudioUrl?: string;
+  endImageUrl?: string;
+  endGizemMalikanesiUrl?: string;
+  endGizemMalikanesiLabel?: string;
+  introAudioUrl?: string;
+  hubStory: string;
+  hubStoryAudioUrl?: string;
+  /** Tapınak amber / Dijital Araf siberpunk-cyan */
+  visualTheme: VisualThemeId;
+  /** Hub + oda ekranı harita görseli */
+  mapImagePath: string;
+  /** Intro sol panel kapak görseli; yoksa placeholder */
+  introCoverImagePath?: string | null;
+};
 
 export const games = [
   {
@@ -23,27 +51,48 @@ export const games = [
     ],
     durationMinutes: 60,
     roomCount: rooms.length,
-    /** Final escape code entered on hub after all 6 rooms solved (6. odada gösterilir). */
     finalCode: "lanetlitapınağıngizemi",
-    /** Uzun oyun sonu hikâyesi (sonuç ekranı sağ panel). */
     endStoryLong:
       "Terazinin taş kolları gıcırdayarak hareket etti... Denge sağlanmıştı. Sonsuzluğun Kapısı önümde yavaşça açılırken, güneş ışığı loş tapınak duvarlarına vurdu. Sırtımdan aşağı soğuk bir ter damladı. Bitti mi, Yoksa daha yeni mi başlıyor diye düşündüm. Bir adım attım. Toz kokusunun yerini temiz hava aldı. Gözlerim kamaştı, bedenim hafifledi. Tapınaktan çıktığımda gökyüzünü gördüm. Özgürdüm. Ama içimde bir şeyler hâlâ oturmuyordu. Bu kadar kolay olmamalıydı. Kapı aniden büyük bir gürültüyle kapandı. Sanki hiçbir zaman açılmamış gibi, antik taşlar yerine oturdu. Ve işte o an… Her yer titremeye başladı, deprem mi oluyordu, anlayamadım. Gökyüzü birden simsiyah oldu, toprak yarılmaya başladı, ve boşluktan aşağı doğru düşmeye başladım, sonsuzluğa doğru süzülerek... Gözlerimi açtığımda, bir anda her şey değişmişti. Masa lambasının soluk ışığı gözlerimi kamaştırdı. Sert bir yüzeye dayalıydım, başım zonkluyordu resmen. Elimde bir kalem vardı, önümde eski dava dosyaları… Başımı kaldırdım. Burası… ofisimdi. Ofisimdeydim. Önümde açık duran, sayfaları dağılmış Gizem Malikanesi Davası'nın dosyaları bana bakıyordu. Günlerdir eve gitmemiş, gözümü bile kırpmadan çalışmıştım. Anlaşılan dosyaların üzerinde uyuyakalmıştım. Bir an durdum. Gördüğüm her şey… Tapınak, bilmeceler, lanet… sadece bir rüyaydı. Ama ya değilse? Ellerim titriyordu. Her şey o kadar gerçek hissettirmişti ki… Dosyalardan birini çektim. Gizem Malikanesi'ndeki cinayetin krokisi önümdeydi. Kurbanın bedeni, saatler önce üzerinde çalıştığım terazi figürüne benziyordu. Bir anda içim ürperdi. Bu bir oyun muydu? Zihnim bana bir ipucu mu veriyordu? Ve o an fark ettim. Bingo. Katili bulmuştum...",
-    /** Oyun sonu hikâye ses dosyası (varsa sağ panelde oynatıcı gösterilir). */
-    endAudioUrl: "/games/tapinagin-laneti/audio/9-Tapınağın Laneti Oyun Sonu Seslendirme.mp3" as string | undefined,
-    /** Oyun sonu görseli (varsa sağ panel üstünde gösterilir). */
-    endImageUrl: "/games/tapinagin-laneti/images/Tapınağın Laneti Çıkış.png" as string | undefined,
-    /** Çıkış ekranında gösterilecek ek CTA (örn. DAVA02 Gizem Malikanesi). */
-    endGizemMalikanesiUrl: "https://www.5n1dedektif.com/gizemmalikanesi" as string | undefined,
-    endGizemMalikanesiLabel: "DAVA02 Gizem Malikanesi'ne git!" as string | undefined,
-    /** Giriş ekranı hikâye seslendirmesi (varsa intro sayfasında oynatıcı gösterilir). */
-    introAudioUrl: "/games/tapinagin-laneti/audio/1-Tapınak Girişi Seslendirme.mp3" as string | undefined,
-    /** Lobi (hub) ekranında HİKAYE bölümünde gösterilecek metin. */
+    endAudioUrl: "/games/tapinagin-laneti/audio/9-Tapınağın Laneti Oyun Sonu Seslendirme.mp3",
+    endImageUrl: "/games/tapinagin-laneti/images/Tapınağın Laneti Çıkış.png",
+    endGizemMalikanesiUrl: "https://www.5n1dedektif.com/gizemmalikanesi",
+    endGizemMalikanesiLabel: "DAVA02 Gizem Malikanesi'ne git!",
+    introAudioUrl: "/games/tapinagin-laneti/audio/1-Tapınak Girişi Seslendirme.mp3",
     hubStory:
       "Zifiri karanlık koridorun girişinde duruyorum. Hava ağır, sıcak ve kuru... Sanki yüzyıllardır burada hapsolmuş bir lanetin nefesini hissediyorum. Tozlu taş duvarlara dokunduğumda, parmaklarımın arasından ince kumlar dökülüyor. Sanki bu tapınak, zamanın içinde eriyip gitmiş ama beni bekliyormuş gibi.\n\nEfsaneler, buranın lanetli olduğunu söylüyor. Kaybolmuş bir firavunun, gömüldüğü yerin sonsuza dek mühürlenmesi için bir büyü yaptığını... İçeriye girenlerin asla geri dönemediğini... Yalnızca bütün sırları çözenler buradan sağ çıkabilirmiş.\n\nFakat bu bir masal değil. Önümde, taş bloklara kazınmış eski Mısır yazıları, bana sanki bir şeyler fısıldıyor. Arkamdaki giriş, içeri adım attığım anda büyük bir gürültüyle kapandı. Artık geri dönüş yok.\n\nYolumun üzerindeki altı odanın her biri bir sınav olacak. Kapılar, sadece doğru cevapları bulanlara açılacak. Eğer yanlış yaparsam... Efsanelerin söylediği gibi, bu tapınağın bir parçası olup kalacağım.\n\nDerin bir nefes alıyorum. Gözlerimi karanlığa dikiyorum. Bu benim bugüne kadar ki en zor sınavım... Ya tapınağın sırlarını çözüp kurtulacağım ya da bu lanetin bir parçası olacağım.",
-    /** Lobi hikâye seslendirmesi (varsa hub HİKAYE bölümünde oynatıcı gösterilir). */
-    hubStoryAudioUrl: "/games/tapinagin-laneti/audio/2-Tapınağın Laneti Giriş Seslendirme.mp3" as string | undefined,
+    hubStoryAudioUrl: "/games/tapinagin-laneti/audio/2-Tapınağın Laneti Giriş Seslendirme.mp3",
+    visualTheme: "temple",
+    mapImagePath: "/images/temple-map.jpg",
+    introCoverImagePath:
+      "/games/tapinagin-laneti/images/" + encodeURIComponent("Tapınağın Laneti.png"),
   },
-] as const;
+  {
+    slug: "digital-araf",
+    title: "Dijital Araf",
+    wixLandingUrl: `${WIX_LANDING_BASE}/digital-araf`,
+    story:
+      "Prof. Dr. Erhan Sivrizeka’nın bilinç yapısı, deney protokolü kapsamında nöral arayüzle dijitale aktarıldı. Ben, bu sisteme düşen bir ziyaretçiyim: Araf adı verilen ara katmanda, onun hafızasının kırıkları ve sınırları arasında ilerliyorum. Altı modül—altı oda—her biri zihnin farklı bir katmanını simgeliyor. Süre dolmadan çıkış protokolünü tamamlamazsam, veri akışına gömülüp kaybolacağım.",
+    rules: [
+      "Oyuna başlamadan önce kağıt ve kaleminizi hazırlayın.",
+      "Haritadaki modülleri sırayla ziyaret edin.",
+      "Her modülde bir görev metni ve seçenekler yer alır; önce metni okuyun.",
+      "Doğru yanıtla bir sonraki modülün kilidi açılır.",
+      "Tüm modüller tamamlandıktan sonra ana çıkış kodunu girin.",
+      "Toplam süreniz 60 dakikadır.",
+    ],
+    durationMinutes: 60,
+    roomCount: digitalArafRooms.length,
+    finalCode: "test",
+    endStoryLong:
+      "Son protokol satırı ekranda yanıp söndü. Bant genişliği daraldı, gürültü kesildi. Sivrizeka’nın dijital yankısı uzaklaştı; geride yalnızca sessiz bir terminal kaldı. Çıkış kapısı açıldı—gerçek dünyaya dönüş mü, yoksa başka bir simülasyon katmanı mı, emin değilim. Ama şimdilik… özgürüm.",
+    hubStory:
+      "Soğuk mavi ışık koridoru boyunca ilerliyorum. Duvarlar veri akışı desenleriyle kaplı; her adımda nöron ağlarına benzeyen çizgiler kıpırdıyor. Bu yer, bir bilgisayarın içi gibi ama nefes alıyor—Sivrizeka’nın zihninin kalıntıları burada.\n\nAltı modül görünüyor. Her biri farklı bir bilişsel işlevi temsil ediyor olmalı. Yanlış seçim yaparsam sistem beni izole edebilir; doğru sırayla ve doğru yanıtlarla ilerlemeliyim.\n\nGeri dönüş portu kapandı. Tek yol ileri: Araf’tan çıkmak için tüm modülleri çözmek.",
+    visualTheme: "cyber",
+    mapImagePath: "/images/digital-map.jpg",
+    introCoverImagePath: null,
+  },
+] as const satisfies readonly GameConfig[];
 
 export type Game = (typeof games)[number];
 
@@ -54,10 +103,11 @@ export function getGameBySlug(slug: string): Game | undefined {
 /** Intro back button: Wix promo page for this game. */
 export function getWixLandingUrl(slug: string): string {
   const game = getGameBySlug(slug);
-  return (game && "wixLandingUrl" in game ? game.wixLandingUrl : null) ?? `${WIX_LANDING_BASE}/${slug}`;
+  return game?.wixLandingUrl ?? `${WIX_LANDING_BASE}/${slug}`;
 }
 
 export function getRoomsForGame(slug: string) {
   if (slug === "tapinagin-laneti") return rooms;
+  if (slug === "digital-araf") return digitalArafRooms;
   return [];
 }

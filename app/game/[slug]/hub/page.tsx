@@ -1,6 +1,6 @@
 import GameStateGate from "@/components/GameStateGate";
 import HubClient from "@/components/HubClient";
-import { games, getGameBySlug, getRoomsForGame } from "@/data/games";
+import { games, getGameBySlug, getRoomsForGame, type GameConfig } from "@/data/games";
 import { getTranslations } from "@/lib/i18n";
 import { notFound } from "next/navigation";
 
@@ -20,9 +20,8 @@ export default async function HubPage({ params }: HubPageProps) {
 
   if (!game || rooms.length === 0) notFound();
 
-  const finalCode = "finalCode" in game ? (game as { finalCode?: string }).finalCode : undefined;
-  const g = game as { hubStory?: string; hubStoryAudioUrl?: string };
-  const story = g.hubStory ?? game.story;
+  const g = game as GameConfig;
+  const story = g.hubStory;
   const storyAudioUrl = g.hubStoryAudioUrl ?? null;
 
   return (
@@ -33,11 +32,12 @@ export default async function HubPage({ params }: HubPageProps) {
         story={story}
         storyAudioUrl={storyAudioUrl || undefined}
         rooms={rooms}
-        finalCode={finalCode}
+        finalCode={game.finalCode}
         t={t.hub}
         timerAriaLabel={t.room.timerAriaLabel}
         timerHudLabel={t.room.timerHudLabel}
         durationMinutes={game.durationMinutes}
+        mapImageSrc={game.mapImagePath}
       />
     </GameStateGate>
   );

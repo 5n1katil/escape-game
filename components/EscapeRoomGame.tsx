@@ -1,5 +1,6 @@
 "use client";
 
+import { useGameUi } from "@/components/GameVisualThemeProvider";
 import {
   addPenaltySeconds,
   clearGameState,
@@ -55,6 +56,8 @@ function EscapePasswordBox({
   copiedLabel: string;
   copyAriaLabel: string;
 }) {
+  const { ui } = useGameUi();
+  const er = ui.escapeRoom;
   const [copied, setCopied] = useState(false);
   const resetTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -88,20 +91,20 @@ function EscapePasswordBox({
   }
 
   return (
-    <div className="rounded-lg border border-amber-500/40 bg-amber-950/30 px-4 py-3 text-left">
-      <p className="text-sm font-semibold text-amber-400/90">{label}</p>
+    <div className={er.codeBox}>
+      <p className={er.codeLabel}>{label}</p>
       <div className="mt-2 flex min-w-0 flex-col items-stretch gap-3 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
-        <p className="min-w-0 flex-1 break-all font-mono text-base font-bold tracking-wide text-amber-200 sm:text-lg">
+        <p className={er.codeValue}>
           {code}
         </p>
         <button
           type="button"
           onClick={() => void handleCopy()}
           aria-label={copyAriaLabel}
-          className="inline-flex shrink-0 touch-manipulation items-center justify-center gap-1.5 rounded-md border border-amber-500/30 bg-[#020617] px-3 py-2 text-sm font-medium text-amber-400 shadow-none transition-all duration-200 hover:border-amber-500/45 hover:bg-amber-500/10 hover:text-amber-300 hover:shadow-[0_0_14px_rgba(245,158,11,0.2)] active:scale-[0.97] sm:min-w-[7.5rem]"
+          className={er.copyBtn}
         >
           {copied ? (
-            <span className="text-xs font-semibold tracking-tight text-amber-200 sm:text-sm">
+            <span className={er.copyBtnLabel}>
               {copiedLabel}
             </span>
           ) : (
@@ -147,6 +150,8 @@ export default function EscapeRoomGame({
   backToHubLabel = "Ana Ekrana Dön",
   finalCode,
 }: EscapeRoomGameProps) {
+  const { ui } = useGameUi();
+  const er = ui.escapeRoom;
   const router = useRouter();
   const [attempts, setAttempts] = useState(0);
   const [error, setError] = useState<string | null>(null);
@@ -290,8 +295,8 @@ export default function EscapeRoomGame({
     }
 
     return (
-      <div className="mx-auto w-full max-w-3xl space-y-6 rounded-xl border border-amber-500/30 bg-amber-950/20 px-4 py-8 text-center sm:px-8 sm:py-10 lg:max-w-none">
-        <h2 className="text-2xl font-bold text-amber-400 sm:text-3xl md:text-4xl">
+      <div className={er.winWrap}>
+        <h2 className={er.winTitle}>
           {t.escaped.title}
         </h2>
         <p className="text-base leading-8 text-slate-200 sm:text-lg">
@@ -299,11 +304,11 @@ export default function EscapeRoomGame({
         </p>
         {finalResult && (
           <div
-            className="space-y-3 rounded-lg border border-amber-500/20 bg-zinc-900/40 px-4 py-4 text-left"
+            className={er.winCard}
             role="region"
             aria-label={t.result.title}
           >
-            <h3 className="text-center text-lg font-semibold text-amber-300">
+            <h3 className={er.winCardTitle}>
               {t.result.title}
             </h3>
             <dl className="grid gap-2 sm:grid-cols-2">
@@ -347,7 +352,7 @@ export default function EscapeRoomGame({
               clearGameState(slug);
               window.location.href = `/game/${slug}/intro`;
             }}
-            className="inline-flex min-h-[48px] min-w-[160px] touch-manipulation items-center justify-center rounded-lg bg-amber-600 px-6 py-3 text-lg font-semibold text-white transition-colors hover:bg-amber-500 active:scale-95"
+            className={er.winCta}
           >
             {t.escaped.playAgain}
           </button>
@@ -373,7 +378,7 @@ export default function EscapeRoomGame({
                 placeholder={t.answerPlaceholder}
                 autoComplete="off"
                 autoFocus
-                className="w-full rounded-lg border-2 border-zinc-600/50 bg-black/40 px-4 py-3 text-base text-zinc-100 shadow-inner shadow-black/20 placeholder:text-zinc-400 focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500/80 focus:ring-offset-2 focus:ring-offset-zinc-950 sm:py-3.5 sm:text-lg"
+                className={er.textInput}
                 aria-invalid={!!error}
                 aria-describedby={error ? "error-message" : undefined}
               />
@@ -390,7 +395,7 @@ export default function EscapeRoomGame({
             <button
               type="submit"
               disabled={!inputValue.trim()}
-              className="w-full min-h-[48px] touch-manipulation rounded-lg bg-amber-600 px-6 py-3.5 text-base font-semibold text-white shadow-md shadow-amber-900/30 transition-all duration-300 hover:bg-amber-500 hover:shadow-lg hover:shadow-amber-500/20 disabled:cursor-not-allowed disabled:opacity-50 disabled:shadow-none active:scale-[0.98] sm:py-4 sm:text-lg"
+              className={er.primaryBtn}
             >
               {t.submitAnswer}
             </button>
@@ -407,7 +412,7 @@ export default function EscapeRoomGame({
                   key={idx}
                   type="button"
                   onClick={() => handleMultipleChoiceSelect(idx)}
-                  className="min-h-[48px] touch-manipulation rounded-lg border-2 border-zinc-600/50 bg-zinc-800/40 px-4 py-3 text-left text-base font-medium text-zinc-100 shadow-sm shadow-black/20 transition-all duration-300 hover:border-amber-500/80 hover:bg-amber-500/10 hover:text-amber-50 hover:shadow-[0_0_22px_rgba(245,158,11,0.18)] active:scale-[0.98] sm:text-lg"
+                  className={er.choiceBtn}
                 >
                   {option}
                 </button>
@@ -435,7 +440,7 @@ export default function EscapeRoomGame({
               {media.map((item, idx) => (
                 <div
                   key={idx}
-                  className="group flex min-h-[100px] flex-col overflow-hidden rounded-xl border-2 border-zinc-600/50 bg-zinc-800/40 shadow-sm shadow-black/25 transition-all duration-300 hover:border-amber-500/80 hover:bg-zinc-800/60 hover:shadow-[0_0_24px_rgba(245,158,11,0.15)] sm:min-h-[120px]"
+                  className={er.imageChoiceCard}
                 >
                   <button
                     type="button"
@@ -451,14 +456,14 @@ export default function EscapeRoomGame({
                       />
                     ) : (
                       <span
-                        className="flex h-14 w-14 items-center justify-center rounded-full bg-amber-950/50 text-3xl text-amber-400/80"
+                        className={er.imageChoiceIcon}
                         aria-hidden
                       >
                         {["◆", "◇", "●", "○"][idx % 4]}
                       </span>
                     )}
                     {item.alt && (
-                      <span className="text-center text-sm font-medium text-zinc-100 group-hover:text-amber-100">
+                      <span className={er.imageChoiceCaption}>
                         {item.alt}
                       </span>
                     )}
@@ -466,7 +471,7 @@ export default function EscapeRoomGame({
                   <button
                     type="button"
                     onClick={() => handleImageChoiceSelect(idx)}
-                    className="min-h-[44px] w-full touch-manipulation border-t-2 border-zinc-600/40 bg-zinc-800/50 px-4 py-2.5 text-sm font-semibold text-amber-300 transition-all duration-300 hover:border-amber-500/70 hover:bg-amber-500/15 hover:text-amber-200 hover:shadow-[inset_0_0_20px_rgba(245,158,11,0.08)] active:scale-[0.98]"
+                    className={er.imageChoiceSelect}
                   >
                     {t.chooseThisOption}
                   </button>
@@ -495,7 +500,7 @@ export default function EscapeRoomGame({
                 <span className="text-6xl">🗺️</span>
               </div>
               <div className="absolute inset-0 flex items-center justify-center gap-4">
-                <span className="rounded-full border-2 border-amber-500/60 bg-amber-500/20 px-4 py-2 text-sm font-medium text-amber-400">
+                <span className={er.attemptBadge}>
                   Tıklanabilir nokta
                 </span>
               </div>
@@ -556,7 +561,7 @@ export default function EscapeRoomGame({
           </span>
         </div>
         {currentRoom.description && (
-          <p className="text-sm text-amber-500/80">{currentRoom.description}</p>
+          <p className={er.descMuted}>{currentRoom.description}</p>
         )}
       </div>
 
@@ -576,7 +581,7 @@ export default function EscapeRoomGame({
 
       {storyText && (
         <section aria-label={t.storyLabel} className="min-w-0">
-          <h3 className="mb-3 text-sm font-semibold uppercase tracking-wider text-amber-500/90">
+          <h3 className={`mb-3 ${er.storyHeading}`}>
             {t.storyLabel}
           </h3>
           <p className="whitespace-pre-line text-base leading-8 text-slate-200 lg:text-lg">
@@ -633,10 +638,10 @@ export default function EscapeRoomGame({
 
       {isRoomAlreadySolved ? (
         <section
-          className="rounded-xl border border-amber-500/30 bg-amber-950/30 px-5 py-5 sm:px-6 sm:py-6"
+          className={er.puzzlePanel}
           aria-label={t.roomSolved}
         >
-          <p className="text-center text-lg font-semibold text-amber-400 sm:text-xl">
+          <p className={er.puzzlePrompt}>
             {t.roomAlreadyCompleted}
           </p>
           {isLastRoom && finalCode && (
@@ -654,7 +659,7 @@ export default function EscapeRoomGame({
         </section>
       ) : (
         <section aria-label={t.puzzlePromptLabel} className="min-w-0">
-          <h3 className="mb-3 text-sm font-semibold uppercase tracking-wider text-amber-500/90">
+          <h3 className={`mb-3 ${er.storyHeading}`}>
             {t.puzzlePromptLabel}
           </h3>
           <p className="mb-5 text-base leading-8 text-slate-200 sm:mb-6 lg:text-lg">
@@ -676,7 +681,7 @@ export default function EscapeRoomGame({
           <button
             type="button"
             onClick={() => setLightboxImage(null)}
-            className="absolute right-4 top-4 z-10 flex h-10 w-10 items-center justify-center rounded-full bg-zinc-800 text-white shadow-lg transition-colors hover:bg-zinc-700 focus:outline-none focus:ring-2 focus:ring-amber-400"
+            className={er.lightboxClose}
             aria-label={t.imageCloseLabel}
           >
             <span className="text-xl leading-none" aria-hidden>×</span>

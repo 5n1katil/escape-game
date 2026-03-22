@@ -1,5 +1,6 @@
 "use client";
 
+import { useGameUi } from "@/components/GameVisualThemeProvider";
 import { getTranslations } from "@/lib/i18n";
 import { clearGameState, getStoredRemainingTime } from "@/lib/gameStorage";
 import Link from "next/link";
@@ -18,6 +19,8 @@ interface GameStateGateProps {
  * When the 1h timer runs out, shows game-over popup (lanet, Tekrar Oyna, Çıkış Yap).
  */
 export default function GameStateGate({ slug, children }: GameStateGateProps) {
+  const { ui } = useGameUi();
+  const go = ui.gameOver;
   const router = useRouter();
   const [ready, setReady] = useState(false);
   const [timeUp, setTimeUp] = useState(false);
@@ -56,7 +59,7 @@ export default function GameStateGate({ slug, children }: GameStateGateProps) {
   if (!ready) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-zinc-950">
-        <div className="h-8 w-8 animate-spin rounded-full border-2 border-amber-500 border-t-transparent" />
+        <div className={`h-8 w-8 animate-spin rounded-full border-2 ${go.spinner}`} />
       </div>
     );
   }
@@ -68,11 +71,11 @@ export default function GameStateGate({ slug, children }: GameStateGateProps) {
           role="dialog"
           aria-modal="true"
           aria-labelledby="game-over-title"
-          className="w-full max-w-md rounded-2xl border border-amber-700/50 bg-zinc-900 px-6 py-8 shadow-xl sm:px-8 sm:py-10"
+          className={go.card}
         >
           <h2
             id="game-over-title"
-            className="text-center text-xl font-bold text-amber-400 sm:text-2xl"
+            className={go.title}
           >
             {t.message}
           </h2>
@@ -83,7 +86,7 @@ export default function GameStateGate({ slug, children }: GameStateGateProps) {
             <button
               type="button"
               onClick={handlePlayAgain}
-              className="min-h-[48px] rounded-xl bg-amber-600 px-6 py-3 font-semibold text-white transition-colors hover:bg-amber-500 active:scale-[0.98]"
+              className={go.primaryBtn}
             >
               {t.playAgain}
             </button>

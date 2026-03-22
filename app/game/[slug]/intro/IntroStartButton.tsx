@@ -1,5 +1,6 @@
 "use client";
 
+import { useGameUi } from "@/components/GameVisualThemeProvider";
 import {
   getCompletedGameResult,
   getPlayerKeyForSlug,
@@ -31,6 +32,12 @@ export default function IntroStartButton({
   durationSeconds,
   firstRoomId = 1,
 }: IntroStartButtonProps) {
+  const { themeId, ui } = useGameUi();
+  const im = ui.introModal;
+  const rankingTitleShadow =
+    themeId === "cyber"
+      ? "0 0 40px rgba(34, 211, 238, 0.35), 0 2px 0 rgba(0,0,0,0.8)"
+      : "0 0 40px rgba(245, 158, 11, 0.35), 0 2px 0 rgba(0,0,0,0.8)";
   const t = getTranslations();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -95,56 +102,46 @@ export default function IntroStartButton({
           aria-modal="true"
           aria-labelledby="intro-ranking-title"
         >
-          {/* Dış amber parıltı */}
-          <div
-            className="pointer-events-none absolute -inset-1 rounded-[1.35rem] bg-gradient-to-br from-amber-400/35 via-amber-600/15 to-transparent opacity-90 blur-sm sm:-inset-2 sm:rounded-[1.75rem] lg:-inset-3"
-            aria-hidden
-          />
-          <div className="pointer-events-none absolute inset-0 rounded-3xl shadow-[0_0_100px_rgba(245,158,11,0.22),0_0_180px_rgba(180,83,9,0.12)] sm:rounded-[1.75rem]" aria-hidden />
+          <div className={im.outerGlow} aria-hidden />
+          <div className={im.outerShadowGlow} aria-hidden />
 
-          <div className="relative overflow-hidden rounded-3xl border-2 border-amber-500/55 bg-gradient-to-b from-zinc-900/98 via-zinc-950/98 to-black/95 p-6 shadow-[0_25px_80px_rgba(0,0,0,0.65),inset_0_1px_0_rgba(251,191,36,0.12)] ring-2 ring-amber-400/25 sm:p-10 md:p-12 lg:p-14 xl:p-16 sm:rounded-[1.75rem]">
+          <div className={im.frame}>
+            <div className={im.radialOverlay} aria-hidden />
             <div
-              className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_80%_50%_at_50%_-20%,rgba(251,191,36,0.14),transparent_55%)]"
+              className={`pointer-events-none absolute left-4 top-4 h-6 w-6 border-l-2 border-t-2 sm:left-6 sm:top-6 lg:left-8 lg:top-8 ${im.corner}`}
               aria-hidden
             />
             <div
-              className="pointer-events-none absolute left-4 top-4 h-6 w-6 border-l-2 border-t-2 border-amber-400/50 sm:left-6 sm:top-6 lg:left-8 lg:top-8"
+              className={`pointer-events-none absolute right-4 top-4 h-6 w-6 border-r-2 border-t-2 sm:right-6 sm:top-6 lg:right-8 lg:top-8 ${im.corner}`}
               aria-hidden
             />
             <div
-              className="pointer-events-none absolute right-4 top-4 h-6 w-6 border-r-2 border-t-2 border-amber-400/50 sm:right-6 sm:top-6 lg:right-8 lg:top-8"
+              className={`pointer-events-none absolute bottom-4 left-4 h-6 w-6 border-b-2 border-l-2 sm:bottom-6 sm:left-6 lg:bottom-8 lg:left-8 ${im.corner}`}
               aria-hidden
             />
             <div
-              className="pointer-events-none absolute bottom-4 left-4 h-6 w-6 border-b-2 border-l-2 border-amber-400/50 sm:bottom-6 sm:left-6 lg:bottom-8 lg:left-8"
-              aria-hidden
-            />
-            <div
-              className="pointer-events-none absolute bottom-4 right-4 h-6 w-6 border-b-2 border-r-2 border-amber-400/50 sm:bottom-6 sm:right-6 lg:bottom-8 lg:right-8"
+              className={`pointer-events-none absolute bottom-4 right-4 h-6 w-6 border-b-2 border-r-2 sm:bottom-6 sm:right-6 lg:bottom-8 lg:right-8 ${im.corner}`}
               aria-hidden
             />
 
             <div className="relative mx-auto flex max-w-4xl flex-col items-center text-center xl:max-w-5xl">
               <h3
                 id="intro-ranking-title"
-                className="text-balance text-xl font-bold leading-tight tracking-tight text-amber-300 sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl"
-                style={{
-                  textShadow:
-                    "0 0 40px rgba(245, 158, 11, 0.35), 0 2px 0 rgba(0,0,0,0.8)",
-                }}
+                className={im.modalTitle}
+                style={{ textShadow: rankingTitleShadow }}
               >
                 {t.intro.rankingModalTitle}
               </h3>
-              <p className="mt-6 max-w-3xl text-pretty text-sm leading-relaxed text-zinc-200 sm:mt-8 sm:text-base md:text-lg md:leading-relaxed lg:mt-10 lg:text-xl lg:leading-relaxed">
+              <p className={im.modalBody}>
                 {t.intro.rankingModalBody1}
               </p>
-              <p className="mt-5 max-w-3xl text-pretty text-sm leading-relaxed text-zinc-200 sm:mt-6 sm:text-base md:text-lg md:leading-relaxed lg:text-xl lg:leading-relaxed">
+              <p className={im.modalBodySecond}>
                 {t.intro.rankingModalBody2}
               </p>
               <button
                 type="button"
                 onClick={() => setShowRankingModal(false)}
-                className="ranking-modal-cta mt-8 min-h-[48px] w-full max-w-md touch-manipulation rounded-2xl bg-gradient-to-b from-amber-500 to-amber-600 px-8 py-3.5 text-sm font-bold text-white shadow-[0_0_32px_rgba(245,158,11,0.45),0_12px_28px_rgba(0,0,0,0.45)] ring-2 ring-amber-400/40 transition-all duration-300 hover:from-amber-400 hover:to-amber-500 hover:shadow-[0_0_48px_rgba(251,191,36,0.55),0_16px_36px_rgba(0,0,0,0.5)] hover:ring-amber-300/50 active:scale-[0.98] sm:mt-10 sm:min-h-[56px] sm:max-w-lg sm:py-4 sm:text-base lg:mt-12 lg:min-h-[64px] lg:max-w-xl lg:text-lg"
+                className={im.modalCta}
               >
                 {t.intro.rankingModalCta}
               </button>
@@ -170,7 +167,7 @@ export default function IntroStartButton({
             <button
               type="button"
               onClick={handleRestart}
-              className="flex-1 min-h-[56px] touch-manipulation rounded-xl border-2 border-amber-700/60 bg-transparent px-6 py-4 text-lg font-semibold text-amber-100/90 transition-colors hover:border-amber-600/80 hover:bg-amber-900/20 active:scale-[0.98] sm:min-h-[64px] sm:text-xl"
+              className={im.btnGhost}
             >
               {t.intro.restartFromIntro}
             </button>
@@ -186,14 +183,14 @@ export default function IntroStartButton({
           <button
             type="button"
             onClick={handleContinue}
-            className="flex-1 min-h-[56px] touch-manipulation rounded-xl bg-amber-600 px-6 py-4 text-lg font-semibold text-white shadow-lg shadow-amber-900/30 transition-all hover:bg-amber-500 hover:shadow-amber-500/25 active:scale-[0.98] sm:min-h-[64px] sm:text-xl"
+            className={im.btnPrimary}
           >
             {t.intro.continueGame}
           </button>
           <button
             type="button"
             onClick={handleRestart}
-            className="flex-1 min-h-[56px] touch-manipulation rounded-xl border-2 border-amber-700/60 bg-transparent px-6 py-4 text-lg font-semibold text-amber-100/90 transition-colors hover:border-amber-600/80 hover:bg-amber-900/20 active:scale-[0.98] sm:min-h-[64px] sm:text-xl"
+            className={im.btnGhost}
           >
             {t.intro.restartFromIntro}
           </button>
@@ -208,7 +205,7 @@ export default function IntroStartButton({
       <button
         type="button"
         onClick={handleStart}
-        className="w-full min-h-[64px] touch-manipulation rounded-xl bg-amber-600 px-8 py-5 text-xl font-bold text-white shadow-lg shadow-amber-900/40 transition-all hover:bg-amber-500 hover:shadow-amber-500/30 active:scale-[0.98] sm:min-h-[72px] sm:text-2xl"
+        className={im.startMain}
       >
         {t.intro.startGame}
       </button>
