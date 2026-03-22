@@ -107,6 +107,22 @@ body {
   box-decoration-break: clone;
 }
 
+/* Oyun odası sağ sütun — uzun ilerleme listesi için ince kaydırma */
+.game-room-sidebar-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(245, 158, 11, 0.35) rgba(24, 24, 27, 0.5);
+}
+.game-room-sidebar-scroll::-webkit-scrollbar {
+  width: 6px;
+}
+.game-room-sidebar-scroll::-webkit-scrollbar-thumb {
+  background: rgba(245, 158, 11, 0.35);
+  border-radius: 9999px;
+}
+.game-room-sidebar-scroll::-webkit-scrollbar-track {
+  background: rgba(24, 24, 27, 0.45);
+}
+
 /* Tapınak haritası — açık oda bölgeleri: yanıp sönen amber parlama */
 @keyframes map-room-amber-glow {
   0%,

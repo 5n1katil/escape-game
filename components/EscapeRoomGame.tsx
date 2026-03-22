@@ -150,7 +150,7 @@ export default function EscapeRoomGame({
 
   if (showSuccess) {
     return (
-      <div className="mx-auto w-full max-w-xl space-y-6 rounded-lg border border-emerald-500/30 bg-emerald-950/20 px-4 py-8 text-center sm:px-8 sm:py-10">
+      <div className="mx-auto w-full max-w-3xl space-y-6 rounded-xl border border-emerald-500/30 bg-emerald-950/20 px-4 py-8 text-center sm:px-8 sm:py-10 lg:max-w-none">
         <div className="flex justify-center">
           <span className="text-5xl" aria-hidden>✓</span>
         </div>
@@ -198,11 +198,11 @@ export default function EscapeRoomGame({
     }
 
     return (
-      <div className="mx-auto w-full max-w-xl space-y-6 rounded-lg border border-amber-500/30 bg-amber-950/20 px-4 py-8 text-center sm:px-8 sm:py-10">
+      <div className="mx-auto w-full max-w-3xl space-y-6 rounded-xl border border-amber-500/30 bg-amber-950/20 px-4 py-8 text-center sm:px-8 sm:py-10 lg:max-w-none">
         <h2 className="text-2xl font-bold text-amber-400 sm:text-3xl md:text-4xl">
           {t.escaped.title}
         </h2>
-        <p className="text-base leading-relaxed text-zinc-300 sm:text-lg">
+        <p className="text-base leading-8 text-slate-200 sm:text-lg">
           {t.escaped.message}
         </p>
         {finalResult && (
@@ -450,10 +450,10 @@ export default function EscapeRoomGame({
   const isRoomAlreadySolved = hydrated && roomIndex <= maxSolvedIndex;
 
   return (
-    <div className="mx-auto w-full max-w-2xl space-y-4 rounded-lg border border-zinc-800/50 bg-zinc-900/30 px-4 py-5 text-left sm:space-y-5 sm:px-6 sm:py-6 md:px-8 md:py-7">
-      <div className="flex flex-col gap-1">
-        <div className="flex items-center justify-between gap-4">
-          <h2 className="text-lg font-semibold text-white sm:text-xl">
+    <div className="w-full min-w-0 space-y-5 text-left sm:space-y-6">
+      <div className="flex flex-col gap-2">
+        <div className="flex flex-wrap items-start justify-between gap-4">
+          <h2 className="text-balance text-lg font-semibold text-white sm:text-xl lg:text-2xl">
             {currentRoom.title}
           </h2>
           <span
@@ -469,12 +469,12 @@ export default function EscapeRoomGame({
       </div>
 
       {currentRoom.audioSrc && (
-        <div className="flex items-center gap-3 rounded-lg border border-zinc-700/50 bg-zinc-800/30 px-4 py-3 sm:py-3.5">
+        <div className="flex w-full min-w-0 items-center gap-3 rounded-xl border border-zinc-700/50 bg-zinc-800/30 px-4 py-3 sm:py-3.5">
           <span className="text-2xl shrink-0" aria-hidden>🔊</span>
           <audio
             controls
             src={encodeURI(currentRoom.audioSrc)}
-            className="h-10 min-h-[40px] flex-1 min-w-0 max-w-full rounded-md border border-zinc-600/50 bg-zinc-900/60"
+            className="h-10 min-h-[40px] w-full min-w-0 max-w-full flex-1 rounded-md border border-zinc-600/50 bg-zinc-900/60"
             preload="metadata"
           >
             {t.audioLabel}
@@ -483,11 +483,11 @@ export default function EscapeRoomGame({
       )}
 
       {storyText && (
-        <section aria-label={t.storyLabel}>
-          <h3 className="mb-2 text-sm font-semibold uppercase tracking-wider text-amber-500/90">
+        <section aria-label={t.storyLabel} className="min-w-0">
+          <h3 className="mb-3 text-sm font-semibold uppercase tracking-wider text-amber-500/90">
             {t.storyLabel}
           </h3>
-          <p className="whitespace-pre-line text-base leading-relaxed text-zinc-300 sm:text-lg">
+          <p className="whitespace-pre-line text-base leading-8 text-slate-200 lg:text-lg">
             {storyText}
           </p>
         </section>
@@ -562,11 +562,11 @@ export default function EscapeRoomGame({
           )}
         </section>
       ) : (
-        <section aria-label={t.puzzlePromptLabel}>
-          <h3 className="mb-2 text-sm font-semibold uppercase tracking-wider text-amber-500/90">
+        <section aria-label={t.puzzlePromptLabel} className="min-w-0">
+          <h3 className="mb-3 text-sm font-semibold uppercase tracking-wider text-amber-500/90">
             {t.puzzlePromptLabel}
           </h3>
-          <p className="mb-4 text-base leading-relaxed text-zinc-300 sm:text-lg">
+          <p className="mb-5 text-base leading-8 text-slate-200 sm:mb-6 lg:text-lg">
             {puzzlePromptText}
           </p>
           {renderPuzzle()}
