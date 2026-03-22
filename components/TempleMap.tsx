@@ -82,8 +82,12 @@ export default function TempleMap({
   containImgClassName = "max-h-[min(72vh,560px)]",
   mapImageSrc = TEMPLE_MAP_IMAGE_PATH,
 }: TempleMapProps) {
-  const { ui } = useGameUi();
+  const { ui, themeId } = useGameUi();
   const tm = ui.templeMap;
+  const openPulseClass =
+    themeId === "cyber" ? "map-room-open-pulse-cyber" : "map-room-open-pulse";
+  const solvedPulseClass =
+    themeId === "cyber" ? "map-room-solved-pulse-cyber" : "map-room-solved-pulse";
   const [unlockedIds, setUnlockedIds] = useState<number[]>([]);
   const [mounted, setMounted] = useState(false);
   const [mapError, setMapError] = useState(false);
@@ -174,7 +178,7 @@ export default function TempleMap({
         key={roomId}
         href={`/game/${slug}/room/${roomId}`}
         className={`${openBaseClass} ${
-          solved ? "border-emerald-500/75 map-room-solved-pulse" : "map-room-open-pulse"
+          solved ? `border-emerald-500/75 ${solvedPulseClass}` : openPulseClass
         } ${active ? openActiveExtra : ""} active:scale-[0.98]`}
         style={style}
         aria-label={`${room.title} - ${goToRoomLabel}`}
