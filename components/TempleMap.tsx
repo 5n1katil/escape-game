@@ -9,8 +9,9 @@ import {
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 
-/** Tapınak haritası (public/images/temple-map.jpg — oyun ile senkron). */
-export const TEMPLE_MAP_IMAGE_PATH = "/images/temple-map.jpg";
+/** Varsayılan harita (Tapınak); oyunlar `mapImagePath` ile geçersiz kılar. */
+export const TEMPLE_MAP_IMAGE_PATH =
+  "/games/tapinagin-laneti/images/temple-map.jpg";
 
 /** Harita üzerinde oda alanları (yüzde: tüm görüntü koordinat sistemi). */
 export const TEMPLE_MAP_SEGMENTS: {
