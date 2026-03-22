@@ -24,6 +24,9 @@ export const zihinLabirentiRooms: Room[] = [
       "Zifiri karanlık... Bedenimi hissetmiyorum ama düşüncelerim, sonsuz bir boşlukta yankılanıyor gibi. Soğuk bir metalin üzerinde miyim, yoksa sadece bir sunucunun içindeki veri akışından mı ibaretim? Gözlerimi açamıyorum çünkü fiziksel gözlerim artık yok. Ben Prof. Dr. Erhan Sivrizeka... Ebedi Korteks Projesi'nin yaratıcısı.\n\nLaboratuvarımda her şey planlandığı gibi gidiyordu. Sonra o keskin acı... Kalbim. Evet, fiziksel ölümüm gerçekleşti. Ama buradayım. Bilincim başardı! Zihnim şu an ana bilgisayarın Araf protokolünde asılı bekliyor.\n\nAniden zihnimin içinde mekanik bir ses yankılanıyor: 'Bilinmeyen biyolojik veri akışı tespit edildi. Transferin tamamlanması ve bilincin sisteme entegre edilebilmesi için Kurucu Protokol onayı gerekiyor.'\n\nEğer doğru yetkilendirme kodunu bulamazsam, bilincim bir virüs gibi silinecek. Kendi yarattığım sisteme, bu projenin 'nihai amacını' hatırlatmalıyım. Neden tüm bunları yaptım? İnsanlık için neyi yenmeye çalışıyordum?",
     puzzlePrompt:
       "Doğru yetkilendirme protokolünü seç — Kurucu Protokol seni tanımalı.",
+    storyImages: [
+      { url: "/games/zihin-labirenti/images/oda-1.png", alt: "1. oda görseli" },
+    ],
   },
   {
     id: 2,
@@ -57,6 +60,9 @@ export const zihinLabirentiRooms: Room[] = [
     story:
       "Terminal Hack Testi.\n\nGüvenlik katmanı hâlâ aktif. Ham veri akışına sızmak için yerel bir konsola düştünüz. Yetki kodunu bilmiyorsanız sistem sizi izole edecek.",
     puzzlePrompt: "Terminalde doğru yetki kodunu girin (Enter).",
+    storyImages: [
+      { url: "/games/zihin-labirenti/images/oda-3.png", alt: "3. oda görseli" },
+    ],
   },
   {
     id: 4,
@@ -70,6 +76,9 @@ export const zihinLabirentiRooms: Room[] = [
     story:
       "Nöral Frekans Testi.\n\nÇekirdek senkronizasyon bozuldu. Üç taşıyıcı hattı aynı genlikte olmadan ilerleyemezsiniz.",
     puzzlePrompt: "Alfa, Beta ve Teta kaydırıcılarını %50 değerine getirin.",
+    storyImages: [
+      { url: "/games/zihin-labirenti/images/oda-4.png", alt: "4. oda görseli" },
+    ],
   },
   {
     id: 5,
@@ -83,6 +92,9 @@ export const zihinLabirentiRooms: Room[] = [
     story:
       "Sinaps Matrisi Testi.\n\nAğda rastgele düşük sinyalli düğümler var. Hepsi aktif olunca geçit açılır.",
     puzzlePrompt: "3×3 ızgarada sönük hücreleri tıklayarak tamamını aktif edin.",
+    storyImages: [
+      { url: "/games/zihin-labirenti/images/oda-5.png", alt: "5. oda görseli" },
+    ],
   },
   {
     id: 6,
@@ -96,5 +108,8 @@ export const zihinLabirentiRooms: Room[] = [
     story:
       "Final Çıkış Kodu Testi. Şifre: ebedi\n\nTüm modüller tamam. Ana çıkış protokolü yalnızca doğru anahtar kelimeyi kabul eder.",
     puzzlePrompt: "Çıkış şifresini yazıp gönderin.",
+    storyImages: [
+      { url: "/games/zihin-labirenti/images/oda-6.png", alt: "6. oda görseli" },
+    ],
   },
 ];

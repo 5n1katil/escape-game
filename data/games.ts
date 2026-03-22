@@ -96,7 +96,7 @@ export const games = [
       "Koyu lacivert bir koridor, tavanda akan cyan veri hatları. Bu yer nörobilim laboratuvarı ile siber uzayın arasında; Sivrizeka’nın zihninin haritası gibi.\n\nAltı modül sıralı görünüyor. Yanlış dallanma beni izole edebilir; doğru sıra ve yanıtlarla ilerlemeliyim.\n\nGeri dönüş kapısı kilitlendi. Tek çıkış: tüm modülleri çözmek.",
     visualTheme: "cyber",
     mapImagePath: "/games/zihin-labirenti/images/zihin-map.jpg",
-    introCoverImagePath: null,
+    introCoverImagePath: "/games/zihin-labirenti/images/cover.jpg",
   },
 ] as const satisfies readonly GameConfig[];
 

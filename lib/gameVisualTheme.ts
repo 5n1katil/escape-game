@@ -113,7 +113,7 @@ export const THEME_UI = {
       primaryBtn:
         "w-full min-h-[48px] touch-manipulation rounded-lg bg-amber-600 px-6 py-3.5 text-base font-semibold text-white shadow-md shadow-amber-900/30 transition-all duration-300 hover:bg-amber-500 hover:shadow-lg hover:shadow-amber-500/20 disabled:cursor-not-allowed disabled:opacity-50 disabled:shadow-none active:scale-[0.98] sm:py-4 sm:text-lg",
       choiceBtn:
-        "min-h-[48px] touch-manipulation rounded-lg border-2 border-zinc-600/50 bg-zinc-800/40 px-4 py-3 text-left text-base font-medium text-zinc-100 shadow-sm shadow-black/20 transition-all duration-300 hover:border-amber-500/80 hover:bg-amber-500/10 hover:text-amber-50 hover:shadow-[0_0_22px_rgba(245,158,11,0.18)] active:scale-[0.98] sm:text-lg",
+        "min-h-[52px] w-full touch-manipulation rounded-xl border-2 border-zinc-600/55 bg-slate-900/60 px-6 py-4 text-left text-lg font-semibold text-zinc-100 shadow-sm shadow-black/25 transition-all duration-300 hover:-translate-y-1 hover:border-amber-500/90 hover:bg-amber-500/[0.12] hover:text-amber-50 hover:shadow-[0_0_18px_rgba(251,191,36,0.4),0_0_28px_rgba(245,158,11,0.22),0_8px_24px_rgba(0,0,0,0.35)] active:scale-[0.98] md:text-xl",
       imageChoiceCard:
         "group flex min-h-[100px] flex-col overflow-hidden rounded-xl border-2 border-zinc-600/50 bg-zinc-800/40 shadow-sm shadow-black/25 transition-all duration-300 hover:border-amber-500/80 hover:bg-zinc-800/60 hover:shadow-[0_0_24px_rgba(245,158,11,0.15)] sm:min-h-[120px]",
       imageChoiceIcon:
@@ -310,7 +310,7 @@ export const THEME_UI = {
       primaryBtn:
         "w-full min-h-[48px] touch-manipulation rounded-lg bg-cyan-600 px-6 py-3.5 text-base font-semibold text-white shadow-md shadow-cyan-900/35 transition-all duration-300 hover:bg-cyan-500 hover:shadow-lg hover:shadow-cyan-400/25 disabled:cursor-not-allowed disabled:opacity-50 disabled:shadow-none active:scale-[0.98] sm:py-4 sm:text-lg",
       choiceBtn:
-        "min-h-[48px] touch-manipulation rounded-lg border-2 border-zinc-600/50 bg-zinc-800/40 px-4 py-3 text-left text-base font-medium text-zinc-100 shadow-sm shadow-black/20 transition-all duration-300 hover:border-cyan-500/75 hover:bg-cyan-500/10 hover:text-cyan-50 hover:shadow-[0_0_22px_rgba(34,211,238,0.2)] active:scale-[0.98] sm:text-lg",
+        "min-h-[52px] w-full touch-manipulation rounded-xl border-2 border-zinc-600/55 bg-slate-900/60 px-6 py-4 text-left text-lg font-semibold text-zinc-100 shadow-sm shadow-black/25 transition-all duration-300 hover:-translate-y-1 hover:border-cyan-400/90 hover:bg-cyan-500/[0.12] hover:text-cyan-50 hover:shadow-[0_0_18px_rgba(34,211,238,0.45),0_0_28px_rgba(6,182,212,0.25),0_8px_24px_rgba(0,0,0,0.35)] active:scale-[0.98] md:text-xl",
       imageChoiceCard:
         "group flex min-h-[100px] flex-col overflow-hidden rounded-xl border-2 border-zinc-600/50 bg-zinc-800/40 shadow-sm shadow-black/25 transition-all duration-300 hover:border-cyan-500/75 hover:bg-zinc-800/60 hover:shadow-[0_0_24px_rgba(34,211,238,0.18)] sm:min-h-[120px]",
       imageChoiceIcon:
