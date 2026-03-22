@@ -12,6 +12,17 @@ export const ROOM_TYPES = [
 
 export type RoomType = (typeof ROOM_TYPES)[number];
 
+/** Özel React mini-oyunları; `EscapeRoomGame` önce buna bakar. */
+export const PUZZLE_TYPES = [
+  "multiple-choice",
+  "text",
+  "terminal",
+  "slider",
+  "matrix",
+] as const;
+
+export type PuzzleType = (typeof PUZZLE_TYPES)[number];
+
 export interface Room {
   id: number;
   title: string;
@@ -30,6 +41,11 @@ export interface Room {
   audioSrc?: string;
   /** Hikâye bölümünde gösterilecek görseller (papirüs, duvar vb.). */
   storyImages?: { url: string; alt?: string }[];
+  /**
+   * terminal / slider / matrix: özel bileşen render edilir.
+   * text / multiple-choice: isteğe bağlı; çoğunlukla `type` ile belirlenir.
+   */
+  puzzleType?: PuzzleType;
 }
 
 export const rooms: Room[] = [

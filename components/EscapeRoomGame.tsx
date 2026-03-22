@@ -18,6 +18,9 @@ import {
   isCorrectImageChoice,
   isCorrectMultipleChoice,
 } from "@/lib/rooms";
+import MatrixPuzzle from "@/components/puzzles/MatrixPuzzle";
+import SliderPuzzle from "@/components/puzzles/SliderPuzzle";
+import TerminalPuzzle from "@/components/puzzles/TerminalPuzzle";
 import type { Room } from "@/data/rooms";
 import type { Translations } from "@/lib/i18n";
 import { useRouter } from "next/navigation";
@@ -362,6 +365,63 @@ export default function EscapeRoomGame({
   }
 
   function renderPuzzle() {
+    const pt = currentRoom.puzzleType;
+
+    if (pt === "terminal") {
+      return (
+        <div className="space-y-4">
+          <TerminalPuzzle
+            onSolve={() => {
+              setError(null);
+              markRoomSolved();
+            }}
+            onWrong={handleWrongAnswer}
+          />
+          {error && (
+            <p role="alert" className="text-sm text-red-400">
+              {error}
+            </p>
+          )}
+        </div>
+      );
+    }
+
+    if (pt === "slider") {
+      return (
+        <div className="space-y-4">
+          <SliderPuzzle
+            onSolve={() => {
+              setError(null);
+              markRoomSolved();
+            }}
+          />
+          {error && (
+            <p role="alert" className="text-sm text-red-400">
+              {error}
+            </p>
+          )}
+        </div>
+      );
+    }
+
+    if (pt === "matrix") {
+      return (
+        <div className="space-y-4">
+          <MatrixPuzzle
+            onSolve={() => {
+              setError(null);
+              markRoomSolved();
+            }}
+          />
+          {error && (
+            <p role="alert" className="text-sm text-red-400">
+              {error}
+            </p>
+          )}
+        </div>
+      );
+    }
+
     switch (currentRoom.type) {
       case "text":
         return (

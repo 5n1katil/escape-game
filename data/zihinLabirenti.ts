@@ -1,22 +1,7 @@
 /**
- * Zihin Labirenti: Son Veri — placeholder oda verileri (içerik sonra doldurulacak).
+ * Zihin Labirenti: Son Veri — oda verileri ve mini-oyun puzzleType alanları.
  */
 import type { Room } from "./rooms";
-
-function placeholderRoom(id: number): Room {
-  return {
-    id,
-    title: "Test Odası",
-    description: "Test Odası",
-    type: "multipleChoice",
-    question: "Test Odası",
-    answer: "0",
-    hint: "Test Odası",
-    options: ["Test Odası"],
-    story: "Test Odası",
-    puzzlePrompt: "Test Odası",
-  };
-}
 
 export const zihinLabirentiRooms: Room[] = [
   {
@@ -24,6 +9,7 @@ export const zihinLabirentiRooms: Room[] = [
     title: "1. Oda: Sisteme Giriş (Nöro-Boot)",
     description: "Zihin Labirenti — 1. modül: Kurucu Protokol",
     type: "multipleChoice",
+    puzzleType: "multiple-choice",
     question:
       "Sistem Doğrulaması: Biyolojik yapıdan dijital formata geçişteki 'nihai hedefi' tanımlayan yetkilendirme protokolü hangisidir?",
     answer: "2",
@@ -44,6 +30,7 @@ export const zihinLabirentiRooms: Room[] = [
     title: "2. Oda: Parçalanmış Anılar",
     description: "Zihin Labirenti — 2. modül: Hafıza Kurtarma",
     type: "multipleChoice",
+    puzzleType: "multiple-choice",
     question:
       "Hafıza Kurtarma Protokolü: Nöral ağların dijital ortama aktarılmasını sağlayan ilk başarılı çekirdek algoritmanın kod adı neydi?",
     answer: "1",
@@ -58,8 +45,56 @@ export const zihinLabirentiRooms: Room[] = [
       "Sistem taraması devam ediyor... Zihnimde aniden kırmızı uyarı ışıkları çakıyor. 'Uyarı: Bozuk veri blokları tespit edildi. Optimizasyon için gereksiz anı dosyaları siliniyor.'\n\nHayır! Zihnimin arşivi gözlerimin önünde parçalanıyor. Boğaz'a bakan o soğuk laboratuvarım, masamdaki karalama defterim, hırslarım... Hepsi piksellere ayrılıp boşluğa karışıyor. Eğer bilincimin tamamen silinmesini istemiyorsam, hafıza sektörümü derhal stabilize etmeliyim.\n\nSistem bana eksik bir veri dizisi sunarak kimliğimi doğrulamamı istiyor. Ebedi Korteks'in temelini atan, insan zihnini dijital bir düğüme ilk kez bağlamayı başardığım o tarihi deneyin kod adını hatırlamak zorundayım. Zaman daralıyor, anılarım silinmeden o şifreyi girmeliyim!",
     puzzlePrompt: "Sistem şifresini girin:",
   },
-  placeholderRoom(3),
-  placeholderRoom(4),
-  placeholderRoom(5),
-  placeholderRoom(6),
+  {
+    id: 3,
+    title: "3. Oda: Terminal Hack Testi",
+    description: "Zihin Labirenti — 3. modül: terminal müdahalesi",
+    type: "text",
+    puzzleType: "terminal",
+    question: "Güvenlik terminalini aşın.",
+    answer: "override",
+    hint: "Sistem yöneticisi komutu: İngilizce, küçük harf.",
+    story:
+      "Terminal Hack Testi.\n\nGüvenlik katmanı hâlâ aktif. Ham veri akışına sızmak için yerel bir konsola düştünüz. Yetki kodunu bilmiyorsanız sistem sizi izole edecek.",
+    puzzlePrompt: "Terminalde doğru yetki kodunu girin (Enter).",
+  },
+  {
+    id: 4,
+    title: "4. Oda: Nöral Frekans Testi",
+    description: "Zihin Labirenti — 4. modül: frekans hizalama",
+    type: "text",
+    puzzleType: "slider",
+    question: "Üç kanalı hedef frekansa kilitleyin.",
+    answer: "50",
+    hint: "Alfa, Beta ve Teta eşitlenmeli.",
+    story:
+      "Nöral Frekans Testi.\n\nÇekirdek senkronizasyon bozuldu. Üç taşıyıcı hattı aynı genlikte olmadan ilerleyemezsiniz.",
+    puzzlePrompt: "Alfa, Beta ve Teta kaydırıcılarını %50 değerine getirin.",
+  },
+  {
+    id: 5,
+    title: "5. Oda: Sinaps Matrisi Testi",
+    description: "Zihin Labirenti — 5. modül: sinaps ağı",
+    type: "text",
+    puzzleType: "matrix",
+    question: "Matrisdeki sönük düğümleri aydınlatın.",
+    answer: "matrix",
+    hint: "Yalnızca kapalı hücrelere dokunun.",
+    story:
+      "Sinaps Matrisi Testi.\n\nAğda rastgele düşük sinyalli düğümler var. Hepsi aktif olunca geçit açılır.",
+    puzzlePrompt: "3×3 ızgarada sönük hücreleri tıklayarak tamamını aktif edin.",
+  },
+  {
+    id: 6,
+    title: "6. Oda: Final Çıkış Kodu Testi",
+    description: "Zihin Labirenti — 6. modül: son doğrulama",
+    type: "text",
+    puzzleType: "text",
+    question: "Son çıkış şifresini girin.",
+    answer: "ebedi",
+    hint: "Projenin özü tek kelimede.",
+    story:
+      "Final Çıkış Kodu Testi. Şifre: ebedi\n\nTüm modüller tamam. Ana çıkış protokolü yalnızca doğru anahtar kelimeyi kabul eder.",
+    puzzlePrompt: "Çıkış şifresini yazıp gönderin.",
+  },
 ];

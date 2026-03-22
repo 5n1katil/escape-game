@@ -16,9 +16,16 @@ export function isCorrectMultipleChoice(
   room: { answer?: string; options?: string[] },
   selectedIndex: number
 ): boolean {
-  if (!room.options || !room.answer) return false;
+  if (!room.options || room.answer === undefined || room.answer === "")
+    return false;
   const selected = room.options[selectedIndex];
   if (!selected) return false;
+  const ans = room.answer.trim();
+  /** Şık indeksi: "0", "1", "2" … (Zihin Labirenti ve çoğu çoktan seçmeli) */
+  if (/^\d+$/.test(ans)) {
+    return String(selectedIndex) === ans;
+  }
+  /** Eski / alternatif: doğru cevap tam metin veya kısa metin olarak saklanmışsa */
   return isCorrectAnswer(room, selected);
 }
 

@@ -89,7 +89,7 @@ export const games = [
     ],
     durationMinutes: 60,
     roomCount: zihinLabirentiRooms.length,
-    finalCode: "test",
+    finalCode: "ebedi",
     endStoryLong:
       "Son veri paketi ekranda çözüldü. Sinyal gürültüsü kesildi; terminal loşlaştı. Sivrizeka’nın dijital izi silindi mi, yoksa başka bir sunucuda mı kopyalandı—bilmiyorum. Çıkış kapısı açıldı. Gerçek dünya soğuk ve netti. Şimdilik… özgürüm.",
     hubStory:
