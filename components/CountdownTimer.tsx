@@ -14,10 +14,8 @@ interface CountdownTimerProps {
    * `label` ile üst başlık (örn. “Zaman sayacı”).
    */
   variant?: "default" | "compact" | "tactical";
-  /** variant="tactical" iken görünen üst etiket */
+  /** variant="tactical" iken görünen üst etiket (örn. “Kalan zaman”) */
   label?: string;
-  /** variant="tactical" alt satır (ince yazı) */
-  tacticalFooter?: string;
 }
 
 export default function CountdownTimer({
@@ -27,7 +25,6 @@ export default function CountdownTimer({
   compact = false,
   variant,
   label,
-  tacticalFooter,
 }: CountdownTimerProps) {
   const effectiveVariant = variant ?? (compact ? "compact" : "default");
   const defaultSeconds = initialMinutes * 60;
@@ -71,42 +68,37 @@ export default function CountdownTimer({
   if (effectiveVariant === "tactical") {
     return (
       <div
-        className="tactical-hud-pulse relative overflow-hidden rounded-xl border-2 border-amber-600/50 bg-gradient-to-b from-zinc-900 via-zinc-950 to-zinc-950 px-3 py-3 sm:px-4 sm:py-4"
+        className="tactical-hud-pulse relative overflow-hidden rounded-xl border-2 border-amber-500/55 bg-gradient-to-b from-zinc-900 via-zinc-950 to-black px-3 py-4 sm:px-4 sm:py-5"
         aria-live="polite"
         aria-label={ariaLabel}
       >
         <div
-          className="pointer-events-none absolute inset-0 rounded-[10px] bg-[linear-gradient(180deg,rgba(251,191,36,0.04)_0%,transparent_45%,rgba(0,0,0,0.35)_100%)]"
+          className="pointer-events-none absolute inset-0 rounded-[10px] bg-[linear-gradient(180deg,rgba(251,191,36,0.06)_0%,transparent_42%,rgba(0,0,0,0.4)_100%)]"
           aria-hidden
         />
         <div
-          className="pointer-events-none absolute inset-x-4 top-0 h-px bg-gradient-to-r from-transparent via-amber-400/50 to-transparent"
+          className="pointer-events-none absolute inset-x-3 top-0 h-px bg-gradient-to-r from-transparent via-amber-300/60 to-transparent sm:inset-x-5"
           aria-hidden
         />
         <div
-          className="pointer-events-none absolute inset-0 rounded-xl ring-1 ring-amber-500/20 ring-inset"
+          className="pointer-events-none absolute inset-0 rounded-xl ring-1 ring-amber-400/25 ring-inset"
           aria-hidden
         />
         {label ? (
-          <p className="relative mb-2 text-center text-[10px] font-bold uppercase tracking-[0.28em] text-amber-400/95 sm:text-[11px]">
+          <p className="relative mb-3 text-center text-xs font-extrabold uppercase leading-tight tracking-[0.2em] text-amber-300 sm:mb-3.5 sm:text-sm sm:tracking-[0.24em]">
             {label}
           </p>
         ) : null}
-        <div className="relative flex flex-col items-center justify-center gap-0.5">
+        <div className="relative flex items-center justify-center py-0.5">
           <span
-            className="font-mono text-[2.35rem] font-bold leading-none tabular-nums tracking-[0.06em] text-amber-100 sm:text-[2.75rem] md:text-5xl"
+            className="font-mono text-[2.65rem] font-bold leading-none tabular-nums tracking-[0.08em] text-amber-50 sm:text-[3.1rem] md:text-[3.25rem]"
             style={{
               textShadow:
-                "0 0 18px rgba(251, 191, 36, 0.45), 0 0 36px rgba(245, 158, 11, 0.2), 0 1px 0 rgba(0,0,0,0.8)",
+                "0 0 22px rgba(251, 191, 36, 0.55), 0 0 48px rgba(245, 158, 11, 0.28), 0 2px 0 rgba(0,0,0,0.85)",
             }}
           >
             {timeStr}
           </span>
-          {tacticalFooter ? (
-            <span className="text-[10px] font-medium uppercase tracking-widest text-amber-600/80 sm:text-xs">
-              {tacticalFooter}
-            </span>
-          ) : null}
         </div>
       </div>
     );
