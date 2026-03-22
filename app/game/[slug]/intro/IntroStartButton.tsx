@@ -127,7 +127,7 @@ export default function IntroStartButton({
             <div className="relative mx-auto flex max-w-4xl flex-col items-center text-center xl:max-w-5xl">
               <h3
                 id="intro-ranking-title"
-                className="text-balance text-2xl font-bold leading-tight tracking-tight text-amber-300 sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl"
+                className="text-balance text-xl font-bold leading-tight tracking-tight text-amber-300 sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl"
                 style={{
                   textShadow:
                     "0 0 40px rgba(245, 158, 11, 0.35), 0 2px 0 rgba(0,0,0,0.8)",
@@ -135,16 +135,16 @@ export default function IntroStartButton({
               >
                 {t.intro.rankingModalTitle}
               </h3>
-              <p className="mt-6 max-w-3xl text-pretty text-base leading-relaxed text-zinc-200 sm:mt-8 sm:text-lg md:text-xl md:leading-relaxed lg:mt-10 lg:text-2xl lg:leading-relaxed">
+              <p className="mt-6 max-w-3xl text-pretty text-sm leading-relaxed text-zinc-200 sm:mt-8 sm:text-base md:text-lg md:leading-relaxed lg:mt-10 lg:text-xl lg:leading-relaxed">
                 {t.intro.rankingModalBody1}
               </p>
-              <p className="mt-5 max-w-3xl text-pretty text-base leading-relaxed text-zinc-200 sm:mt-6 sm:text-lg md:text-xl md:leading-relaxed lg:text-2xl lg:leading-relaxed">
+              <p className="mt-5 max-w-3xl text-pretty text-sm leading-relaxed text-zinc-200 sm:mt-6 sm:text-base md:text-lg md:leading-relaxed lg:text-xl lg:leading-relaxed">
                 {t.intro.rankingModalBody2}
               </p>
               <button
                 type="button"
                 onClick={() => setShowRankingModal(false)}
-                className="ranking-modal-cta mt-8 min-h-[52px] w-full max-w-md touch-manipulation rounded-2xl bg-gradient-to-b from-amber-500 to-amber-600 px-8 py-4 text-base font-bold text-white shadow-[0_0_32px_rgba(245,158,11,0.45),0_12px_28px_rgba(0,0,0,0.45)] ring-2 ring-amber-400/40 transition-all duration-300 hover:from-amber-400 hover:to-amber-500 hover:shadow-[0_0_48px_rgba(251,191,36,0.55),0_16px_36px_rgba(0,0,0,0.5)] hover:ring-amber-300/50 active:scale-[0.98] sm:mt-10 sm:min-h-[60px] sm:max-w-lg sm:py-5 sm:text-lg lg:mt-12 lg:min-h-[68px] lg:max-w-xl lg:text-xl"
+                className="ranking-modal-cta mt-8 min-h-[48px] w-full max-w-md touch-manipulation rounded-2xl bg-gradient-to-b from-amber-500 to-amber-600 px-8 py-3.5 text-sm font-bold text-white shadow-[0_0_32px_rgba(245,158,11,0.45),0_12px_28px_rgba(0,0,0,0.45)] ring-2 ring-amber-400/40 transition-all duration-300 hover:from-amber-400 hover:to-amber-500 hover:shadow-[0_0_48px_rgba(251,191,36,0.55),0_16px_36px_rgba(0,0,0,0.5)] hover:ring-amber-300/50 active:scale-[0.98] sm:mt-10 sm:min-h-[56px] sm:max-w-lg sm:py-4 sm:text-base lg:mt-12 lg:min-h-[64px] lg:max-w-xl lg:text-lg"
               >
                 {t.intro.rankingModalCta}
               </button>
