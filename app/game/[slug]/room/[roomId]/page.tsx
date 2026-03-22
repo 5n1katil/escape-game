@@ -3,6 +3,7 @@ import EscapeRoomGame from "@/components/EscapeRoomGame";
 import GameStateGate from "@/components/GameStateGate";
 import RestartButton from "@/components/RestartButton";
 import RoomMap from "@/components/RoomMap";
+import TempleMap from "@/components/TempleMap";
 import SessionSync from "@/components/SessionSync";
 import { getGameBySlug, getRoomsForGame } from "@/data/games";
 import { getTranslations } from "@/lib/i18n";
@@ -38,7 +39,7 @@ export default async function RoomPage({ params }: RoomPageProps) {
           aria-hidden
         />
 
-        {/* Mobil: sayaç en üstte yapışkan; hemen altında kompakt ilerleme */}
+        {/* Mobil: yapışkan sayaç; altında kesilmemiş harita (yüzde alanlar tam görüntüye göre); sonra ilerleme */}
         <div className="sticky top-0 z-[60] w-full md:hidden">
           <CountdownTimer
             slug={slug}
@@ -47,7 +48,19 @@ export default async function RoomPage({ params }: RoomPageProps) {
             variant="mobileBar"
             label={t.room.timerHudLabel}
           />
-          <div className="border-b border-amber-900/40 bg-zinc-950/95 px-2 pb-2 pt-1.5 shadow-[0_8px_24px_rgba(0,0,0,0.35)] backdrop-blur-md">
+          <div className="border-b border-amber-900/40 bg-zinc-950/95 px-2 pb-2 pt-2 shadow-[0_8px_24px_rgba(0,0,0,0.35)] backdrop-blur-md">
+            <p className="mb-1.5 text-center text-[10px] font-semibold uppercase tracking-[0.2em] text-amber-500/90">
+              {t.hub.map}
+            </p>
+            <TempleMap
+              slug={slug}
+              rooms={rooms}
+              goToRoomLabel={t.hub.goToRoom}
+              imageFit="contain"
+              containImgClassName="h-auto w-full max-h-[min(65vh,560px)] object-contain"
+            />
+          </div>
+          <div className="border-b border-amber-900/40 bg-zinc-950/95 px-2 pb-2 pt-1.5 backdrop-blur-md">
             <RoomMap
               slug={slug}
               currentRoomIndex={roomIndex}

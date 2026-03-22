@@ -2,6 +2,7 @@
 
 import CountdownTimer from "@/components/CountdownTimer";
 import RestartButton from "@/components/RestartButton";
+import TempleMap from "@/components/TempleMap";
 import type { Room } from "@/data/rooms";
 import { fetchUserAvatarFromRtdb } from "@/lib/firebase";
 import { calculateScore } from "@/lib/gameSession";
@@ -21,37 +22,6 @@ import type { Translations } from "@/lib/i18n";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
-
-/** Tapınak haritası (public/images/temple-map.jpg — oyun map ile senkron tutulur). */
-const MAP_IMAGE_PATH = "/images/temple-map.jpg";
-
-/** Harita üzerinde oda tıklama alanları (yüzde: top, left, width, height). */
-const MAP_SEGMENTS: { id: number; top: number; left: number; width: number; height: number }[] = [
-  { id: 1, top: 8, left: 4, width: 26, height: 40 },
-  { id: 2, top: 8, left: 36, width: 26, height: 40 },
-  { id: 3, top: 8, left: 69, width: 26, height: 40 },
-  { id: 4, top: 55, left: 4, width: 26, height: 40 },
-  { id: 5, top: 55, left: 36, width: 26, height: 40 },
-  { id: 6, top: 55, left: 69, width: 26, height: 40 },
-];
-
-function MapLockIcon({ className }: { className?: string }) {
-  return (
-    <svg
-      className={className}
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth={2}
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden
-    >
-      <rect x="5" y="11" width="14" height="10" rx="2" />
-      <path d="M7 11V7a5 5 0 0 1 10 0v4" />
-    </svg>
-  );
-}
 
 interface HubClientProps {
   slug: string;
@@ -86,7 +56,6 @@ export default function HubClient({
   const [finalInput, setFinalInput] = useState("");
   const [finalError, setFinalError] = useState<string | null>(null);
   const [mounted, setMounted] = useState(false);
-  const [mapError, setMapError] = useState(false);
   const [finalSubmitting, setFinalSubmitting] = useState(false);
   const leftColumnRef = useRef<HTMLDivElement>(null);
 
@@ -167,75 +136,6 @@ export default function HubClient({
     );
   }
 
-  const maxSolved = getStoredMaxSolvedRoomIndex(slug, roomIds);
-  const activeRoomId = roomIds[maxSolved + 1] ?? null;
-
-  const segmentStyle = (seg: (typeof MAP_SEGMENTS)[0]) => ({
-    top: `${seg.top}%`,
-    left: `${seg.left}%`,
-    width: `${seg.width}%`,
-    height: `${seg.height}%`,
-  });
-
-  /** Tam ekran hissi: resim z-0, şeffaf yüzde kutular z-10 (kilitli / açık mantığı aynı). */
-  const mapContent = !mapError ? (
-    <div
-      className="relative z-0 h-full min-h-[200px] w-full overflow-hidden bg-zinc-900"
-      role="img"
-      aria-label="Tapınak haritası - odalara tıklayarak gidebilirsiniz"
-    >
-      <img
-        src={MAP_IMAGE_PATH}
-        alt=""
-        className="absolute inset-0 z-0 h-full w-full object-cover"
-        onError={() => setMapError(true)}
-      />
-      <div className="absolute inset-0 z-10">
-        {MAP_SEGMENTS.map((seg) => {
-          const roomId = seg.id;
-          const room = rooms.find((r) => r.id === roomId);
-          const unlocked = unlockedIds.includes(roomId);
-          const roomIndex = rooms.findIndex((r) => r.id === roomId);
-          const solved = roomIndex >= 0 && roomIndex <= maxSolved;
-          const active = unlocked && !solved && roomId === activeRoomId;
-          const style = segmentStyle(seg);
-          if (!unlocked || !room) {
-            return (
-              <div
-                key={roomId}
-                className="pointer-events-none absolute flex min-h-[44px] min-w-[44px] flex-col items-center justify-center gap-1 rounded-md border-2 border-purple-500/70 bg-zinc-900 ring-1 ring-purple-400/35 shadow-[0_0_20px_rgba(168,85,247,0.22),0_0_12px_rgba(251,191,36,0.14)]"
-                style={style}
-                title="Kilitli"
-                aria-hidden
-              >
-                <MapLockIcon className="h-10 w-10 shrink-0 text-amber-100 drop-shadow-[0_0_6px_rgba(251,191,36,0.45)]" />
-                <span className="text-sm font-bold tabular-nums text-amber-100 drop-shadow-sm">{roomId}</span>
-              </div>
-            );
-          }
-          return (
-            <Link
-              key={roomId}
-              href={`/game/${slug}/room/${roomId}`}
-              className={`absolute flex min-h-[44px] min-w-[44px] items-center justify-center rounded-md border border-amber-400/30 bg-transparent text-2xl font-bold text-white shadow-none transition-all duration-200 touch-manipulation hover:border-amber-400 hover:bg-amber-400/10 hover:shadow-[0_0_22px_rgba(251,191,36,0.35)] active:scale-[0.98] ${
-                active ? "ring-2 ring-amber-400/80 ring-offset-2 ring-offset-zinc-950/90" : ""
-              } ${solved ? "border-emerald-500/40" : ""}`}
-              style={style}
-              aria-label={`${room.title} - ${t.goToRoom}`}
-              title={room.title}
-            >
-              {roomId}
-            </Link>
-          );
-        })}
-      </div>
-    </div>
-  ) : (
-    <div className="flex h-full min-h-[200px] w-full items-center justify-center bg-zinc-900/50 text-5xl text-zinc-600" aria-hidden>
-      🗺️
-    </div>
-  );
-
   return (
     <div className="relative h-screen max-h-[100dvh] min-h-0 overflow-hidden bg-zinc-950">
       <div
@@ -293,9 +193,13 @@ export default function HubClient({
               {t.map}
             </h2>
             <div className="bg-zinc-900/50 p-2">
-              <div className="relative mx-auto aspect-[4/3] w-full min-h-[200px] max-h-[min(50vh,420px)]">
-                {mapContent}
-              </div>
+              <TempleMap
+                slug={slug}
+                rooms={rooms}
+                goToRoomLabel={t.goToRoom}
+                imageFit="contain"
+                containImgClassName="max-h-[min(50vh,420px)]"
+              />
             </div>
           </section>
 
@@ -434,7 +338,13 @@ export default function HubClient({
         <aside className="relative hidden min-h-0 md:flex md:h-full md:w-[38%] md:shrink-0 lg:w-[42%] xl:max-w-[520px]">
           <div className="sticky top-0 flex h-full min-h-0 w-full flex-col border-l border-amber-900/40 bg-zinc-950/95">
             <div className="relative flex min-h-0 flex-1 overflow-hidden p-3 lg:p-5">
-              {mapContent}
+              <TempleMap
+                slug={slug}
+                rooms={rooms}
+                goToRoomLabel={t.goToRoom}
+                imageFit="cover"
+                className="min-h-0 flex-1 rounded-md"
+              />
             </div>
           </div>
         </aside>

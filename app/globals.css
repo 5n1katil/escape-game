@@ -101,3 +101,73 @@ body {
   width: 0;
   height: 0;
 }
+
+/* Tapınak haritası — açık oda bölgeleri: yanıp sönen amber parlama */
+@keyframes map-room-amber-glow {
+  0%,
+  100% {
+    box-shadow:
+      0 0 14px rgba(251, 191, 36, 0.55),
+      0 0 28px rgba(245, 158, 11, 0.38),
+      0 0 42px rgba(217, 119, 6, 0.22),
+      inset 0 0 14px rgba(251, 191, 36, 0.06);
+    border-color: rgba(253, 224, 71, 0.92);
+    filter: drop-shadow(0 0 12px rgba(251, 191, 36, 0.45));
+  }
+  50% {
+    box-shadow:
+      0 0 26px rgba(251, 191, 36, 0.95),
+      0 0 48px rgba(245, 158, 11, 0.62),
+      0 0 72px rgba(251, 191, 36, 0.35),
+      inset 0 0 22px rgba(251, 191, 36, 0.12);
+    border-color: rgba(252, 211, 77, 1);
+    filter: drop-shadow(0 0 22px rgba(251, 191, 36, 0.82));
+  }
+}
+
+@keyframes map-room-solved-glow {
+  0%,
+  100% {
+    box-shadow:
+      0 0 12px rgba(52, 211, 153, 0.4),
+      0 0 24px rgba(251, 191, 36, 0.28),
+      inset 0 0 10px rgba(16, 185, 129, 0.08);
+    filter: drop-shadow(0 0 10px rgba(52, 211, 153, 0.35));
+  }
+  50% {
+    box-shadow:
+      0 0 22px rgba(52, 211, 153, 0.65),
+      0 0 40px rgba(251, 191, 36, 0.4),
+      inset 0 0 16px rgba(16, 185, 129, 0.12);
+    filter: drop-shadow(0 0 18px rgba(251, 191, 36, 0.55));
+  }
+}
+
+.map-room-open-pulse {
+  animation: map-room-amber-glow 1.75s ease-in-out infinite;
+}
+
+.map-room-solved-pulse {
+  animation: map-room-solved-glow 2.1s ease-in-out infinite;
+}
+
+.map-room-open:hover,
+.map-room-open:focus-visible {
+  animation-duration: 0.85s;
+  filter: drop-shadow(0 0 24px rgba(251, 191, 36, 0.9)) !important;
+}
+
+.map-room-open:active {
+  animation-duration: 0.5s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .map-room-open-pulse,
+  .map-room-solved-pulse {
+    animation: none;
+  }
+  .map-room-open:hover,
+  .map-room-open:focus-visible {
+    filter: drop-shadow(0 0 16px rgba(251, 191, 36, 0.65));
+  }
+}

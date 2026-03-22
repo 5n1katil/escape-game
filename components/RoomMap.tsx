@@ -155,7 +155,7 @@ export default function RoomMap({
 
         <div
           className={`flex min-h-0 flex-col ${
-            fill ? "flex-1 gap-1.5 overflow-hidden" : strip ? "flex-1 gap-1 overflow-y-auto overscroll-y-contain pr-0.5 [scrollbar-width:thin]" : "gap-0"
+            fill ? "flex-1 gap-2 overflow-hidden" : strip ? "flex-1 gap-1 overflow-y-auto overscroll-y-contain pr-0.5 [scrollbar-width:thin]" : "gap-0"
           }`}
           role="list"
           aria-label="Oda durumları"
