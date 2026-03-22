@@ -230,7 +230,7 @@ export default function NeuralFlowPuzzle({ onSolve, onWrong }: NeuralFlowPuzzleP
         </div>
 
         <div
-          className="grid aspect-square w-full grid-cols-5 gap-1.5 rounded-lg border border-cyan-500/25 bg-slate-900/90 p-2 sm:gap-2"
+          className="grid aspect-square w-full grid-cols-5 gap-1 rounded-lg border border-cyan-500/25 bg-slate-900/90 p-1.5 sm:gap-2 sm:p-2"
           role="grid"
           aria-label="Nöral akış ızgarası"
         >
@@ -246,7 +246,7 @@ export default function NeuralFlowPuzzle({ onSolve, onWrong }: NeuralFlowPuzzleP
                   role="gridcell"
                   onClick={() => rotateCell(r, c)}
                   disabled={solved}
-                  className="relative aspect-square min-h-0 rounded-md border border-cyan-500/20 bg-slate-950/95 shadow-inner shadow-black/40 transition-[border-color,box-shadow] hover:border-cyan-400/55 hover:shadow-[0_0_16px_rgba(34,211,238,0.2)] active:scale-[0.97] disabled:pointer-events-none disabled:opacity-60"
+                  className="relative aspect-square min-h-0 min-w-0 touch-manipulation rounded-md border border-cyan-500/20 bg-slate-950/95 shadow-inner shadow-black/40 transition-[border-color,box-shadow] hover:border-cyan-400/55 hover:shadow-[0_0_16px_rgba(34,211,238,0.2)] active:scale-[0.97] disabled:pointer-events-none disabled:opacity-60"
                   aria-label={`Nöral segment ${r + 1}-${c + 1}, döndürmek için tıklayın`}
                 >
                   <TileSvg kind={kind} rot={rot} uniqueId={uid} />
@@ -265,7 +265,7 @@ export default function NeuralFlowPuzzle({ onSolve, onWrong }: NeuralFlowPuzzleP
       {error && (
         <p
           role="alert"
-          className="text-center text-sm font-semibold uppercase tracking-wider text-red-400"
+          className="px-2 py-2 text-center text-xs font-semibold uppercase leading-snug tracking-wide text-red-400 sm:px-3 sm:text-sm md:text-base md:tracking-wider"
         >
           {error}
         </p>
@@ -275,7 +275,7 @@ export default function NeuralFlowPuzzle({ onSolve, onWrong }: NeuralFlowPuzzleP
         type="button"
         onClick={handleSubmit}
         disabled={solved}
-        className="min-h-[56px] w-full touch-manipulation rounded-xl border-2 border-zinc-600/55 bg-slate-900/60 px-6 py-4 text-center text-lg font-semibold text-zinc-100 shadow-sm shadow-black/25 transition-all duration-300 hover:-translate-y-1 hover:border-cyan-400/90 hover:bg-cyan-500/[0.12] hover:text-cyan-50 hover:shadow-[0_0_18px_rgba(34,211,238,0.45),0_0_28px_rgba(6,182,212,0.25)] active:scale-[0.98] disabled:pointer-events-none disabled:opacity-50 md:text-xl"
+        className="min-h-[52px] w-full touch-manipulation rounded-xl border-2 border-zinc-600/55 bg-slate-900/60 px-4 py-3 text-center text-base font-semibold text-zinc-100 shadow-sm shadow-black/25 transition-all duration-300 hover:-translate-y-1 hover:border-cyan-400/90 hover:bg-cyan-500/[0.12] hover:text-cyan-50 hover:shadow-[0_0_18px_rgba(34,211,238,0.45),0_0_28px_rgba(6,182,212,0.25)] active:scale-[0.98] disabled:pointer-events-none disabled:opacity-50 sm:min-h-[56px] sm:px-6 sm:py-4 md:text-lg"
       >
         AĞI SENKRONİZE ET
       </button>

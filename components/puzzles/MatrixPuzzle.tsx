@@ -62,7 +62,7 @@ export default function MatrixPuzzle({ onSolve }: MatrixPuzzleProps) {
         <span className="text-cyan-400">aktif</span> yapin.
       </p>
       <div
-        className="mx-auto grid max-w-xs grid-cols-3 gap-2 sm:max-w-sm sm:gap-3"
+        className="mx-auto grid w-full max-w-xs grid-cols-3 gap-1.5 sm:max-w-sm sm:gap-3"
         role="grid"
         aria-label="Sinaps matrisi"
       >
@@ -75,8 +75,8 @@ export default function MatrixPuzzle({ onSolve }: MatrixPuzzleProps) {
             disabled={on}
             className={
               on
-                ? "min-h-[52px] rounded-lg border-2 border-cyan-400/70 bg-cyan-500/20 text-cyan-200 shadow-[0_0_20px_rgba(34,211,238,0.35)] transition-all sm:min-h-[60px]"
-                : "min-h-[52px] rounded-lg border-2 border-slate-700 bg-slate-900/80 text-slate-600 transition-all hover:border-cyan-600/50 hover:bg-slate-800 active:scale-[0.98] sm:min-h-[60px]"
+                ? "aspect-square min-h-[48px] w-full min-w-0 touch-manipulation rounded-lg border-2 border-cyan-400/70 bg-cyan-500/20 text-cyan-200 shadow-[0_0_20px_rgba(34,211,238,0.35)] transition-all sm:min-h-[56px]"
+                : "aspect-square min-h-[48px] w-full min-w-0 touch-manipulation rounded-lg border-2 border-slate-700 bg-slate-900/80 text-slate-600 transition-all hover:border-cyan-600/50 hover:bg-slate-800 active:scale-[0.98] sm:min-h-[56px]"
             }
             aria-pressed={on}
             aria-label={on ? `Hücre ${i + 1} aktif` : `Hücre ${i + 1} sönük`}

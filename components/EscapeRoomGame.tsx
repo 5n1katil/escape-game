@@ -459,7 +459,7 @@ export default function EscapeRoomGame({
                 placeholder={t.answerPlaceholder}
                 autoComplete="off"
                 autoFocus
-                className={er.textInput}
+                className={`${er.textInput} touch-manipulation`}
                 aria-invalid={!!error}
                 aria-describedby={error ? "error-message" : undefined}
               />
@@ -476,7 +476,7 @@ export default function EscapeRoomGame({
             <button
               type="submit"
               disabled={!inputValue.trim()}
-              className={er.primaryBtn}
+              className={`${er.primaryBtn} touch-manipulation`}
             >
               {t.submitAnswer}
             </button>
@@ -493,7 +493,7 @@ export default function EscapeRoomGame({
                   key={idx}
                   type="button"
                   onClick={() => handleMultipleChoiceSelect(idx)}
-                  className={er.choiceBtn}
+                  className={`${er.choiceBtn} touch-manipulation`}
                 >
                   {option}
                 </button>
@@ -552,7 +552,7 @@ export default function EscapeRoomGame({
                   <button
                     type="button"
                     onClick={() => handleImageChoiceSelect(idx)}
-                    className={er.imageChoiceSelect}
+                    className={`${er.imageChoiceSelect} touch-manipulation`}
                   >
                     {t.chooseThisOption}
                   </button>

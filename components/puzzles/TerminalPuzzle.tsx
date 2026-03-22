@@ -52,7 +52,7 @@ export default function TerminalPuzzle({ onSolve, onWrong }: TerminalPuzzleProps
             autoComplete="off"
             autoFocus
             spellCheck={false}
-            className="min-h-[44px] flex-1 border-b border-emerald-600/50 bg-transparent px-2 py-2 text-emerald-300 caret-emerald-400 outline-none placeholder:text-emerald-800 focus:border-emerald-400"
+            className="min-h-[48px] flex-1 touch-manipulation border-b border-emerald-600/50 bg-transparent px-2 py-2 text-sm text-emerald-300 caret-emerald-400 outline-none placeholder:text-emerald-800 focus:border-emerald-400 sm:min-h-[44px] sm:text-base"
             placeholder="komut"
             aria-label="Terminal girişi"
           />

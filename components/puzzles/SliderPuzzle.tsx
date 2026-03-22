@@ -62,7 +62,7 @@ export default function SliderPuzzle({ onSolve, onWrong }: SliderPuzzleProps) {
                 });
                 setError(null);
               }}
-              className="h-2 w-full cursor-pointer appearance-none rounded-full bg-slate-800 accent-cyan-400 [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-cyan-400 [&::-webkit-slider-thumb]:shadow-[0_0_12px_rgba(34,211,238,0.8)]"
+              className="h-3 w-full cursor-pointer touch-manipulation appearance-none rounded-full bg-slate-800 accent-cyan-400 sm:h-2 [&::-webkit-slider-thumb]:h-6 [&::-webkit-slider-thumb]:w-6 [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-cyan-400 [&::-webkit-slider-thumb]:shadow-[0_0_12px_rgba(34,211,238,0.8)] sm:[&::-webkit-slider-thumb]:h-4 sm:[&::-webkit-slider-thumb]:w-4"
               aria-label={`${label} frekansı`}
             />
           </div>
@@ -72,7 +72,7 @@ export default function SliderPuzzle({ onSolve, onWrong }: SliderPuzzleProps) {
       {error && (
         <p
           role="alert"
-          className="text-center text-sm font-semibold uppercase tracking-wider text-red-400"
+          className="px-2 py-2 text-center text-xs font-semibold uppercase leading-snug tracking-wide text-red-400 sm:px-3 sm:text-sm md:text-base md:tracking-wider"
         >
           {error}
         </p>
@@ -81,7 +81,7 @@ export default function SliderPuzzle({ onSolve, onWrong }: SliderPuzzleProps) {
       <button
         type="button"
         onClick={handleSubmit}
-        className={`min-h-[56px] w-full touch-manipulation rounded-xl border-2 border-zinc-600/55 bg-slate-900/60 px-6 py-4 text-center text-lg font-semibold text-zinc-100 shadow-sm shadow-black/25 transition-all duration-300 hover:-translate-y-1 hover:border-cyan-400/90 hover:bg-cyan-500/[0.12] hover:text-cyan-50 hover:shadow-[0_0_18px_rgba(34,211,238,0.45),0_0_28px_rgba(6,182,212,0.25)] active:scale-[0.98] md:text-xl`}
+        className={`min-h-[52px] w-full touch-manipulation rounded-xl border-2 border-zinc-600/55 bg-slate-900/60 px-4 py-3 text-center text-base font-semibold text-zinc-100 shadow-sm shadow-black/25 transition-all duration-300 hover:-translate-y-1 hover:border-cyan-400/90 hover:bg-cyan-500/[0.12] hover:text-cyan-50 hover:shadow-[0_0_18px_rgba(34,211,238,0.45),0_0_28px_rgba(6,182,212,0.25)] active:scale-[0.98] sm:min-h-[56px] sm:px-6 sm:py-4 md:text-lg`}
       >
         SENKRONİZASYONU BAŞLAT
       </button>
