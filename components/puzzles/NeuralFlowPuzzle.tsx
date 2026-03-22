@@ -68,23 +68,23 @@ function pathConnectsInputToOutput(
 }
 
 /**
- * Designed solution: edge path along top row then down right column to (4,4).
- * Off-path: mostly vertical straights; center uses cross/T for fractured-network look
- * (still isolated from the main corridor in the solved configuration).
+ * Fully populated 5x5 grid. Path: (0,0)→top row→(0,4)→right col→(4,4).
+ * Off-path cells use straight, L, T, cross as decoys; rotations ensure they don't
+ * accidentally connect to the solution path in the solved state.
  */
 const SOL_KIND: TileKind[][] = [
   ["L", "straight", "straight", "straight", "L"],
-  ["straight", "T", "straight", "straight", "straight"],
-  ["straight", "straight", "cross", "straight", "straight"],
-  ["straight", "straight", "straight", "L", "straight"],
+  ["straight", "T", "L", "straight", "straight"],
+  ["straight", "cross", "cross", "L", "straight"],
+  ["L", "straight", "T", "L", "straight"],
   ["straight", "straight", "straight", "straight", "straight"],
 ];
 
 const SOL_ROT: number[][] = [
   [0, 1, 1, 1, 2],
-  [0, 2, 0, 0, 0],
-  [0, 0, 0, 0, 0],
+  [0, 2, 1, 0, 0],
   [0, 0, 0, 3, 0],
+  [2, 0, 2, 3, 0],
   [0, 0, 0, 0, 0],
 ];
 
@@ -97,69 +97,72 @@ function scrambleRotations(): number[][] {
   );
 }
 
-/** SVG pipe segments in unit space 0–100, center 50; drawn for rotation 0 base shapes. */
-function TileSvg({
-  kind,
-  rot,
-  uniqueId,
-}: {
-  kind: TileKind;
-  rot: number;
-  uniqueId: string;
-}) {
-  const gradId = `${uniqueId}-grad`;
-  const filtId = `${uniqueId}-filt`;
-  const stroke = `url(#${gradId})`;
-  const common = {
-    fill: "none" as const,
-    strokeWidth: 9,
-    strokeLinecap: "round" as const,
-    strokeLinejoin: "round" as const,
-    filter: `url(#${filtId})`,
-  };
+const STROKE_COLOR = "#22d3ee";
+const STROKE_WIDTH = 12;
 
-  let paths: ReactElement | ReactElement[];
-  switch (kind) {
-    case "straight":
-      paths = <path d="M 50 12 L 50 88" {...common} stroke={stroke} />;
-      break;
-    case "L":
-      paths = <path d="M 50 12 L 50 50 L 88 50" {...common} stroke={stroke} />;
-      break;
-    case "T":
-      paths = [
-        <path key="h" d="M 12 50 L 88 50" {...common} stroke={stroke} />,
-        <path key="v" d="M 50 12 L 50 50" {...common} stroke={stroke} />,
-      ];
-      break;
-    case "cross":
-      paths = [
-        <path key="v" d="M 50 12 L 50 88" {...common} stroke={stroke} />,
-        <path key="h" d="M 12 50 L 88 50" {...common} stroke={stroke} />,
-      ];
-      break;
-  }
-
+/** Shared SVG defs — one glow filter for all tiles. */
+function NeuralFlowDefs({ idPrefix }: { idPrefix: string }) {
+  const glowId = `${idPrefix}-glow`;
   return (
-    <svg viewBox="0 0 100 100" className="h-full w-full" aria-hidden>
+    <svg aria-hidden className="absolute h-0 w-0 overflow-hidden" focusable={false}>
       <defs>
-        <linearGradient id={gradId} x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stopColor="#22d3ee" stopOpacity="1" />
-          <stop offset="100%" stopColor="#06b6d4" stopOpacity="0.95" />
-        </linearGradient>
-        <filter id={filtId} x="-50%" y="-50%" width="200%" height="200%">
-          <feGaussianBlur stdDeviation="2.2" result="blur" />
+        <filter id={glowId} x="-80%" y="-80%" width="260%" height="260%" colorInterpolationFilters="sRGB">
+          <feGaussianBlur in="SourceGraphic" stdDeviation="3" result="blur" />
           <feMerge>
             <feMergeNode in="blur" />
             <feMergeNode in="SourceGraphic" />
           </feMerge>
         </filter>
       </defs>
+    </svg>
+  );
+}
+
+/** SVG pipe segments in unit space 0–100, center 50; drawn for rotation 0 base shapes. */
+function TileSvg({
+  kind,
+  rot,
+  idPrefix,
+}: {
+  kind: TileKind;
+  rot: number;
+  idPrefix: string;
+}) {
+  const glowId = `${idPrefix}-glow`;
+  const pathProps = {
+    fill: "none" as const,
+    stroke: STROKE_COLOR,
+    strokeWidth: STROKE_WIDTH,
+    strokeLinecap: "round" as const,
+    strokeLinejoin: "round" as const,
+    filter: `url(#${glowId})`,
+  };
+  let paths: ReactElement | ReactElement[];
+  switch (kind) {
+    case "straight":
+      paths = <path d="M 50 8 L 50 92" {...pathProps} />;
+      break;
+    case "L":
+      paths = <path d="M 50 8 L 50 50 L 92 50" {...pathProps} />;
+      break;
+    case "T":
+      paths = [
+        <path key="h" d="M 8 50 L 92 50" {...pathProps} />,
+        <path key="v" d="M 50 8 L 50 50" {...pathProps} />,
+      ];
+      break;
+    case "cross":
+      paths = [
+        <path key="v" d="M 50 8 L 50 92" {...pathProps} />,
+        <path key="h" d="M 8 50 L 92 50" {...pathProps} />,
+      ];
+      break;
+  }
+
+  return (
+    <svg viewBox="0 0 100 100" className="h-full w-full" aria-hidden preserveAspectRatio="xMidYMid meet">
       <g
-        style={{
-          transform: `rotate(${rot * 90}deg)`,
-          transformOrigin: "50px 50px",
-        }}
+        transform={`rotate(${rot * 90} 50 50)`}
         className="transition-transform duration-300 ease-out"
       >
         {paths}
@@ -207,6 +210,7 @@ export default function NeuralFlowPuzzle({ onSolve, onWrong }: NeuralFlowPuzzleP
 
   return (
     <div className="space-y-5 rounded-xl border border-cyan-500/35 bg-slate-950/90 p-3 shadow-[0_0_40px_rgba(6,182,212,0.08)] sm:p-5">
+      <NeuralFlowDefs idPrefix={baseId} />
       <div className="relative mx-auto w-full max-w-md">
         {/* Input node — top-left */}
         <div
@@ -238,7 +242,6 @@ export default function NeuralFlowPuzzle({ onSolve, onWrong }: NeuralFlowPuzzleP
             Array.from({ length: SIZE }, (_, c) => {
               const kind = kinds[r][c];
               const rot = rots[r][c];
-              const uid = `${baseId}-t${r}-${c}`;
               return (
                 <button
                   key={`${r}-${c}`}
@@ -249,7 +252,7 @@ export default function NeuralFlowPuzzle({ onSolve, onWrong }: NeuralFlowPuzzleP
                   className="relative aspect-square min-h-0 min-w-0 touch-manipulation rounded-md border border-cyan-500/20 bg-slate-950/95 shadow-inner shadow-black/40 transition-[border-color,box-shadow] hover:border-cyan-400/55 hover:shadow-[0_0_16px_rgba(34,211,238,0.2)] active:scale-[0.97] disabled:pointer-events-none disabled:opacity-60"
                   aria-label={`Nöral segment ${r + 1}-${c + 1}, döndürmek için tıklayın`}
                 >
-                  <TileSvg kind={kind} rot={rot} uniqueId={uid} />
+                  <TileSvg kind={kind} rot={rot} idPrefix={baseId} />
                 </button>
               );
             })
