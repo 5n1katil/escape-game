@@ -39,7 +39,25 @@ export const zihinLabirentiRooms: Room[] = [
     puzzlePrompt:
       "Doğru yetkilendirme protokolünü seç — Kurucu Protokol seni tanımalı.",
   },
-  placeholderRoom(2),
+  {
+    id: 2,
+    title: "2. Oda: Parçalanmış Anılar",
+    description: "Zihin Labirenti — 2. modül: Hafıza Kurtarma",
+    type: "multipleChoice",
+    question:
+      "Hafıza Kurtarma Protokolü: Nöral ağların dijital ortama aktarılmasını sağlayan ilk başarılı çekirdek algoritmanın kod adı neydi?",
+    answer: "1",
+    hint: "Başlangıç anlamına gelen kelime ile bağlantı noktasını birleştir.",
+    options: [
+      "A) Alfa-Senkron",
+      "B) Genesis Düğümü",
+      "C) Nöro-Bölünme",
+      "D) Sinerji-X",
+    ],
+    story:
+      "Sistem taraması devam ediyor... Zihnimde aniden kırmızı uyarı ışıkları çakıyor. 'Uyarı: Bozuk veri blokları tespit edildi. Optimizasyon için gereksiz anı dosyaları siliniyor.'\n\nHayır! Zihnimin arşivi gözlerimin önünde parçalanıyor. Boğaz'a bakan o soğuk laboratuvarım, masamdaki karalama defterim, hırslarım... Hepsi piksellere ayrılıp boşluğa karışıyor. Eğer bilincimin tamamen silinmesini istemiyorsam, hafıza sektörümü derhal stabilize etmeliyim.\n\nSistem bana eksik bir veri dizisi sunarak kimliğimi doğrulamamı istiyor. Ebedi Korteks'in temelini atan, insan zihnini dijital bir düğüme ilk kez bağlamayı başardığım o tarihi deneyin kod adını hatırlamak zorundayım. Zaman daralıyor, anılarım silinmeden o şifreyi girmeliyim!",
+    puzzlePrompt: "Sistem şifresini girin:",
+  },
   placeholderRoom(3),
   placeholderRoom(4),
   placeholderRoom(5),
