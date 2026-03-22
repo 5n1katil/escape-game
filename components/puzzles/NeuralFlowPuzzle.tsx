@@ -105,15 +105,9 @@ const INITIAL_GRID: CellState[][] = [
   ],
 ];
 
-/** Bulletproof SVG paths — full extent 0–100, bright cyan, no filter. */
-function TileSvg({ kind, rot }: { kind: TileKind; rot: number }) {
-  const pathProps = {
-    fill: "none" as const,
-    stroke: "#22d3ee" as const,
-    strokeWidth: 8,
-    strokeLinecap: "round" as const,
-    strokeLinejoin: "round" as const,
-  };
+/** Bulletproof SVG paths — thick cyan lines with glow. */
+function TileSvg({ kind, rot, uniqueId }: { kind: TileKind; rot: number; uniqueId: string }) {
+  const filterId = `${uniqueId}-glow`;
 
   const dMap: Record<TileKind, string> = {
     straight: "M 50 0 L 50 100",
@@ -122,8 +116,22 @@ function TileSvg({ kind, rot }: { kind: TileKind; rot: number }) {
     cross: "M 50 0 L 50 100 M 0 50 L 100 50",
   };
 
+  const pathProps = {
+    fill: "none" as const,
+    stroke: "#22d3ee" as const,
+    strokeWidth: 10,
+    strokeLinecap: "round" as const,
+    strokeLinejoin: "round" as const,
+    filter: `url(#${filterId})`,
+  };
+
   return (
     <svg viewBox="0 0 100 100" className="h-full w-full" aria-hidden preserveAspectRatio="xMidYMid meet">
+      <defs>
+        <filter id={filterId} x="-50%" y="-50%" width="200%" height="200%">
+          <feDropShadow dx="0" dy="0" stdDeviation="2" floodColor="#22d3ee" floodOpacity="0.8" />
+        </filter>
+      </defs>
       <g
         transform={`rotate(${rot * 90} 50 50)`}
         className="transition-transform duration-300 ease-out"
@@ -178,25 +186,30 @@ export default function NeuralFlowPuzzle({ onSolve, onWrong }: NeuralFlowPuzzleP
   return (
     <div className="space-y-5 rounded-xl border border-cyan-500/35 bg-slate-950/90 p-3 shadow-[0_0_40px_rgba(6,182,212,0.08)] sm:p-5">
       <div className="relative mx-auto w-full max-w-md">
-        {/* Input node — top-left */}
+        {/* GİRİŞ — North edge of (0,0), chevron down into grid. Centered over col 0. */}
         <div
-          className="pointer-events-none absolute -left-1 -top-2 z-10 flex flex-col items-center sm:-left-2 sm:-top-3"
+          className="pointer-events-none absolute left-0 top-0 z-10 flex w-[20%] flex-col items-center"
+          style={{ transform: "translateY(-100%)" }}
           aria-hidden
         >
-          <div className="text-[10px] font-semibold uppercase tracking-widest text-cyan-400/90 sm:text-xs">
-            Giriş
-          </div>
-          <div className="mt-0.5 h-3 w-3 rounded-full border-2 border-cyan-300 bg-cyan-400/40 shadow-[0_0_14px_rgba(34,211,238,0.85)] animate-pulse sm:h-3.5 sm:w-3.5" />
+          <span className="text-[10px] font-bold uppercase tracking-widest text-cyan-300 sm:text-xs">
+            GİRİŞ
+          </span>
+          <span className="mt-0.5 text-cyan-400 drop-shadow-[0_0_6px_rgba(34,211,238,0.9)]">▼</span>
+          <div className="mt-0.5 h-2.5 w-2.5 rounded-full border-2 border-cyan-400 bg-cyan-500/50 shadow-[0_0_10px_rgba(34,211,238,0.8)] animate-pulse sm:h-3 sm:w-3" />
         </div>
-        {/* Output node — bottom-right */}
+
+        {/* ÇIKIŞ — South edge of (4,4), chevron down out of grid. Centered over col 4. */}
         <div
-          className="pointer-events-none absolute -bottom-2 -right-1 z-10 flex flex-col items-center sm:-bottom-3 sm:-right-2"
+          className="pointer-events-none absolute bottom-0 right-0 z-10 flex w-[20%] flex-col items-center"
+          style={{ transform: "translateY(100%)" }}
           aria-hidden
         >
-          <div className="h-3 w-3 rounded-full border-2 border-cyan-300 bg-cyan-500/35 shadow-[0_0_12px_rgba(6,182,212,0.75)] sm:h-3.5 sm:w-3.5" />
-          <div className="mt-0.5 text-[10px] font-semibold uppercase tracking-widest text-cyan-400/90 sm:text-xs">
-            Çıkış
-          </div>
+          <div className="h-2.5 w-2.5 rounded-full border-2 border-cyan-400 bg-cyan-500/50 shadow-[0_0_10px_rgba(34,211,238,0.8)] sm:h-3 sm:w-3" />
+          <span className="mt-0.5 text-cyan-400 drop-shadow-[0_0_6px_rgba(34,211,238,0.9)]">▼</span>
+          <span className="mt-0.5 text-[10px] font-bold uppercase tracking-widest text-cyan-300 sm:text-xs">
+            ÇIKIŞ
+          </span>
         </div>
 
         <div
@@ -206,7 +219,10 @@ export default function NeuralFlowPuzzle({ onSolve, onWrong }: NeuralFlowPuzzleP
         >
           {Array.from({ length: SIZE }, (_, r) =>
             Array.from({ length: SIZE }, (_, c) => {
-              const cell = grid[r]?.[c] ?? { kind: "cross" as TileKind, rot: 0 };
+              const cell = grid[r]?.[c];
+              const safeCell: CellState = cell
+                ? { kind: cell.kind, rot: cell.rot }
+                : { kind: "cross", rot: 0 };
               const tileId = `${baseId}-${r}-${c}`;
               return (
                 <button
@@ -218,7 +234,7 @@ export default function NeuralFlowPuzzle({ onSolve, onWrong }: NeuralFlowPuzzleP
                   className="relative aspect-square min-h-0 min-w-0 touch-manipulation rounded-md border border-cyan-500/20 bg-slate-950/95 shadow-inner shadow-black/40 transition-[border-color,box-shadow] hover:border-cyan-400/55 hover:shadow-[0_0_16px_rgba(34,211,238,0.2)] active:scale-[0.97] disabled:pointer-events-none disabled:opacity-60"
                   aria-label={`Nöral segment ${r + 1}-${c + 1}, döndürmek için tıklayın`}
                 >
-                  <TileSvg kind={cell.kind} rot={cell.rot} />
+                  <TileSvg kind={safeCell.kind} rot={safeCell.rot} uniqueId={tileId} />
                 </button>
               );
             })
