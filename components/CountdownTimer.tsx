@@ -9,12 +9,9 @@ interface CountdownTimerProps {
   ariaLabelTemplate?: string;
   /** Küçük, kutu içi yatay düzen (hub lobi vb.). */
   compact?: boolean;
-  /**
-   * Oda ekranı: mistik / taktik gösterge paneli (sabit sağ sütun).
-   * `label` ile üst başlık (örn. “Zaman sayacı”).
-   */
-  variant?: "default" | "compact" | "tactical";
-  /** variant="tactical" iken görünen üst etiket (örn. “Kalan zaman”) */
+  /** tactical: masaüstü sağ panel; mobileBar: mobil üst yapışkan çubuk. */
+  variant?: "default" | "compact" | "tactical" | "mobileBar";
+  /** tactical / mobileBar üst etiket */
   label?: string;
 }
 
@@ -65,37 +62,48 @@ export default function CountdownTimer({
     );
   }
 
-  if (effectiveVariant === "tactical") {
+  if (effectiveVariant === "mobileBar") {
     return (
       <div
-        className="tactical-hud-pulse relative w-full min-w-0 overflow-visible rounded-xl border-2 border-amber-500/55 bg-gradient-to-b from-zinc-900 via-zinc-950 to-black py-3 sm:py-4"
+        className="flex w-full min-w-0 items-center justify-between gap-3 border-b border-amber-500/40 bg-black/70 px-3 py-2.5 shadow-[0_4px_24px_rgba(0,0,0,0.5)] backdrop-blur-md sm:px-4"
         aria-live="polite"
         aria-label={ariaLabel}
       >
-        {/* Dekor katmanları ayrı: metin/glow kesilmesin */}
-        <div className="pointer-events-none absolute inset-0 overflow-hidden rounded-[10px]" aria-hidden>
-          <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(251,191,36,0.06)_0%,transparent_42%,rgba(0,0,0,0.4)_100%)]" />
-          <div className="absolute inset-x-3 top-0 h-px bg-gradient-to-r from-transparent via-amber-300/60 to-transparent sm:inset-x-4" />
-          <div className="absolute inset-0 rounded-xl ring-1 ring-amber-400/25 ring-inset" />
-        </div>
-        <div className="relative z-10 w-full min-w-0 px-2 sm:px-3">
-          {label ? (
-            <p className="mb-2 text-center text-[11px] font-extrabold uppercase leading-tight tracking-[0.14em] text-amber-300 sm:mb-2.5 sm:text-xs sm:tracking-[0.18em]">
-              {label}
-            </p>
-          ) : null}
-          <div className="flex w-full min-w-0 justify-center overflow-visible py-0.5">
-            <span
-              className="font-mono text-[clamp(1.65rem,4.2vw+0.6rem,2.35rem)] font-bold leading-none tabular-nums tracking-tight text-amber-50"
-              style={{
-                textShadow:
-                  "0 0 18px rgba(251, 191, 36, 0.5), 0 0 40px rgba(245, 158, 11, 0.22), 0 2px 0 rgba(0,0,0,0.85)",
-              }}
-            >
-              {timeStr}
-            </span>
-          </div>
-        </div>
+        {label ? (
+          <span className="shrink-0 text-[10px] font-extrabold uppercase leading-tight tracking-[0.12em] text-amber-400 sm:text-xs sm:tracking-[0.16em]">
+            {label}
+          </span>
+        ) : (
+          <span className="sr-only">{ariaLabel}</span>
+        )}
+        <span
+          className="font-mono text-3xl font-black tabular-nums tracking-tight text-amber-400 drop-shadow-[0_0_14px_rgba(251,191,36,0.55)] sm:text-4xl"
+          style={{ textShadow: "0 0 20px rgba(245, 158, 11, 0.35)" }}
+        >
+          {timeStr}
+        </span>
+      </div>
+    );
+  }
+
+  if (effectiveVariant === "tactical") {
+    return (
+      <div
+        className="w-full shrink-0 rounded-xl border-2 border-amber-500/50 bg-black/60 px-3 py-4 shadow-[0_0_36px_rgba(245,158,11,0.18),inset_0_1px_0_rgba(251,191,36,0.08)] sm:px-4 sm:py-5"
+        aria-live="polite"
+        aria-label={ariaLabel}
+      >
+        {label ? (
+          <p className="text-center text-[11px] font-extrabold uppercase tracking-[0.2em] text-amber-400/95 sm:text-xs sm:tracking-[0.22em]">
+            {label}
+          </p>
+        ) : null}
+        <p
+          className={`text-center font-mono text-5xl font-black tabular-nums tracking-tight text-amber-400 drop-shadow-[0_0_15px_rgba(251,191,36,0.6)] lg:text-6xl ${label ? "mt-2 sm:mt-3" : ""}`}
+          style={{ textShadow: "0 0 28px rgba(245, 158, 11, 0.4)" }}
+        >
+          {timeStr}
+        </p>
       </div>
     );
   }
