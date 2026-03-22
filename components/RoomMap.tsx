@@ -136,11 +136,29 @@ export default function RoomMap({
 
     const framed = fill && embeddedInFrame;
 
+    function rowShellClass(state: RoomState, canNavigate: boolean) {
+      if (!framed && !strip) {
+        return `flex w-full min-w-0 ${fill || strip ? "gap-2" : "gap-1 sm:gap-2"}`;
+      }
+      const base =
+        "box-border flex w-full min-w-0 rounded-lg border border-transparent transition-all duration-200";
+      if (!canNavigate) {
+        return `${base} gap-2 hover:border-zinc-600/35 hover:bg-zinc-800/30 hover:shadow-[inset_0_0_0_1px_rgba(82,82,91,0.25)]`;
+      }
+      if (state === "current") {
+        return `${base} gap-2 hover:border-amber-500/45 hover:bg-amber-500/[0.08] hover:shadow-[0_0_22px_rgba(245,158,11,0.18)]`;
+      }
+      if (state === "solved") {
+        return `${base} gap-2 hover:border-emerald-500/40 hover:bg-emerald-950/35 hover:shadow-[0_0_18px_rgba(16,185,129,0.14)]`;
+      }
+      return `${base} gap-2 hover:border-amber-500/40 hover:bg-amber-950/40 hover:shadow-[0_0_20px_rgba(245,158,11,0.16)] hover:translate-x-px`;
+    }
+
     return (
       <aside
         className={`flex flex-col rounded-xl ${
           framed
-            ? "h-full min-h-0 min-w-0 flex-1 overflow-hidden rounded-lg border border-amber-900/30 bg-zinc-900/40 px-2.5 py-2 sm:px-3 sm:py-3"
+            ? "h-full min-h-0 min-w-0 flex-1 rounded-lg border border-amber-900/30 bg-zinc-900/40 box-border px-3 py-3 sm:px-4 sm:py-3.5"
             : `border border-zinc-800/60 bg-zinc-900/50 ring-1 ring-amber-950/30 ${
                 fill
                   ? "h-full min-h-0 min-w-0 flex-1 overflow-hidden px-3 py-3 sm:px-4 sm:py-4"
@@ -167,7 +185,7 @@ export default function RoomMap({
           className={`flex min-h-0 flex-col ${
             fill
               ? framed
-                ? "flex-1 gap-1.5 overflow-hidden"
+                ? "flex-1 gap-2 overflow-visible py-0.5"
                 : "flex-1 gap-2 overflow-hidden"
               : strip
                 ? "flex-1 gap-1 overflow-y-auto overscroll-y-contain pr-0.5 [scrollbar-width:thin]"
@@ -185,7 +203,7 @@ export default function RoomMap({
             const rowInner = (
               <>
                 <div
-                  className={`flex shrink-0 flex-col items-center ${fill ? "w-10" : strip ? "w-8" : "w-11 sm:w-12"}`}
+                  className={`flex shrink-0 flex-col items-center ${fill ? (framed ? "w-11" : "w-10") : strip ? "w-8" : "w-11 sm:w-12"}`}
                 >
                   <span
                     className={cellClass(state, canNavigate, !fill)}
@@ -215,16 +233,18 @@ export default function RoomMap({
                   )}
                 </div>
                 <div
-                  className={`min-w-0 flex-1 border-b border-zinc-800/40 pl-0 pr-1 ${
-                    fill ? (framed ? "py-2 sm:py-2.5" : "py-2.5 sm:py-3") : strip ? "py-1.5" : "py-1.5 sm:py-2"
+                  className={`min-w-0 flex-1 border-b border-zinc-800/40 pl-1 pr-2 ${
+                    fill ? (framed ? "py-2.5 sm:py-3" : "py-2.5 sm:py-3") : strip ? "py-1.5" : "py-1.5 sm:py-2"
                   } ${
-                    state === "current" ? "rounded-r-lg bg-amber-500/5 pr-2 ring-1 ring-amber-500/20" : ""
+                    state === "current"
+                      ? "rounded-r-md bg-amber-500/5 ring-1 ring-amber-500/30 ring-offset-0 ring-offset-transparent"
+                      : ""
                   }`}
                 >
                   {canNavigate ? (
                     <Link
                       href={roomHref}
-                      className={`block transition-colors duration-200 hover:text-amber-200 ${tClass}`}
+                      className={`block rounded-sm transition-all duration-200 hover:text-amber-100 ${tClass}`}
                       aria-label={`${room.title}: ${state === "solved" ? "Çözüldü" : state === "current" ? "Mevcut oda" : "Açık"} - Odaya git`}
                     >
                       {room.title}
@@ -242,7 +262,7 @@ export default function RoomMap({
               <div
                 key={room.id}
                 role="listitem"
-                className={`flex w-full min-w-0 ${fill || strip ? "gap-2" : "gap-1 sm:gap-2"}`}
+                className={rowShellClass(state, canNavigate)}
               >
                 {rowInner}
               </div>
@@ -254,7 +274,7 @@ export default function RoomMap({
           href={`/game/${slug}/hub`}
           className={
             fill || strip
-              ? "mt-2 flex w-full shrink-0 items-center justify-center rounded-lg border border-amber-700/50 bg-amber-950/30 px-2 py-1.5 text-center text-xs font-medium text-amber-200/90 transition-colors hover:bg-amber-900/40 hover:text-amber-100 sm:py-2"
+              ? "mt-3 flex w-full shrink-0 items-center justify-center rounded-lg border border-amber-700/50 bg-amber-950/30 px-3 py-2 text-center text-xs font-medium text-amber-200/90 transition-all duration-200 hover:border-amber-600/60 hover:bg-amber-900/45 hover:text-amber-50 hover:shadow-[0_0_18px_rgba(245,158,11,0.12)] sm:text-sm"
               : hubLinkClass
           }
         >
