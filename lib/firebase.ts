@@ -17,7 +17,6 @@ export const db = getDatabase(app);
 const LEADERBOARD_BASE_PATH = "leaderboards";
 const PLAYER_STATS_PATH = "playerGameStats";
 const GLOBAL_LEADERBOARD_PATH = "globalLeaderboard";
-const USERS_PATH = "users";
 
 /**
  * Saves score to Firebase. Leaderboard stores completion time (bitirme süresi).
@@ -79,13 +78,10 @@ export async function saveScore(
   // leaderboards/{type}/{gameKey}/{playerKey}
   const leaderboardPath = `${LEADERBOARD_BASE_PATH}/${type}/${safeGameKey}/${identityKey}`;
   const statsPath = `${PLAYER_STATS_PATH}/${identityKey}/${safeGameKey}`;
-  const userIdentityKey = finalMemberId || identityKey;
-  const userPath = `${USERS_PATH}/${userIdentityKey}`;
-  console.log("[saveScore] writing to paths:", { leaderboardPath, statsPath, userPath });
+  console.log("[saveScore] writing to paths:", { leaderboardPath, statsPath });
 
   const leaderboardRef = ref(db, leaderboardPath);
   const statsRef = ref(db, statsPath);
-  const userRef = ref(db, userPath);
 
   try {
     // Read player stats for this game (attempts + best values).
@@ -214,27 +210,6 @@ export async function saveScore(
     } else {
       console.log("[saveScore] success (stats updated, leaderboard unchanged)");
     }
-
-    // Keep user profile node updated (display-only fields).
-    // When memberId exists, this writes under users/{memberId} and auto-creates if missing.
-    const userSnap = await get(userRef);
-    const userExisting = userSnap.exists()
-      ? (userSnap.val() as { createdAt?: unknown; avatarUrl?: unknown } | null)
-      : null;
-    const existingCreatedAt =
-      typeof userExisting?.createdAt === "number" && Number.isFinite(userExisting.createdAt)
-        ? userExisting.createdAt
-        : null;
-    const existingAvatarUrl =
-      typeof userExisting?.avatarUrl === "string" ? userExisting.avatarUrl : null;
-
-    await update(userRef, {
-      memberId: finalMemberId ?? null,
-      playerName: playerName.trim(),
-      avatarUrl: avatarUrl ?? existingAvatarUrl ?? null,
-      createdAt: existingCreatedAt ?? now,
-      updatedAt: now,
-    });
 
     // --- Global total leaderboard: sum bestFinalScore across all games for this player ---
     try {

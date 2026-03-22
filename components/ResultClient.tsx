@@ -74,40 +74,96 @@ interface ResultClientProps {
 }
 
 const DEFAULT_DETECTIVE_AVATAR =
-  "data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='64' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='32' fill='%233f3f46'/%3E%3Ctext x='32' y='40' text-anchor='middle' font-size='28' fill='%23fbbf24' font-family='Arial,sans-serif'%3E%F0%9F%95%B5%EF%B8%8F%3C/text%3E%3C/svg%3E";
+  "https://cdn-icons-png.flaticon.com/512/3135/3135715.png";
 
-async function resolveMissingAvatars(entries: LeaderboardEntry[]): Promise<LeaderboardEntry[]> {
-  const missingMemberIds = Array.from(
-    new Set(
-      entries
-        .filter((entry) => !entry.avatarUrl && entry.memberId)
-        .map((entry) => entry.memberId as string)
-    )
-  );
-  if (missingMemberIds.length === 0) return entries;
+type UsersAvatarLookups = {
+  byMemberId: Record<string, string>;
+  byPlayerName: Record<string, string>;
+};
 
-  const avatarMap: Record<string, string> = {};
-  await Promise.all(
-    missingMemberIds.map(async (memberId) => {
-      try {
-        const res = await fetch(`${FIREBASE_DB_BASE}/users/${encodeURIComponent(memberId)}.json`);
-        if (!res.ok) return;
-        const user = (await res.json()) as { avatarUrl?: unknown } | null;
-        if (user && typeof user.avatarUrl === "string" && user.avatarUrl.trim()) {
-          avatarMap[memberId] = user.avatarUrl;
-        }
-      } catch {
-        // ignore avatar lookup errors; fallback avatar will be used.
+type FirebaseUserRow = {
+  memberId?: string | null;
+  playerName?: string | null;
+  name?: string | null;
+  avatarUrl?: string | null;
+};
+
+function normalizePlayerLookupKey(value: string): string {
+  return value.trim().toLowerCase().replace(/[.#$/\[\]]/g, "_");
+}
+
+function pathKeyLooksLikeMemberId(key: string): boolean {
+  if (
+    /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(key)
+  ) {
+    return true;
+  }
+  return /^[A-Za-z0-9_-]{16,}$/.test(key);
+}
+
+/**
+ * Tek GET ile tüm users.json okunur; avatar eşlemesi memberId öncelikli, yoksa oyuncu adı ile.
+ */
+async function fetchUsersAvatarLookups(): Promise<UsersAvatarLookups> {
+  const byMemberId: Record<string, string> = {};
+  const byPlayerName: Record<string, string> = {};
+  try {
+    const res = await fetch(`${FIREBASE_DB_BASE}/users.json`);
+    if (!res.ok) return { byMemberId, byPlayerName };
+    const data = (await res.json()) as Record<string, FirebaseUserRow> | null;
+    if (!data || typeof data !== "object") return { byMemberId, byPlayerName };
+
+    for (const [pathKey, row] of Object.entries(data)) {
+      if (!row || typeof row !== "object") continue;
+      const url =
+        typeof row.avatarUrl === "string" && row.avatarUrl.trim() ? row.avatarUrl.trim() : null;
+      if (!url) continue;
+
+      byMemberId[pathKey] = url;
+      const mid =
+        typeof row.memberId === "string" && row.memberId.trim() ? row.memberId.trim() : null;
+      if (mid) byMemberId[mid] = url;
+
+      const pn = typeof row.playerName === "string" ? row.playerName.trim() : "";
+      const nm = typeof row.name === "string" ? row.name.trim() : "";
+      const displayName = pn || nm;
+      if (displayName) {
+        byPlayerName[normalizePlayerLookupKey(displayName)] = url;
       }
-    })
-  );
 
-  return entries.map((entry) => ({
-    ...entry,
-    avatarUrl:
-      entry.avatarUrl ||
-      (entry.memberId ? avatarMap[entry.memberId] ?? null : null),
-  }));
+      if (pathKey && !pathKeyLooksLikeMemberId(pathKey)) {
+        byPlayerName[normalizePlayerLookupKey(pathKey.replace(/_/g, " "))] = url;
+        byPlayerName[normalizePlayerLookupKey(pathKey)] = url;
+      }
+    }
+  } catch {
+    // ignore; caller falls back to default avatar
+  }
+  return { byMemberId, byPlayerName };
+}
+
+function resolveAvatarUrl(
+  lookups: UsersAvatarLookups,
+  opts: {
+    rowAvatarUrl?: string | null;
+    memberId?: string | null;
+    displayName: string;
+  }
+): string {
+  const fromRow =
+    typeof opts.rowAvatarUrl === "string" && opts.rowAvatarUrl.trim()
+      ? opts.rowAvatarUrl.trim()
+      : null;
+  if (fromRow) return fromRow;
+
+  const mid =
+    typeof opts.memberId === "string" && opts.memberId.trim() ? opts.memberId.trim() : null;
+  if (mid && lookups.byMemberId[mid]) return lookups.byMemberId[mid];
+
+  const nameKey = normalizePlayerLookupKey(opts.displayName);
+  if (nameKey && lookups.byPlayerName[nameKey]) return lookups.byPlayerName[nameKey];
+
+  return DEFAULT_DETECTIVE_AVATAR;
 }
 
 function formatTime(seconds: number): string {
@@ -150,15 +206,14 @@ async function fetchGameLeaderboard(
       avatarUrl: typeof row.avatarUrl === "string" ? row.avatarUrl : null,
     };
   });
-  const enrichedEntries = await resolveMissingAvatars(entries);
-  enrichedEntries.sort((a, b) => {
+  entries.sort((a, b) => {
     if (b.score !== a.score) return b.score - a.score;
     if (a.time === null && b.time === null) return 0;
     if (a.time === null) return 1;
     if (b.time === null) return -1;
     return a.time - b.time;
   });
-  return enrichedEntries.slice(0, limit);
+  return entries.slice(0, limit);
 }
 
 /**
@@ -222,9 +277,8 @@ async function fetchGlobalLeaderboard(limit: number): Promise<LeaderboardEntry[]
       };
     })
   );
-  const enrichedEntries = await resolveMissingAvatars(entries);
-  enrichedEntries.sort((a, b) => b.score - a.score);
-  return enrichedEntries.slice(0, limit);
+  entries.sort((a, b) => b.score - a.score);
+  return entries.slice(0, limit);
 }
 
 async function resolveLeaderboardData(
@@ -261,6 +315,10 @@ export default function ResultClient({
     mode: "game",
     type: "escape_room",
     gameKey: slug,
+  });
+  const [usersAvatarLookups, setUsersAvatarLookups] = useState<UsersAvatarLookups>({
+    byMemberId: {},
+    byPlayerName: {},
   });
   const scoreSavedRef = useRef(false);
 
@@ -305,6 +363,18 @@ export default function ResultClient({
     if (!escaped) return;
     let cancelled = false;
     (async () => {
+      const lookups = await fetchUsersAvatarLookups();
+      if (!cancelled) setUsersAvatarLookups(lookups);
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [escaped]);
+
+  useEffect(() => {
+    if (!escaped) return;
+    let cancelled = false;
+    (async () => {
       try {
         const top = await resolveLeaderboardData(leaderboardFilter, 5);
         if (!cancelled) {
@@ -341,6 +411,12 @@ export default function ResultClient({
 
   const storyText = endStoryLong ?? tResult.endStory;
 
+  const activePlayerAvatarSrc = resolveAvatarUrl(usersAvatarLookups, {
+    rowAvatarUrl: finalResult.avatarUrl,
+    memberId: finalResult.memberId ?? null,
+    displayName: finalResult.playerName,
+  });
+
   const backUrl = mainPageUrl ?? wixUrl;
   const backLabel = mainPageUrl ? tResult.backToMain : tResult.backToWix;
 
@@ -361,8 +437,17 @@ export default function ResultClient({
                 {tResult.endTitle}
               </h1>
               <p className="mt-2 text-sm text-zinc-400">{tResult.endStory}</p>
-              <p className="mt-2 text-sm text-zinc-400">
-                Dedektif: <span className="font-medium text-zinc-200">{finalResult.playerName}</span>
+              <p className="mt-2 flex items-center gap-2 text-sm text-zinc-400">
+                <img
+                  src={encodeURI(activePlayerAvatarSrc)}
+                  alt=""
+                  className="h-9 w-9 shrink-0 rounded-full border border-purple-500/50 object-cover"
+                  loading="lazy"
+                />
+                <span>
+                  Dedektif:{" "}
+                  <span className="font-medium text-zinc-200">{finalResult.playerName}</span>
+                </span>
               </p>
             </header>
 
@@ -469,9 +554,15 @@ export default function ResultClient({
                       >
                         <span className="flex items-center gap-2 font-medium text-zinc-200">
                           <img
-                            src={entry.avatarUrl || DEFAULT_DETECTIVE_AVATAR}
+                            src={encodeURI(
+                              resolveAvatarUrl(usersAvatarLookups, {
+                                rowAvatarUrl: entry.avatarUrl,
+                                memberId: entry.memberId ?? null,
+                                displayName: entry.name,
+                              })
+                            )}
                             alt=""
-                            className="h-6 w-6 rounded-full object-cover ring-1 ring-zinc-600/70"
+                            className="h-8 w-8 shrink-0 rounded-full border border-purple-500/50 object-cover"
                             loading="lazy"
                           />
                           {i + 1}. {entry.name}
