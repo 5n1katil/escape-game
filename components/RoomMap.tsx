@@ -18,6 +18,8 @@ interface RoomMapProps {
   fillColumn?: boolean;
   /** Oda sayfası mobil: sayaç altında kompakt ilerleme şeridi (masaüstü aside ile ayrı instance). */
   compactStrip?: boolean;
+  /** Geniş taktik çerçeve içinde: dış çift border kaldırılır, içerik ferahlar. */
+  embeddedInFrame?: boolean;
 }
 
 type RoomState = "locked" | "current" | "solved" | "available";
@@ -40,6 +42,7 @@ export default function RoomMap({
   density = "default",
   fillColumn = false,
   compactStrip = false,
+  embeddedInFrame = false,
 }: RoomMapProps) {
   const slim = density === "slim";
   const sidebar = density === "sidebar";
@@ -117,27 +120,34 @@ export default function RoomMap({
         return "text-left text-xs font-semibold leading-snug tracking-normal break-words line-clamp-2 text-zinc-200";
       }
       if (fill) {
+        const clamp = framed ? "line-clamp-3" : "line-clamp-2";
         if (state === "current") {
-          return "text-left text-base font-bold leading-snug tracking-normal break-words line-clamp-2 text-amber-100";
+          return `text-left text-base font-bold leading-snug tracking-normal break-words ${clamp} text-amber-100`;
         }
         if (state === "locked") {
-          return "text-left text-sm font-medium leading-snug tracking-normal break-words line-clamp-2 text-zinc-500";
+          return `text-left text-sm font-medium leading-snug tracking-normal break-words ${clamp} text-zinc-500`;
         }
-        return "text-left text-sm font-semibold leading-snug tracking-normal break-words line-clamp-2 text-zinc-200";
+        return `text-left text-sm font-semibold leading-snug tracking-normal break-words ${clamp} text-zinc-200`;
       }
       return `text-left text-sm font-medium leading-snug tracking-normal break-words sm:text-[0.9375rem] ${
         state === "locked" ? "text-zinc-500" : "text-zinc-200"
       }`;
     };
 
+    const framed = fill && embeddedInFrame;
+
     return (
       <aside
-        className={`flex flex-col rounded-xl border border-zinc-800/60 bg-zinc-900/50 ring-1 ring-amber-950/30 ${
-          fill
-            ? "h-full min-h-0 min-w-0 flex-1 overflow-hidden px-3 py-3 sm:px-4 sm:py-4"
-            : strip
-              ? "max-h-[min(42vh,320px)] min-h-0 w-full shrink-0 overflow-hidden px-2.5 py-2"
-              : "px-3 py-4 sm:px-4"
+        className={`flex flex-col rounded-xl ${
+          framed
+            ? "h-full min-h-0 min-w-0 flex-1 overflow-hidden rounded-lg border border-amber-900/30 bg-zinc-900/40 px-2.5 py-2 sm:px-3 sm:py-3"
+            : `border border-zinc-800/60 bg-zinc-900/50 ring-1 ring-amber-950/30 ${
+                fill
+                  ? "h-full min-h-0 min-w-0 flex-1 overflow-hidden px-3 py-3 sm:px-4 sm:py-4"
+                  : strip
+                    ? "max-h-[min(42vh,320px)] min-h-0 w-full shrink-0 overflow-hidden px-2.5 py-2"
+                    : "px-3 py-4 sm:px-4"
+              }`
         }`}
         aria-label="Oda ilerleme durumu"
       >
@@ -155,7 +165,13 @@ export default function RoomMap({
 
         <div
           className={`flex min-h-0 flex-col ${
-            fill ? "flex-1 gap-2 overflow-hidden" : strip ? "flex-1 gap-1 overflow-y-auto overscroll-y-contain pr-0.5 [scrollbar-width:thin]" : "gap-0"
+            fill
+              ? framed
+                ? "flex-1 gap-1.5 overflow-hidden"
+                : "flex-1 gap-2 overflow-hidden"
+              : strip
+                ? "flex-1 gap-1 overflow-y-auto overscroll-y-contain pr-0.5 [scrollbar-width:thin]"
+                : "gap-0"
           }`}
           role="list"
           aria-label="Oda durumları"
@@ -200,7 +216,7 @@ export default function RoomMap({
                 </div>
                 <div
                   className={`min-w-0 flex-1 border-b border-zinc-800/40 pl-0 pr-1 ${
-                    fill ? "py-2.5 sm:py-3" : strip ? "py-1.5" : "py-1.5 sm:py-2"
+                    fill ? (framed ? "py-2 sm:py-2.5" : "py-2.5 sm:py-3") : strip ? "py-1.5" : "py-1.5 sm:py-2"
                   } ${
                     state === "current" ? "rounded-r-lg bg-amber-500/5 pr-2 ring-1 ring-amber-500/20" : ""
                   }`}

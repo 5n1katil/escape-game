@@ -9,8 +9,8 @@ interface CountdownTimerProps {
   ariaLabelTemplate?: string;
   /** Küçük, kutu içi yatay düzen (hub lobi vb.). */
   compact?: boolean;
-  /** tactical: masaüstü sağ panel; mobileBar: mobil üst yapışkan çubuk. */
-  variant?: "default" | "compact" | "tactical" | "mobileBar";
+  /** tactical: sağ panel; tacticalWide: geniş çerçeve, dikey biraz daha kompakt; mobileBar: mobil çubuk. */
+  variant?: "default" | "compact" | "tactical" | "tacticalWide" | "mobileBar";
   /** tactical / mobileBar üst etiket */
   label?: string;
 }
@@ -101,6 +101,28 @@ export default function CountdownTimer({
         <p
           className={`text-center font-mono text-5xl font-black tabular-nums tracking-tight text-amber-400 drop-shadow-[0_0_15px_rgba(251,191,36,0.6)] lg:text-6xl ${label ? "mt-2 sm:mt-3" : ""}`}
           style={{ textShadow: "0 0 28px rgba(245, 158, 11, 0.4)" }}
+        >
+          {timeStr}
+        </p>
+      </div>
+    );
+  }
+
+  if (effectiveVariant === "tacticalWide") {
+    return (
+      <div
+        className="w-full shrink-0 rounded-xl border-2 border-amber-500/45 bg-black/55 px-3 py-2.5 shadow-[0_0_28px_rgba(245,158,11,0.14),inset_0_1px_0_rgba(251,191,36,0.08)] sm:px-4 sm:py-3"
+        aria-live="polite"
+        aria-label={ariaLabel}
+      >
+        {label ? (
+          <p className="text-center text-[10px] font-extrabold uppercase tracking-[0.2em] text-amber-400/95 sm:text-[11px] sm:tracking-[0.2em]">
+            {label}
+          </p>
+        ) : null}
+        <p
+          className={`text-center font-mono text-4xl font-black tabular-nums tracking-tight text-amber-400 drop-shadow-[0_0_14px_rgba(251,191,36,0.55)] sm:text-5xl lg:text-[2.75rem] ${label ? "mt-1 sm:mt-1.5" : ""}`}
+          style={{ textShadow: "0 0 22px rgba(245, 158, 11, 0.35)" }}
         >
           {timeStr}
         </p>

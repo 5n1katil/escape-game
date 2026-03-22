@@ -102,6 +102,11 @@ body {
   height: 0;
 }
 
+/* Oyun odası — geniş sağ taktik çerçeve (RoomTacticalPanel ile uyumlu) */
+.room-tactical-panel {
+  box-decoration-break: clone;
+}
+
 /* Tapınak haritası — açık oda bölgeleri: yanıp sönen amber parlama */
 @keyframes map-room-amber-glow {
   0%,
