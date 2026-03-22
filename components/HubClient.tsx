@@ -189,13 +189,13 @@ export default function HubClient({
             return (
               <div
                 key={roomId}
-                className="pointer-events-none absolute flex min-h-[44px] min-w-[44px] flex-col items-center justify-center gap-1 rounded-md border border-amber-400/25 bg-transparent shadow-[0_0_14px_rgba(251,191,36,0.08)]"
+                className="pointer-events-none absolute flex min-h-[44px] min-w-[44px] flex-col items-center justify-center gap-1 rounded-md border-2 border-purple-800/60 bg-zinc-950/92 shadow-[0_0_14px_rgba(251,191,36,0.12)]"
                 style={style}
                 title="Kilitli"
                 aria-hidden
               >
-                <MapLockIcon className="h-10 w-10 text-amber-200/45" />
-                <span className="text-sm font-bold tabular-nums text-zinc-500">{roomId}</span>
+                <MapLockIcon className="h-10 w-10 shrink-0 text-amber-300/80" />
+                <span className="text-sm font-bold tabular-nums text-amber-200/70">{roomId}</span>
               </div>
             );
           }
