@@ -72,10 +72,12 @@ export const zihinLabirentiRooms: Room[] = [
     puzzleType: "slider",
     question: "Üç kanalı hedef frekansa kilitleyin.",
     answer: "50",
-    hint: "Alfa, Beta ve Teta eşitlenmeli.",
+    hint:
+      "Beta'ya X dersen, Alfa 2X olur. Teta ise (X + 2X) yani 3X olur. Toplamları (X + 2X + 3X) = 120. Buradan denklemi çözüp doğru frekansları kaydırıcılarda ayarla.",
     story:
-      "Nöral Frekans Testi.\n\nÇekirdek senkronizasyon bozuldu. Üç taşıyıcı hattı aynı genlikte olmadan ilerleyemezsiniz.",
-    puzzlePrompt: "Alfa, Beta ve Teta kaydırıcılarını %50 değerine getirin.",
+      "Etik güvenlik duvarını ezip geçtim. Ama sistem bunu algıladı! Zihnimin dijital sisteme entegrasyonu aşırı yüklenme (overload) hatası veriyor.\n\nSistem uyarısı: 'Kritik Nöral Uyumsuzluk. Bant genişliği sınırı aşıldı. Sistemin toplam kapasitesi olan 120 MHz'e göre dalgaları dengeleyin.'\n\nHayatta kalmak için nöral frekanslarımı (Alfa, Beta ve Teta dalgalarını) Ebedi Korteks'in ana denge formülüne göre tam olarak ayarlamalıyım. Eğer yanlış bir frekans gönderirsem, sistem güvenlik protokolü gereği beni cezalandıracak ve zamanımı tüketecek!",
+    puzzlePrompt:
+      "Sistemin toplam frekans kapasitesi 120 MHz'dir. Kararlılık formülü şöyledir:\n- Alfa frekansı, Beta frekansının tam 2 katı olmalıdır.\n- Teta frekansı ise Alfa ve Beta'nın toplamına eşit olmalıdır.\nDeğerleri ayarlayıp Senkronizasyon'u başlatın.",
     storyImages: [
       { url: "/games/zihin-labirenti/images/oda-4.png", alt: "4. oda görseli" },
     ],

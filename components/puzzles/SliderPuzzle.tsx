@@ -1,39 +1,52 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useGameUi } from "@/components/GameVisualThemeProvider";
+import { useState } from "react";
 
 export interface SliderPuzzleProps {
   onSolve: () => void;
-  target?: number;
+  onWrong?: () => void;
 }
 
 const LABELS = ["Alfa", "Beta", "Teta"] as const;
+const TARGETS: [number, number, number] = [40, 20, 60];
 
-export default function SliderPuzzle({ onSolve, target = 50 }: SliderPuzzleProps) {
+export default function SliderPuzzle({ onSolve, onWrong }: SliderPuzzleProps) {
+  const { ui } = useGameUi();
+  const er = ui.escapeRoom;
   const [values, setValues] = useState([22, 78, 35]);
-  const solvedRef = useRef(false);
+  const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    if (solvedRef.current) return;
-    const ok = values.every((v) => v === target);
+  function handleSubmit() {
+    setError(null);
+    const ok =
+      values[0] === TARGETS[0] &&
+      values[1] === TARGETS[1] &&
+      values[2] === TARGETS[2];
+
     if (ok) {
-      solvedRef.current = true;
       onSolve();
+    } else {
+      setError(
+        "UYUMSUZLUK: BAĞLANTI REDDEDİLDİ. TEKRAR DENEYİN."
+      );
+      onWrong?.();
     }
-  }, [values, target, onSolve]);
+  }
 
   return (
     <div className="space-y-6 rounded-xl border border-cyan-500/35 bg-slate-950/90 p-4 shadow-[0_0_40px_rgba(6,182,212,0.08)] sm:p-6">
       <p className="text-center text-sm text-cyan-200/90">
-        Nöral frekansları{" "}
-        <span className="font-mono font-bold text-cyan-400">{target}</span>% değerine kilitleyin.
+        Nöral frekansları 120 MHz toplam kapasiteye göre dengeleyin.
       </p>
       <div className="space-y-5">
         {LABELS.map((label, i) => (
           <div key={label} className="space-y-2">
             <div className="flex justify-between text-xs font-medium uppercase tracking-wider text-cyan-500/80 sm:text-sm">
               <span>{label}</span>
-              <span className="font-mono tabular-nums text-cyan-300">{values[i]}%</span>
+              <span className="font-mono tabular-nums text-cyan-300">
+                {values[i]} MHz
+              </span>
             </div>
             <input
               type="range"
@@ -47,6 +60,7 @@ export default function SliderPuzzle({ onSolve, target = 50 }: SliderPuzzleProps
                   next[i] = n;
                   return next;
                 });
+                setError(null);
               }}
               className="h-2 w-full cursor-pointer appearance-none rounded-full bg-slate-800 accent-cyan-400 [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-cyan-400 [&::-webkit-slider-thumb]:shadow-[0_0_12px_rgba(34,211,238,0.8)]"
               aria-label={`${label} frekansı`}
@@ -54,6 +68,23 @@ export default function SliderPuzzle({ onSolve, target = 50 }: SliderPuzzleProps
           </div>
         ))}
       </div>
+
+      {error && (
+        <p
+          role="alert"
+          className="text-center text-sm font-semibold uppercase tracking-wider text-red-400"
+        >
+          {error}
+        </p>
+      )}
+
+      <button
+        type="button"
+        onClick={handleSubmit}
+        className={`min-h-[56px] w-full touch-manipulation rounded-xl border-2 border-zinc-600/55 bg-slate-900/60 px-6 py-4 text-center text-lg font-semibold text-zinc-100 shadow-sm shadow-black/25 transition-all duration-300 hover:-translate-y-1 hover:border-cyan-400/90 hover:bg-cyan-500/[0.12] hover:text-cyan-50 hover:shadow-[0_0_18px_rgba(34,211,238,0.45),0_0_28px_rgba(6,182,212,0.25)] active:scale-[0.98] md:text-xl`}
+      >
+        SENKRONİZASYONU BAŞLAT
+      </button>
     </div>
   );
 }

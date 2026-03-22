@@ -394,6 +394,7 @@ export default function EscapeRoomGame({
               setError(null);
               markRoomSolved();
             }}
+            onWrong={handleWrongAnswer}
           />
           {error && (
             <p role="alert" className="text-sm text-red-400">
