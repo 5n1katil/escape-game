@@ -17,6 +17,8 @@ export const db = getDatabase(app);
 const LEADERBOARD_BASE_PATH = "leaderboards";
 const PLAYER_STATS_PATH = "playerGameStats";
 const GLOBAL_LEADERBOARD_PATH = "globalLeaderboard";
+/** Sadece okuma — Wix tarafı yazar; saveScore buradan avatarUrl çeker. */
+const USERS_READ_PATH = "users";
 
 /**
  * Saves score to Firebase. Leaderboard stores completion time (bitirme süresi).
@@ -110,6 +112,25 @@ export async function saveScore(
     const finalScore = Math.round(score);
     const now = Date.now();
 
+    /** Wix’in yazdığı profil; yalnızca GET. Yoksa snapshot’tan gelen avatarUrl kullanılır. */
+    let resolvedAvatarUrl: string | null =
+      typeof avatarUrl === "string" && avatarUrl.trim() ? avatarUrl.trim() : null;
+    if (finalMemberId?.trim()) {
+      try {
+        const userKey = finalMemberId.trim().replace(/[.#$/\[\]]/g, "_");
+        const userReadRef = ref(db, `${USERS_READ_PATH}/${userKey}`);
+        const userSnap = await get(userReadRef);
+        if (userSnap.exists()) {
+          const u = userSnap.val() as { avatarUrl?: unknown };
+          if (typeof u?.avatarUrl === "string" && u.avatarUrl.trim()) {
+            resolvedAvatarUrl = u.avatarUrl.trim();
+          }
+        }
+      } catch (e) {
+        console.warn("[saveScore] users/{memberId} avatar read failed", e);
+      }
+    }
+
     console.log("[saveScore] snapshot score", {
       oldAttemptCount,
       attemptCount,
@@ -170,7 +191,7 @@ export async function saveScore(
     const statsUpdatePayload: Record<string, unknown> = {
       memberId: safeMemberId || null,
       playerName: playerName.trim(),
-      avatarUrl: avatarUrl ?? null,
+      avatarUrl: resolvedAvatarUrl,
       type,
       game: safeGameKey,
       attemptCount,
@@ -195,7 +216,7 @@ export async function saveScore(
         memberId: finalMemberId ?? null,
         name: playerName.trim(),
         playerName: playerName.trim(),
-        avatarUrl: avatarUrl ?? null,
+        avatarUrl: resolvedAvatarUrl,
         score: finalScore,
         time: completionTimeSeconds,
         mistakes,
@@ -250,7 +271,7 @@ export async function saveScore(
           memberId: safeMemberId || null,
           name: playerName.trim(),
           playerName: playerName.trim(),
-          avatarUrl: avatarUrl ?? null,
+          avatarUrl: resolvedAvatarUrl,
           totalScore,
           gamesPlayed,
           updatedAt: now,

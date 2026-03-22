@@ -33,6 +33,24 @@ const MAP_SEGMENTS: { id: number; top: number; left: number; width: number; heig
   { id: 6, top: 55, left: 69, width: 26, height: 40 },
 ];
 
+function MapLockIcon({ className }: { className?: string }) {
+  return (
+    <svg
+      className={className}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={2}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden
+    >
+      <rect x="5" y="11" width="14" height="10" rx="2" />
+      <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+    </svg>
+  );
+}
+
 interface HubClientProps {
   slug: string;
   gameTitle: string;
@@ -171,12 +189,13 @@ export default function HubClient({
             return (
               <div
                 key={roomId}
-                className="pointer-events-none absolute flex items-center justify-center rounded-md border border-purple-500/10 bg-transparent opacity-60"
+                className="pointer-events-none absolute flex min-h-[44px] min-w-[44px] flex-col items-center justify-center gap-1 rounded-md border border-amber-400/25 bg-transparent shadow-[0_0_14px_rgba(251,191,36,0.08)]"
                 style={style}
                 title="Kilitli"
                 aria-hidden
               >
-                <span className="text-2xl font-bold text-zinc-500">{roomId}</span>
+                <MapLockIcon className="h-10 w-10 text-amber-200/45" />
+                <span className="text-sm font-bold tabular-nums text-zinc-500">{roomId}</span>
               </div>
             );
           }
@@ -184,9 +203,9 @@ export default function HubClient({
             <Link
               key={roomId}
               href={`/game/${slug}/room/${roomId}`}
-              className={`absolute flex min-h-[44px] min-w-[44px] items-center justify-center rounded-md border border-purple-500/20 bg-transparent text-2xl font-bold text-white transition-colors duration-200 touch-manipulation hover:border-purple-500 hover:bg-purple-500/10 ${
+              className={`absolute flex min-h-[44px] min-w-[44px] items-center justify-center rounded-md border border-amber-400/30 bg-transparent text-2xl font-bold text-white shadow-none transition-all duration-200 touch-manipulation hover:border-amber-400 hover:bg-amber-400/10 hover:shadow-[0_0_22px_rgba(251,191,36,0.35)] active:scale-[0.98] ${
                 active ? "ring-2 ring-amber-400/80 ring-offset-2 ring-offset-zinc-950/90" : ""
-              } ${solved ? "border-emerald-500/35" : ""}`}
+              } ${solved ? "border-emerald-500/40" : ""}`}
               style={style}
               aria-label={`${room.title} - ${t.goToRoom}`}
               title={room.title}
@@ -225,7 +244,7 @@ export default function HubClient({
           ref={leftColumnRef}
           className="flex min-h-0 w-full flex-1 flex-col gap-4 overflow-y-auto overscroll-y-contain px-4 pb-6 sm:gap-5 sm:px-6 sm:pb-8 md:min-w-0 md:flex-[1.4] md:pl-6 md:pr-4 lg:flex-[1.5] lg:pl-8 lg:pr-6"
         >
-          <section className="flex flex-row flex-wrap items-center justify-center gap-3 rounded-xl border border-zinc-700/60 bg-zinc-900/50 px-4 py-3 sm:gap-4 sm:px-5 sm:py-3.5">
+          <section className="flex flex-row flex-wrap items-center justify-center gap-3 rounded-xl border border-amber-900/45 bg-zinc-900/50 px-4 py-3 sm:gap-4 sm:px-5 sm:py-3.5">
             <CountdownTimer
               slug={slug}
               initialMinutes={durationMinutes}
@@ -238,8 +257,8 @@ export default function HubClient({
           </section>
 
           {/* Mobilde: metin panelinden önce; img + şeffaf yüzde kutular (SVG yok) */}
-          <section className="w-full shrink-0 overflow-hidden rounded-lg border border-zinc-800/50 bg-zinc-900/40 md:hidden">
-            <h2 className="border-b border-zinc-700/50 px-4 py-3 text-sm font-semibold uppercase tracking-wider text-amber-500/90">
+          <section className="w-full shrink-0 overflow-hidden rounded-lg border border-amber-900/40 bg-zinc-900/40 md:hidden">
+            <h2 className="border-b border-amber-900/35 px-4 py-3 text-sm font-semibold uppercase tracking-wider text-amber-500/90">
               {t.map}
             </h2>
             <div className="bg-zinc-900/50 p-2">
@@ -249,7 +268,7 @@ export default function HubClient({
             </div>
           </section>
 
-          <section className="w-full rounded-lg border border-zinc-800/50 bg-zinc-900/30 px-4 py-3 sm:px-6 sm:py-4">
+          <section className="w-full rounded-lg border border-amber-900/35 bg-zinc-900/30 px-4 py-3 sm:px-6 sm:py-4">
             <h2 className="mb-2 text-sm font-semibold uppercase tracking-wider text-amber-500/90">
               {t.story}
             </h2>
@@ -266,7 +285,10 @@ export default function HubClient({
             </div>
           </section>
 
-          <section className="w-full rounded-lg border border-zinc-800/50 bg-zinc-900/40 px-4 py-3 sm:px-6 sm:py-4" aria-label="Oda ilerleme durumu">
+          <section
+            className="w-full rounded-lg border border-amber-900/35 bg-zinc-900/40 px-4 py-3 sm:px-6 sm:py-4"
+            aria-label="Oda ilerleme durumu"
+          >
             <h2 className="mb-3 text-sm font-semibold uppercase tracking-wider text-amber-500/90">
               {t.rooms}
             </h2>
@@ -283,7 +305,7 @@ export default function HubClient({
                   unlocked
                     ? solved
                       ? "border-emerald-700/50 bg-emerald-950/20 cursor-pointer hover:bg-emerald-950/30 transition-colors"
-                      : "border-zinc-700 bg-zinc-800/50 cursor-pointer hover:bg-zinc-800 transition-colors"
+                      : "border-amber-800/40 bg-zinc-800/50 cursor-pointer hover:border-amber-600/35 hover:bg-zinc-800 transition-colors"
                     : "border-zinc-700/50 bg-zinc-800/30 opacity-60 cursor-default"
                 }`;
                 const content = (
@@ -379,7 +401,7 @@ export default function HubClient({
 
         {/* Sağ: relative + h-full; harita img object-cover, önde şeffaf yüzde kutular */}
         <aside className="relative hidden min-h-0 md:flex md:h-full md:w-[38%] md:shrink-0 lg:w-[42%] xl:max-w-[520px]">
-          <div className="sticky top-0 flex h-full min-h-0 w-full flex-col border-l border-zinc-800/50 bg-zinc-950/95">
+          <div className="sticky top-0 flex h-full min-h-0 w-full flex-col border-l border-amber-900/40 bg-zinc-950/95">
             <div className="relative flex min-h-0 flex-1 overflow-hidden p-3 lg:p-5">
               {mapContent}
             </div>

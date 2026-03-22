@@ -80,137 +80,23 @@ interface ResultClientProps {
 const DEFAULT_DETECTIVE_AVATAR =
   "https://cdn-icons-png.flaticon.com/512/3135/3135715.png";
 
-type UsersAvatarLookups = {
-  byMemberId: Record<string, string>;
-  byPlayerName: Record<string, string>;
-  /** Harita anahtarı kaçırırsa: trim + tr-TR küçük harf ile doğrusal tam eşleşme */
-  nameMatchRows: { displayName: string; url: string }[];
-};
-
-type FirebaseUserRow = {
-  memberId?: string | null;
-  playerName?: string | null;
-  name?: string | null;
-  avatarUrl?: string | null;
-};
-
-/**
- * Oyuncu adı eşlemesi: sadece trim + Türkçe yerel küçük harf.
- * İngilizce toLowerCase() ı/İ hatalarına yol açmaz; ş/ğ vb. korunur.
- */
-function playerDisplayNameLookupKey(value: string): string {
-  return value.trim().toLocaleLowerCase("tr-TR");
+/** Avatar saveScore ile leaderboard satırına yazılır; UI sadece row.avatarUrl kullanır. */
+function avatarFromLeaderboardRow(url: string | null | undefined): string {
+  const t = typeof url === "string" ? url.trim() : "";
+  return t || DEFAULT_DETECTIVE_AVATAR;
 }
 
-function registerMemberIdKeys(map: Record<string, string>, id: string, url: string) {
-  const t = id.trim();
-  if (!t) return;
-  map[t] = url;
-  map[t.toLowerCase()] = url;
-}
-
-function pathKeyLooksLikeMemberId(key: string): boolean {
-  if (
-    /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(key)
-  ) {
-    return true;
-  }
-  return /^[A-Za-z0-9_-]{16,}$/.test(key);
-}
-
-/**
- * Tek GET ile tüm users.json okunur; avatar eşlemesi memberId öncelikli, yoksa oyuncu adı ile.
- */
-async function fetchUsersAvatarLookups(): Promise<UsersAvatarLookups> {
-  const byMemberId: Record<string, string> = {};
-  const byPlayerName: Record<string, string> = {};
-  const nameMatchRows: { displayName: string; url: string }[] = [];
-  try {
-    const res = await fetch(`${FIREBASE_DB_BASE}/users.json`);
-    if (!res.ok) return { byMemberId, byPlayerName, nameMatchRows };
-    const data = (await res.json()) as Record<string, FirebaseUserRow> | null;
-    if (!data || typeof data !== "object") return { byMemberId, byPlayerName, nameMatchRows };
-
-    for (const [pathKey, row] of Object.entries(data)) {
-      if (!row || typeof row !== "object") continue;
-      const url =
-        typeof row.avatarUrl === "string" && row.avatarUrl.trim() ? row.avatarUrl.trim() : null;
-      if (!url) continue;
-
-      registerMemberIdKeys(byMemberId, pathKey, url);
-      const mid =
-        typeof row.memberId === "string" && row.memberId.trim() ? row.memberId.trim() : null;
-      if (mid) registerMemberIdKeys(byMemberId, mid, url);
-
-      const pn = typeof row.playerName === "string" ? row.playerName.trim() : "";
-      const nm = typeof row.name === "string" ? row.name.trim() : "";
-      const seenNameKeys = new Set<string>();
-      for (const displayName of [pn, nm].filter(Boolean)) {
-        const nk = playerDisplayNameLookupKey(displayName);
-        byPlayerName[nk] = url;
-        if (!seenNameKeys.has(nk)) {
-          seenNameKeys.add(nk);
-          nameMatchRows.push({ displayName, url });
-        }
-      }
-
-      if (pathKey && !pathKeyLooksLikeMemberId(pathKey)) {
-        const spaced = pathKey.replace(/_/g, " ");
-        byPlayerName[playerDisplayNameLookupKey(spaced)] = url;
-        byPlayerName[playerDisplayNameLookupKey(pathKey)] = url;
-      }
-    }
-  } catch {
-    // ignore; caller falls back to default avatar
-  }
-  return { byMemberId, byPlayerName, nameMatchRows };
-}
-
-function findAvatarByDisplayNameTr(lookups: UsersAvatarLookups, rawName: string): string | null {
-  const trimmed = rawName.trim();
-  if (!trimmed) return null;
-  const key = playerDisplayNameLookupKey(trimmed);
-  const fromMap = lookups.byPlayerName[key];
-  if (fromMap) return fromMap;
-  const want = playerDisplayNameLookupKey(trimmed);
-  for (const { displayName, url } of lookups.nameMatchRows) {
-    if (playerDisplayNameLookupKey(displayName) === want) return url;
-  }
-  return null;
-}
-
-function resolveAvatarUrl(
-  lookups: UsersAvatarLookups,
-  opts: {
-    rowAvatarUrl?: string | null;
-    memberId?: string | null;
-    displayName: string;
-    /** Ek aday isimler (ör. leaderboard playerName vs name) */
-    alternateNames?: (string | null | undefined)[];
-  }
+/** Aktif oyuncu: önce aynı memberId’li leaderboard satırı (saveScore sonrası güncel), yoksa snapshot. */
+function activePlayerAvatarUrl(
+  result: FinalGameResult,
+  leaderboard: LeaderboardEntry[] | null
 ): string {
-  const fromRow =
-    typeof opts.rowAvatarUrl === "string" && opts.rowAvatarUrl.trim()
-      ? opts.rowAvatarUrl.trim()
-      : null;
-  if (fromRow) return fromRow;
-
-  const mid =
-    typeof opts.memberId === "string" && opts.memberId.trim() ? opts.memberId.trim() : null;
-  if (mid) {
-    const fromId =
-      lookups.byMemberId[mid] ?? lookups.byMemberId[mid.toLowerCase()] ?? null;
-    if (fromId) return fromId;
+  const mid = result.memberId?.trim();
+  if (mid && leaderboard?.length) {
+    const row = leaderboard.find((e) => e.memberId?.trim() === mid);
+    if (row) return avatarFromLeaderboardRow(row.avatarUrl);
   }
-
-  const nameCandidates = [opts.displayName, ...(opts.alternateNames ?? [])];
-  for (const candidate of nameCandidates) {
-    if (typeof candidate !== "string" || !candidate.trim()) continue;
-    const hit = findAvatarByDisplayNameTr(lookups, candidate);
-    if (hit) return hit;
-  }
-
-  return DEFAULT_DETECTIVE_AVATAR;
+  return avatarFromLeaderboardRow(result.avatarUrl);
 }
 
 function formatTime(seconds: number): string {
@@ -373,11 +259,7 @@ export default function ResultClient({
     type: "escape_room",
     gameKey: slug,
   });
-  const [usersAvatarLookups, setUsersAvatarLookups] = useState<UsersAvatarLookups>({
-    byMemberId: {},
-    byPlayerName: {},
-    nameMatchRows: [],
-  });
+  const [leaderboardRefreshKey, setLeaderboardRefreshKey] = useState(0);
   const scoreSavedRef = useRef(false);
 
   useEffect(() => {
@@ -411,23 +293,12 @@ export default function ResultClient({
           finalResult.memberId ?? null,
           finalResult.avatarUrl ?? null
         );
+        setLeaderboardRefreshKey((k) => k + 1);
       } catch {
         // ignore
       }
     })();
   }, [finalResult]);
-
-  useEffect(() => {
-    if (!escaped) return;
-    let cancelled = false;
-    (async () => {
-      const lookups = await fetchUsersAvatarLookups();
-      if (!cancelled) setUsersAvatarLookups(lookups);
-    })();
-    return () => {
-      cancelled = true;
-    };
-  }, [escaped]);
 
   useEffect(() => {
     if (!escaped) return;
@@ -449,7 +320,7 @@ export default function ResultClient({
     return () => {
       cancelled = true;
     };
-  }, [escaped, leaderboardFilter]);
+  }, [escaped, leaderboardFilter, leaderboardRefreshKey]);
 
   if (escaped === null || !escaped) {
     return (
@@ -469,11 +340,7 @@ export default function ResultClient({
 
   const storyText = endStoryLong ?? tResult.endStory;
 
-  const activePlayerAvatarSrc = resolveAvatarUrl(usersAvatarLookups, {
-    rowAvatarUrl: finalResult.avatarUrl,
-    memberId: finalResult.memberId ?? null,
-    displayName: finalResult.playerName,
-  });
+  const activePlayerAvatarSrc = activePlayerAvatarUrl(finalResult, leaderboard);
 
   const backUrl = mainPageUrl ?? wixUrl;
   const backLabel = mainPageUrl ? tResult.backToMain : tResult.backToWix;
@@ -499,7 +366,7 @@ export default function ResultClient({
                 <img
                   src={encodeURI(activePlayerAvatarSrc)}
                   alt=""
-                  className="h-9 w-9 shrink-0 rounded-full border border-purple-500/50 object-cover"
+                  className="h-9 w-9 shrink-0 rounded-full border border-amber-500/45 object-cover"
                   loading="lazy"
                 />
                 <span>
@@ -612,16 +479,9 @@ export default function ResultClient({
                       >
                         <span className="flex items-center gap-2 font-medium text-zinc-200">
                           <img
-                            src={encodeURI(
-                              resolveAvatarUrl(usersAvatarLookups, {
-                                rowAvatarUrl: entry.avatarUrl,
-                                memberId: entry.memberId ?? null,
-                                displayName: entry.name,
-                                alternateNames: [entry.playerName],
-                              })
-                            )}
+                            src={encodeURI(avatarFromLeaderboardRow(entry.avatarUrl))}
                             alt=""
-                            className="h-8 w-8 shrink-0 rounded-full border border-purple-500/50 object-cover"
+                            className="h-8 w-8 shrink-0 rounded-full border border-amber-500/45 object-cover"
                             loading="lazy"
                           />
                           {i + 1}. {entry.name}
