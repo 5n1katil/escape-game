@@ -1,12 +1,6 @@
 "use client";
 
-import {
-  useCallback,
-  useId,
-  useMemo,
-  useState,
-  type ReactElement,
-} from "react";
+import { useCallback, useId, useState } from "react";
 
 export interface NeuralFlowPuzzleProps {
   onSolve: () => void;
@@ -20,11 +14,14 @@ const DC = [0, 1, 0, -1] as const;
 
 type TileKind = "straight" | "L" | "T" | "cross";
 
-/** Open sides at rotation 0 (before CW rotation steps). */
+/** Each cell: kind + rot (0,1,2,3 = 0°,90°,180°,270°). */
+type CellState = { kind: TileKind; rot: number };
+
+/** Open sides at rotation 0. T has stem down = E,S,W. */
 const BASE_OPEN: Record<TileKind, readonly number[]> = {
   straight: [0, 2],
   L: [0, 1],
-  T: [0, 1, 3],
+  T: [1, 2, 3],
   cross: [0, 1, 2, 3],
 };
 
@@ -32,11 +29,9 @@ function openSides(kind: TileKind, rot: number): number[] {
   return BASE_OPEN[kind].map((d) => (d + rot) % 4);
 }
 
-function pathConnectsInputToOutput(
-  kinds: TileKind[][],
-  rots: number[][]
-): boolean {
-  if (!openSides(kinds[0][0], rots[0][0]).includes(0)) return false;
+function pathConnectsInputToOutput(grid: CellState[][]): boolean {
+  const cell = grid[0]?.[0];
+  if (!cell || !openSides(cell.kind, cell.rot).includes(0)) return false;
 
   const visited = new Set<string>();
   const queue: [number, number][] = [[0, 0]];
@@ -47,7 +42,9 @@ function pathConnectsInputToOutput(
     if (visited.has(key)) continue;
     visited.add(key);
 
-    const sides = openSides(kinds[r][c], rots[r][c]);
+    const cell = grid[r]?.[c];
+    if (!cell) continue;
+    const sides = openSides(cell.kind, cell.rot);
 
     if (r === SIZE - 1 && c === SIZE - 1) {
       if (sides.includes(2)) return true;
@@ -58,8 +55,10 @@ function pathConnectsInputToOutput(
       const nr = r + DR[d];
       const nc = c + DC[d];
       if (nr < 0 || nr >= SIZE || nc < 0 || nc >= SIZE) continue;
+      const ncell = grid[nr]?.[nc];
+      if (!ncell) continue;
       const opp = (d + 2) % 4;
-      if (!openSides(kinds[nr][nc], rots[nr][nc]).includes(opp)) continue;
+      if (!openSides(ncell.kind, ncell.rot).includes(opp)) continue;
       queue.push([nr, nc]);
     }
   }
@@ -67,120 +66,96 @@ function pathConnectsInputToOutput(
   return false;
 }
 
-/**
- * Fully populated 5x5 grid. Path: (0,0)→top row→(0,4)→right col→(4,4).
- * Off-path cells use straight, L, T, cross as decoys; rotations ensure they don't
- * accidentally connect to the solution path in the solved state.
- */
-const SOL_KIND: TileKind[][] = [
-  ["L", "straight", "straight", "straight", "L"],
-  ["straight", "T", "L", "straight", "straight"],
-  ["straight", "cross", "cross", "L", "straight"],
-  ["L", "straight", "T", "L", "straight"],
-  ["straight", "straight", "straight", "straight", "straight"],
+/** Brute-force hardcoded 5x5 grid. All 25 cells explicitly defined. Path: (0,0)→(1,0)→(2,0)→(2,1)→...→(4,4). Scrambled. */
+const INITIAL_GRID: CellState[][] = [
+  [
+    { kind: "straight", rot: 1 },
+    { kind: "L", rot: 2 },
+    { kind: "T", rot: 3 },
+    { kind: "cross", rot: 0 },
+    { kind: "L", rot: 1 },
+  ],
+  [
+    { kind: "straight", rot: 2 },
+    { kind: "cross", rot: 2 },
+    { kind: "L", rot: 0 },
+    { kind: "T", rot: 1 },
+    { kind: "straight", rot: 3 },
+  ],
+  [
+    { kind: "L", rot: 3 },
+    { kind: "straight", rot: 0 },
+    { kind: "straight", rot: 0 },
+    { kind: "straight", rot: 0 },
+    { kind: "L", rot: 1 },
+  ],
+  [
+    { kind: "T", rot: 0 },
+    { kind: "L", rot: 2 },
+    { kind: "cross", rot: 1 },
+    { kind: "straight", rot: 2 },
+    { kind: "straight", rot: 1 },
+  ],
+  [
+    { kind: "L", rot: 2 },
+    { kind: "straight", rot: 1 },
+    { kind: "T", rot: 2 },
+    { kind: "L", rot: 0 },
+    { kind: "straight", rot: 2 },
+  ],
 ];
 
-const SOL_ROT: number[][] = [
-  [0, 1, 1, 1, 2],
-  [0, 2, 1, 0, 0],
-  [0, 0, 0, 3, 0],
-  [2, 0, 2, 3, 0],
-  [0, 0, 0, 0, 0],
-];
-
-function scrambleRotations(): number[][] {
-  return SOL_ROT.map((row) =>
-    row.map((sol) => {
-      const bump = 1 + Math.floor(Math.random() * 3);
-      return (sol + bump) % 4;
-    })
-  );
-}
-
-const STROKE_COLOR = "#22d3ee";
-const STROKE_WIDTH = 12;
-
-/** SVG pipe segments — each tile has its own defs to guarantee rendering. */
-function TileSvg({
-  kind,
-  rot,
-  uniqueId,
-}: {
-  kind: TileKind;
-  rot: number;
-  uniqueId: string;
-}) {
-  const glowId = `${uniqueId}-glow`;
+/** Bulletproof SVG paths — full extent 0–100, bright cyan, no filter. */
+function TileSvg({ kind, rot }: { kind: TileKind; rot: number }) {
   const pathProps = {
     fill: "none" as const,
-    stroke: STROKE_COLOR,
-    strokeWidth: STROKE_WIDTH,
+    stroke: "#22d3ee" as const,
+    strokeWidth: 8,
     strokeLinecap: "round" as const,
     strokeLinejoin: "round" as const,
-    filter: `url(#${glowId})`,
   };
-  let paths: ReactElement | ReactElement[];
-  switch (kind) {
-    case "straight":
-      paths = <path d="M 50 8 L 50 92" {...pathProps} />;
-      break;
-    case "L":
-      paths = <path d="M 50 8 L 50 50 L 92 50" {...pathProps} />;
-      break;
-    case "T":
-      paths = [
-        <path key="h" d="M 8 50 L 92 50" {...pathProps} />,
-        <path key="v" d="M 50 8 L 50 50" {...pathProps} />,
-      ];
-      break;
-    case "cross":
-    default:
-      paths = [
-        <path key="v" d="M 50 8 L 50 92" {...pathProps} />,
-        <path key="h" d="M 8 50 L 92 50" {...pathProps} />,
-      ];
-      break;
-  }
+
+  const dMap: Record<TileKind, string> = {
+    straight: "M 50 0 L 50 100",
+    L: "M 50 0 L 50 50 L 100 50",
+    T: "M 0 50 L 100 50 M 50 50 L 50 100",
+    cross: "M 50 0 L 50 100 M 0 50 L 100 50",
+  };
 
   return (
     <svg viewBox="0 0 100 100" className="h-full w-full" aria-hidden preserveAspectRatio="xMidYMid meet">
-      <defs>
-        <filter id={glowId} x="-80%" y="-80%" width="260%" height="260%" colorInterpolationFilters="sRGB">
-          <feGaussianBlur in="SourceGraphic" stdDeviation="3" result="blur" />
-          <feMerge>
-            <feMergeNode in="blur" />
-            <feMergeNode in="SourceGraphic" />
-          </feMerge>
-        </filter>
-      </defs>
       <g
         transform={`rotate(${rot * 90} 50 50)`}
         className="transition-transform duration-300 ease-out"
       >
-        {paths}
+        <path d={dMap[kind] ?? dMap.cross} {...pathProps} />
       </g>
     </svg>
   );
 }
 
+/** Deep clone for immutable updates. */
+function cloneGrid(grid: CellState[][]): CellState[][] {
+  return grid.map((row) => row.map((cell) => ({ kind: cell.kind, rot: cell.rot })));
+}
+
 export default function NeuralFlowPuzzle({ onSolve, onWrong }: NeuralFlowPuzzleProps) {
   const baseId = useId().replace(/:/g, "");
 
-  const [rots, setRots] = useState<number[][]>(() => scrambleRotations());
+  const [grid, setGrid] = useState<CellState[][]>(() => cloneGrid(INITIAL_GRID));
   const [error, setError] = useState<string | null>(null);
   const [solved, setSolved] = useState(false);
-
-  const kinds = useMemo(() => SOL_KIND, []);
 
   const rotateCell = useCallback(
     (r: number, c: number) => {
       if (solved) return;
       setError(null);
-      setRots((prev) =>
-        prev.map((row, ri) =>
-          ri === r ? row.map((v, ci) => (ci === c ? (v + 1) % 4 : v)) : row
-        )
-      );
+      setGrid((prev) => {
+        const next = cloneGrid(prev);
+        const cell = next[r]?.[c];
+        if (cell) cell.rot = (cell.rot + 1) % 4;
+        return next;
+      });
     },
     [solved]
   );
@@ -189,7 +164,7 @@ export default function NeuralFlowPuzzle({ onSolve, onWrong }: NeuralFlowPuzzleP
     if (solved) return;
     setError(null);
 
-    if (pathConnectsInputToOutput(kinds, rots)) {
+    if (pathConnectsInputToOutput(grid)) {
       setSolved(true);
       onSolve();
     } else {
@@ -198,7 +173,7 @@ export default function NeuralFlowPuzzle({ onSolve, onWrong }: NeuralFlowPuzzleP
       );
       onWrong?.();
     }
-  }, [solved, kinds, rots, onSolve, onWrong]);
+  }, [solved, grid, onSolve, onWrong]);
 
   return (
     <div className="space-y-5 rounded-xl border border-cyan-500/35 bg-slate-950/90 p-3 shadow-[0_0_40px_rgba(6,182,212,0.08)] sm:p-5">
@@ -231,8 +206,7 @@ export default function NeuralFlowPuzzle({ onSolve, onWrong }: NeuralFlowPuzzleP
         >
           {Array.from({ length: SIZE }, (_, r) =>
             Array.from({ length: SIZE }, (_, c) => {
-              const kind: TileKind = kinds[r]?.[c] ?? "cross";
-              const rot = rots[r]?.[c] ?? 0;
+              const cell = grid[r]?.[c] ?? { kind: "cross" as TileKind, rot: 0 };
               const tileId = `${baseId}-${r}-${c}`;
               return (
                 <button
@@ -244,7 +218,7 @@ export default function NeuralFlowPuzzle({ onSolve, onWrong }: NeuralFlowPuzzleP
                   className="relative aspect-square min-h-0 min-w-0 touch-manipulation rounded-md border border-cyan-500/20 bg-slate-950/95 shadow-inner shadow-black/40 transition-[border-color,box-shadow] hover:border-cyan-400/55 hover:shadow-[0_0_16px_rgba(34,211,238,0.2)] active:scale-[0.97] disabled:pointer-events-none disabled:opacity-60"
                   aria-label={`Nöral segment ${r + 1}-${c + 1}, döndürmek için tıklayın`}
                 >
-                  <TileSvg kind={kind} rot={rot} uniqueId={tileId} />
+                  <TileSvg kind={cell.kind} rot={cell.rot} />
                 </button>
               );
             })
