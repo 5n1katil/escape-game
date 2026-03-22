@@ -129,7 +129,7 @@ export default function TempleMap({
     "text-sm font-extrabold tabular-nums text-amber-100 drop-shadow-[0_1px_4px_rgba(0,0,0,0.9)] sm:text-base";
 
   const openBaseClass =
-    "map-room-open absolute flex min-h-[44px] min-w-[44px] items-center justify-center rounded-md border-2 border-amber-300/95 bg-black/25 text-2xl font-black tabular-nums text-white touch-manipulation transition-transform duration-150 outline-none focus-visible:ring-2 focus-visible:ring-amber-400 focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-950 sm:text-3xl";
+    "map-room-open absolute flex min-h-[44px] min-w-[44px] items-center justify-center rounded-md border-2 border-amber-300/95 bg-black/25 text-2xl font-black tabular-nums text-white touch-manipulation outline-none transition-all duration-300 hover:animate-none hover:!border-amber-500 hover:!bg-amber-500/30 hover:shadow-[0_0_25px_rgba(245,158,11,0.9)] focus-visible:animate-none focus-visible:!border-amber-500 focus-visible:!bg-amber-500/30 focus-visible:shadow-[0_0_25px_rgba(245,158,11,0.9)] focus-visible:ring-2 focus-visible:ring-amber-400 focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-950 sm:text-3xl";
 
   const openActiveExtra =
     "ring-2 ring-amber-300 ring-offset-2 ring-offset-zinc-950/80 z-[1]";

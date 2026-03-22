@@ -156,23 +156,9 @@ body {
   animation: map-room-solved-glow 2.1s ease-in-out infinite;
 }
 
-.map-room-open:hover,
-.map-room-open:focus-visible {
-  animation-duration: 0.85s;
-  filter: drop-shadow(0 0 24px rgba(251, 191, 36, 0.9)) !important;
-}
-
-.map-room-open:active {
-  animation-duration: 0.5s;
-}
-
 @media (prefers-reduced-motion: reduce) {
   .map-room-open-pulse,
   .map-room-solved-pulse {
     animation: none;
-  }
-  .map-room-open:hover,
-  .map-room-open:focus-visible {
-    filter: drop-shadow(0 0 16px rgba(251, 191, 36, 0.65));
   }
 }
