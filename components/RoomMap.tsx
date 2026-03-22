@@ -9,8 +9,11 @@ interface RoomMapProps {
   slug: string;
   currentRoomIndex: number;
   rooms: readonly Room[];
-  /** `slim`: ince sağ sütun (oda ekranı taktik paneli). */
-  density?: "default" | "slim";
+  /**
+   * `slim`: dar dikey liste.
+   * `sidebar`: oda ekranı — ikon + çok satırlı başlık, geniş sütun için.
+   */
+  density?: "default" | "slim" | "sidebar";
 }
 
 type RoomState = "locked" | "current" | "solved" | "available";
@@ -33,6 +36,7 @@ export default function RoomMap({
   density = "default",
 }: RoomMapProps) {
   const slim = density === "slim";
+  const sidebar = density === "sidebar";
   const [maxSolved, setMaxSolved] = useState(-1);
   const [mounted, setMounted] = useState(false);
 
@@ -64,11 +68,113 @@ export default function RoomMap({
     return (
       <div
         className={`flex w-full items-center justify-center rounded-xl border border-zinc-800/50 bg-zinc-900/40 ${
-          slim ? "h-[160px]" : "h-[200px] md:min-h-[240px]"
+          sidebar ? "min-h-[200px]" : slim ? "h-[160px]" : "h-[200px] md:min-h-[240px]"
         }`}
       >
         <div className="h-6 w-6 animate-pulse rounded bg-zinc-700" />
       </div>
+    );
+  }
+
+  function cellClass(state: RoomState, canNavigate: boolean, compact: boolean) {
+    const size = compact ? "h-9 w-9 text-base" : "h-10 w-10 text-lg md:h-11 md:w-11";
+    return `flex shrink-0 items-center justify-center rounded-lg border-2 ${size} ${
+      state === "locked"
+        ? "cursor-default border-zinc-700 bg-zinc-800/50 text-zinc-600 opacity-60"
+        : state === "current"
+          ? "border-amber-500 bg-amber-500/20 text-amber-400 ring-2 ring-amber-500/40"
+          : state === "solved"
+            ? "border-emerald-700/60 bg-emerald-950/40 text-emerald-400"
+            : "border-amber-500/60 bg-amber-950/30 text-amber-400/90"
+    } ${canNavigate ? "cursor-pointer" : ""}`;
+  }
+
+  const hubLinkClass =
+    "mt-4 flex w-full min-h-[44px] items-center justify-center rounded-lg border border-amber-700/50 bg-amber-950/30 px-3 py-2.5 text-center text-sm font-medium text-amber-200/90 transition-colors duration-200 hover:bg-amber-900/40 hover:text-amber-100";
+
+  if (sidebar) {
+    return (
+      <aside
+        className="flex flex-col rounded-xl border border-zinc-800/60 bg-zinc-900/50 px-3 py-4 ring-1 ring-amber-950/30 sm:px-4"
+        aria-label="Oda ilerleme durumu"
+      >
+        <h3 className="mb-3 text-center text-xs font-semibold uppercase tracking-wider text-amber-500/90 sm:text-sm">
+          İlerleme
+        </h3>
+
+        <div className="flex flex-col gap-0" role="list" aria-label="Oda durumları">
+          {rooms.map((room, index) => {
+            const state = getRoomState(index, currentRoomIndex, maxSolved);
+            const canNavigate = state !== "locked";
+            const roomHref = `/game/${slug}/room/${room.id}`;
+            const titleClass = `text-left text-sm font-medium leading-snug tracking-normal break-words sm:text-[0.9375rem] ${
+              state === "locked" ? "text-zinc-500" : "text-zinc-200"
+            }`;
+
+            const rowInner = (
+              <>
+                <div className="flex w-11 shrink-0 flex-col items-center sm:w-12">
+                  <span
+                    className={cellClass(state, canNavigate, true)}
+                    title={
+                      state === "locked"
+                        ? "Kilitli"
+                        : state === "current"
+                          ? "Mevcut oda"
+                          : state === "solved"
+                            ? "Çözüldü"
+                            : "Açık"
+                    }
+                  >
+                    {state === "locked" ? "🔒" : state === "solved" ? "✓" : index + 1}
+                  </span>
+                  {index < rooms.length - 1 && (
+                    <div
+                      className={`my-1 min-h-[14px] w-0.5 flex-1 ${
+                        index <= maxSolved ? "bg-emerald-600/45" : "bg-zinc-700/55"
+                      }`}
+                      aria-hidden
+                    />
+                  )}
+                </div>
+                <div
+                  className={`min-w-0 flex-1 border-b border-zinc-800/40 py-1.5 pl-0 pr-1 sm:py-2 ${
+                    state === "current" ? "rounded-r-lg bg-amber-500/5 pr-2 ring-1 ring-amber-500/20" : ""
+                  }`}
+                >
+                  {canNavigate ? (
+                    <Link
+                      href={roomHref}
+                      className={`block transition-colors duration-200 hover:text-amber-200 ${titleClass}`}
+                      aria-label={`${room.title}: ${state === "solved" ? "Çözüldü" : state === "current" ? "Mevcut oda" : "Açık"} - Odaya git`}
+                    >
+                      {room.title}
+                    </Link>
+                  ) : (
+                    <span className={`block ${titleClass}`} aria-label={`${room.title}: Kilitli`}>
+                      {room.title}
+                    </span>
+                  )}
+                </div>
+              </>
+            );
+
+            return (
+              <div
+                key={room.id}
+                role="listitem"
+                className="flex w-full min-w-0 gap-1 sm:gap-2"
+              >
+                {rowInner}
+              </div>
+            );
+          })}
+        </div>
+
+        <Link href={`/game/${slug}/hub`} className={hubLinkClass}>
+          Ana Ekrana Dön
+        </Link>
+      </aside>
     );
   }
 

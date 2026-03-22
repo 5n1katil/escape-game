@@ -474,7 +474,7 @@ export default function EscapeRoomGame({
           <audio
             controls
             src={encodeURI(currentRoom.audioSrc)}
-            className="h-10 flex-1 min-w-0 max-w-full"
+            className="h-10 min-h-[40px] flex-1 min-w-0 max-w-full rounded-md border border-zinc-600/50 bg-zinc-900/60"
             preload="metadata"
           >
             {t.audioLabel}

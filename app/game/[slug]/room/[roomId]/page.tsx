@@ -48,8 +48,8 @@ export default async function RoomPage({ params }: RoomPageProps) {
           <RestartButton slug={slug} label={t.room.restartGame} />
         </header>
 
-        <div className="relative z-10 mx-auto max-w-6xl px-4 pb-24 pt-6 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 gap-8 md:grid-cols-[minmax(0,1fr)_10.5rem] md:items-start md:gap-6 lg:grid-cols-[minmax(0,1fr)_10rem] lg:gap-8">
+        <div className="relative z-10 mx-auto max-w-7xl px-4 pb-24 pt-6 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 gap-8 md:grid-cols-[minmax(0,1fr)_20rem] md:items-start md:gap-8 lg:grid-cols-[minmax(0,1fr)_22rem] xl:gap-10">
             <div className="min-w-0 md:col-start-1 md:row-start-1">
               <h1 className="mb-5 text-center text-xl font-bold tracking-tight text-white drop-shadow-lg sm:text-2xl md:mb-6 md:text-left md:text-3xl lg:text-4xl">
                 {game.title}
@@ -65,10 +65,10 @@ export default async function RoomPage({ params }: RoomPageProps) {
             </div>
 
             <aside
-              className="mx-auto w-full max-w-[260px] md:col-start-2 md:row-start-1 md:mx-0 md:max-w-none"
+              className="mx-auto w-full max-w-md md:col-start-2 md:row-start-1 md:mx-0 md:max-w-none"
               aria-label="Sayaç ve ilerleme"
             >
-              <div className="flex flex-col gap-3 md:sticky md:top-24 md:z-20 lg:top-28">
+              <div className="flex min-w-0 flex-col gap-4 md:sticky md:top-[5.25rem] md:z-20 lg:top-28 lg:gap-5">
                 <CountdownTimer
                   slug={slug}
                   initialMinutes={game.durationMinutes}
@@ -80,7 +80,7 @@ export default async function RoomPage({ params }: RoomPageProps) {
                   slug={slug}
                   currentRoomIndex={roomIndex}
                   rooms={rooms}
-                  density="slim"
+                  density="sidebar"
                 />
               </div>
             </aside>

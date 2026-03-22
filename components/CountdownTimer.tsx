@@ -68,37 +68,33 @@ export default function CountdownTimer({
   if (effectiveVariant === "tactical") {
     return (
       <div
-        className="tactical-hud-pulse relative overflow-hidden rounded-xl border-2 border-amber-500/55 bg-gradient-to-b from-zinc-900 via-zinc-950 to-black px-3 py-4 sm:px-4 sm:py-5"
+        className="tactical-hud-pulse relative w-full min-w-0 overflow-visible rounded-xl border-2 border-amber-500/55 bg-gradient-to-b from-zinc-900 via-zinc-950 to-black py-3 sm:py-4"
         aria-live="polite"
         aria-label={ariaLabel}
       >
-        <div
-          className="pointer-events-none absolute inset-0 rounded-[10px] bg-[linear-gradient(180deg,rgba(251,191,36,0.06)_0%,transparent_42%,rgba(0,0,0,0.4)_100%)]"
-          aria-hidden
-        />
-        <div
-          className="pointer-events-none absolute inset-x-3 top-0 h-px bg-gradient-to-r from-transparent via-amber-300/60 to-transparent sm:inset-x-5"
-          aria-hidden
-        />
-        <div
-          className="pointer-events-none absolute inset-0 rounded-xl ring-1 ring-amber-400/25 ring-inset"
-          aria-hidden
-        />
-        {label ? (
-          <p className="relative mb-3 text-center text-xs font-extrabold uppercase leading-tight tracking-[0.2em] text-amber-300 sm:mb-3.5 sm:text-sm sm:tracking-[0.24em]">
-            {label}
-          </p>
-        ) : null}
-        <div className="relative flex items-center justify-center py-0.5">
-          <span
-            className="font-mono text-[2.65rem] font-bold leading-none tabular-nums tracking-[0.08em] text-amber-50 sm:text-[3.1rem] md:text-[3.25rem]"
-            style={{
-              textShadow:
-                "0 0 22px rgba(251, 191, 36, 0.55), 0 0 48px rgba(245, 158, 11, 0.28), 0 2px 0 rgba(0,0,0,0.85)",
-            }}
-          >
-            {timeStr}
-          </span>
+        {/* Dekor katmanları ayrı: metin/glow kesilmesin */}
+        <div className="pointer-events-none absolute inset-0 overflow-hidden rounded-[10px]" aria-hidden>
+          <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(251,191,36,0.06)_0%,transparent_42%,rgba(0,0,0,0.4)_100%)]" />
+          <div className="absolute inset-x-3 top-0 h-px bg-gradient-to-r from-transparent via-amber-300/60 to-transparent sm:inset-x-4" />
+          <div className="absolute inset-0 rounded-xl ring-1 ring-amber-400/25 ring-inset" />
+        </div>
+        <div className="relative z-10 w-full min-w-0 px-2 sm:px-3">
+          {label ? (
+            <p className="mb-2 text-center text-[11px] font-extrabold uppercase leading-tight tracking-[0.14em] text-amber-300 sm:mb-2.5 sm:text-xs sm:tracking-[0.18em]">
+              {label}
+            </p>
+          ) : null}
+          <div className="flex w-full min-w-0 justify-center overflow-visible py-0.5">
+            <span
+              className="font-mono text-[clamp(1.65rem,4.2vw+0.6rem,2.35rem)] font-bold leading-none tabular-nums tracking-tight text-amber-50"
+              style={{
+                textShadow:
+                  "0 0 18px rgba(251, 191, 36, 0.5), 0 0 40px rgba(245, 158, 11, 0.22), 0 2px 0 rgba(0,0,0,0.85)",
+              }}
+            >
+              {timeStr}
+            </span>
+          </div>
         </div>
       </div>
     );
