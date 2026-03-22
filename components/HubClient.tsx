@@ -381,7 +381,7 @@ export default function HubClient({
                     onChange={(e) => setFinalInput(e.target.value)}
                     placeholder={t.finalCodePlaceholder}
                     autoComplete="off"
-                    className="w-full rounded-lg border border-amber-700/50 bg-zinc-900/80 px-4 py-3 text-white placeholder-zinc-500 focus:border-amber-500 focus:outline-none focus:ring-1 focus:ring-amber-500"
+                    className="w-full rounded-lg border-2 border-zinc-600/50 bg-black/40 px-4 py-3 text-zinc-100 shadow-inner shadow-black/25 placeholder:text-zinc-400 focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500/80 focus:ring-offset-2 focus:ring-offset-amber-950/50"
                   />
                   {finalError && (
                     <p className="mt-2 text-sm text-red-400" role="alert">
@@ -392,7 +392,7 @@ export default function HubClient({
                 <button
                   type="submit"
                   disabled={!finalInput.trim() || finalSubmitting}
-                  className="w-full rounded-lg bg-amber-600 py-3 text-lg font-semibold text-white transition-colors hover:bg-amber-500 disabled:cursor-not-allowed disabled:opacity-50"
+                  className="w-full rounded-lg bg-amber-600 py-3 text-lg font-semibold text-white shadow-md shadow-amber-900/35 transition-all duration-300 hover:bg-amber-500 hover:shadow-lg hover:shadow-amber-500/25 disabled:cursor-not-allowed disabled:opacity-50 disabled:shadow-none"
                 >
                   {t.finalCodeSubmit}
                 </button>

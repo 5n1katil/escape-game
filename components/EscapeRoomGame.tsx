@@ -281,7 +281,7 @@ export default function EscapeRoomGame({
                 placeholder={t.answerPlaceholder}
                 autoComplete="off"
                 autoFocus
-                className="w-full rounded-lg border border-zinc-700 bg-zinc-800/50 px-4 py-3 text-base text-white placeholder-zinc-500 focus:border-amber-500 focus:outline-none focus:ring-1 focus:ring-amber-500 sm:py-3.5 sm:text-lg"
+                className="w-full rounded-lg border-2 border-zinc-600/50 bg-black/40 px-4 py-3 text-base text-zinc-100 shadow-inner shadow-black/20 placeholder:text-zinc-400 focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500/80 focus:ring-offset-2 focus:ring-offset-zinc-950 sm:py-3.5 sm:text-lg"
                 aria-invalid={!!error}
                 aria-describedby={error ? "error-message" : undefined}
               />
@@ -298,7 +298,7 @@ export default function EscapeRoomGame({
             <button
               type="submit"
               disabled={!inputValue.trim()}
-              className="w-full min-h-[48px] touch-manipulation rounded-lg bg-amber-600 px-6 py-3.5 text-base font-semibold text-white transition-colors hover:bg-amber-500 disabled:cursor-not-allowed disabled:opacity-50 active:scale-[0.98] sm:py-4 sm:text-lg"
+              className="w-full min-h-[48px] touch-manipulation rounded-lg bg-amber-600 px-6 py-3.5 text-base font-semibold text-white shadow-md shadow-amber-900/30 transition-all duration-300 hover:bg-amber-500 hover:shadow-lg hover:shadow-amber-500/20 disabled:cursor-not-allowed disabled:opacity-50 disabled:shadow-none active:scale-[0.98] sm:py-4 sm:text-lg"
             >
               {t.submitAnswer}
             </button>
@@ -315,7 +315,7 @@ export default function EscapeRoomGame({
                   key={idx}
                   type="button"
                   onClick={() => handleMultipleChoiceSelect(idx)}
-                  className="min-h-[48px] touch-manipulation rounded-lg border-2 border-zinc-700 bg-zinc-800/50 px-4 py-3 text-left text-base font-medium text-zinc-200 transition-all hover:border-amber-500/50 hover:bg-zinc-800 active:scale-[0.98] sm:text-lg"
+                  className="min-h-[48px] touch-manipulation rounded-lg border-2 border-zinc-600/50 bg-zinc-800/40 px-4 py-3 text-left text-base font-medium text-zinc-100 shadow-sm shadow-black/20 transition-all duration-300 hover:border-amber-500/80 hover:bg-amber-500/10 hover:text-amber-50 hover:shadow-[0_0_22px_rgba(245,158,11,0.18)] active:scale-[0.98] sm:text-lg"
                 >
                   {option}
                 </button>
@@ -343,7 +343,7 @@ export default function EscapeRoomGame({
               {media.map((item, idx) => (
                 <div
                   key={idx}
-                  className="group flex min-h-[100px] flex-col overflow-hidden rounded-xl border-2 border-zinc-700 bg-zinc-800/50 transition-all hover:border-amber-500/50 hover:bg-zinc-800/70 sm:min-h-[120px]"
+                  className="group flex min-h-[100px] flex-col overflow-hidden rounded-xl border-2 border-zinc-600/50 bg-zinc-800/40 shadow-sm shadow-black/25 transition-all duration-300 hover:border-amber-500/80 hover:bg-zinc-800/60 hover:shadow-[0_0_24px_rgba(245,158,11,0.15)] sm:min-h-[120px]"
                 >
                   <button
                     type="button"
@@ -366,7 +366,7 @@ export default function EscapeRoomGame({
                       </span>
                     )}
                     {item.alt && (
-                      <span className="text-center text-sm font-medium text-zinc-200 group-hover:text-amber-100/90">
+                      <span className="text-center text-sm font-medium text-zinc-100 group-hover:text-amber-100">
                         {item.alt}
                       </span>
                     )}
@@ -374,7 +374,7 @@ export default function EscapeRoomGame({
                   <button
                     type="button"
                     onClick={() => handleImageChoiceSelect(idx)}
-                    className="min-h-[44px] w-full touch-manipulation border-t border-zinc-700 bg-zinc-800/80 px-4 py-2 text-sm font-medium text-amber-400 transition-colors hover:bg-amber-500/20 active:scale-[0.98]"
+                    className="min-h-[44px] w-full touch-manipulation border-t-2 border-zinc-600/40 bg-zinc-800/50 px-4 py-2.5 text-sm font-semibold text-amber-300 transition-all duration-300 hover:border-amber-500/70 hover:bg-amber-500/15 hover:text-amber-200 hover:shadow-[inset_0_0_20px_rgba(245,158,11,0.08)] active:scale-[0.98]"
                   >
                     {t.chooseThisOption}
                   </button>
