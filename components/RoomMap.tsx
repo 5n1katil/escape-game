@@ -58,7 +58,7 @@ export default function RoomMap({
 
   if (!mounted) {
     return (
-      <div className="flex h-[280px] w-full items-center justify-center rounded-xl border border-zinc-800/50 bg-zinc-900/40 md:w-48">
+      <div className="flex h-[200px] w-full items-center justify-center rounded-xl border border-zinc-800/50 bg-zinc-900/40 md:min-h-[240px]">
         <div className="h-6 w-6 animate-pulse rounded bg-zinc-700" />
       </div>
     );
