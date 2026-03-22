@@ -16,6 +16,8 @@ interface RoomMapProps {
   density?: "default" | "slim" | "sidebar";
   /** Sağ taktik sütunda kalan yüksekliği doldur; taşma yok (scrollbar yok). */
   fillColumn?: boolean;
+  /** Oda sayfası mobil: sayaç altında kompakt ilerleme şeridi (masaüstü aside ile ayrı instance). */
+  compactStrip?: boolean;
 }
 
 type RoomState = "locked" | "current" | "solved" | "available";
@@ -37,9 +39,12 @@ export default function RoomMap({
   rooms,
   density = "default",
   fillColumn = false,
+  compactStrip = false,
 }: RoomMapProps) {
   const slim = density === "slim";
   const sidebar = density === "sidebar";
+  const strip = sidebar && compactStrip;
+  const fill = sidebar && fillColumn && !strip;
   const [maxSolved, setMaxSolved] = useState(-1);
   const [mounted, setMounted] = useState(false);
 
@@ -71,7 +76,12 @@ export default function RoomMap({
     return (
       <div
         className={`flex w-full items-center justify-center rounded-xl border border-zinc-800/50 bg-zinc-900/40 ${
-          sidebar ? "min-h-[200px]" : slim ? "h-[160px]" : "h-[200px] md:min-h-[240px]"
+          strip ? "min-h-[120px]"
+            : sidebar
+              ? "min-h-[200px]"
+              : slim
+                ? "h-[160px]"
+                : "h-[200px] md:min-h-[240px]"
         }`}
       >
         <div className="h-6 w-6 animate-pulse rounded bg-zinc-700" />
@@ -96,36 +106,57 @@ export default function RoomMap({
     "mt-4 flex w-full min-h-[44px] items-center justify-center rounded-lg border border-amber-700/50 bg-amber-950/30 px-3 py-2.5 text-center text-sm font-medium text-amber-200/90 transition-colors duration-200 hover:bg-amber-900/40 hover:text-amber-100";
 
   if (sidebar) {
-    const fill = fillColumn;
-
-    const rowTitleClass = (state: RoomState) =>
-      fill
-        ? `text-left text-xs font-medium leading-tight tracking-normal break-words line-clamp-2 ${
-            state === "locked" ? "text-zinc-500" : "text-zinc-200"
-          }`
-        : `text-left text-sm font-medium leading-snug tracking-normal break-words sm:text-[0.9375rem] ${
-            state === "locked" ? "text-zinc-500" : "text-zinc-200"
-          }`;
+    const rowTitleClass = (state: RoomState) => {
+      if (strip) {
+        if (state === "current") {
+          return "text-left text-sm font-bold leading-snug tracking-normal break-words line-clamp-2 text-amber-100";
+        }
+        if (state === "locked") {
+          return "text-left text-xs font-medium leading-snug tracking-normal break-words line-clamp-2 text-zinc-500";
+        }
+        return "text-left text-xs font-semibold leading-snug tracking-normal break-words line-clamp-2 text-zinc-200";
+      }
+      if (fill) {
+        if (state === "current") {
+          return "text-left text-base font-bold leading-snug tracking-normal break-words line-clamp-2 text-amber-100";
+        }
+        if (state === "locked") {
+          return "text-left text-sm font-medium leading-snug tracking-normal break-words line-clamp-2 text-zinc-500";
+        }
+        return "text-left text-sm font-semibold leading-snug tracking-normal break-words line-clamp-2 text-zinc-200";
+      }
+      return `text-left text-sm font-medium leading-snug tracking-normal break-words sm:text-[0.9375rem] ${
+        state === "locked" ? "text-zinc-500" : "text-zinc-200"
+      }`;
+    };
 
     return (
       <aside
         className={`flex flex-col rounded-xl border border-zinc-800/60 bg-zinc-900/50 ring-1 ring-amber-950/30 ${
           fill
-            ? "h-full min-h-0 min-w-0 flex-1 overflow-hidden px-2.5 py-2 sm:px-3 sm:py-3"
-            : "px-3 py-4 sm:px-4"
+            ? "h-full min-h-0 min-w-0 flex-1 overflow-hidden px-3 py-3 sm:px-4 sm:py-4"
+            : strip
+              ? "max-h-[min(42vh,320px)] min-h-0 w-full shrink-0 overflow-hidden px-2.5 py-2"
+              : "px-3 py-4 sm:px-4"
         }`}
         aria-label="Oda ilerleme durumu"
       >
         <h3
           className={`text-center font-semibold uppercase tracking-wider text-amber-500/90 ${
-            fill ? "mb-1.5 shrink-0 text-[10px] tracking-[0.18em]" : "mb-3 text-xs sm:mb-3 sm:text-sm"
+            fill
+              ? "mb-2 shrink-0 text-xs tracking-[0.2em] sm:mb-2.5 sm:text-[0.8125rem]"
+              : strip
+                ? "mb-1.5 shrink-0 text-[10px] tracking-[0.18em]"
+                : "mb-3 text-xs sm:mb-3 sm:text-sm"
           }`}
         >
           İlerleme
         </h3>
 
         <div
-          className={`flex min-h-0 flex-col gap-0 ${fill ? "flex-1 overflow-hidden" : ""}`}
+          className={`flex min-h-0 flex-col ${
+            fill ? "flex-1 gap-1.5 overflow-hidden" : strip ? "flex-1 gap-1 overflow-y-auto overscroll-y-contain pr-0.5 [scrollbar-width:thin]" : "gap-0"
+          }`}
           role="list"
           aria-label="Oda durumları"
         >
@@ -138,10 +169,10 @@ export default function RoomMap({
             const rowInner = (
               <>
                 <div
-                  className={`flex shrink-0 flex-col items-center ${fill ? "w-9" : "w-11 sm:w-12"}`}
+                  className={`flex shrink-0 flex-col items-center ${fill ? "w-10" : strip ? "w-8" : "w-11 sm:w-12"}`}
                 >
                   <span
-                    className={cellClass(state, canNavigate, true)}
+                    className={cellClass(state, canNavigate, !fill)}
                     title={
                       state === "locked"
                         ? "Kilitli"
@@ -157,7 +188,11 @@ export default function RoomMap({
                   {index < rooms.length - 1 && (
                     <div
                       className={`w-0.5 flex-1 ${
-                        fill ? "my-0.5 min-h-[6px]" : "my-1 min-h-[14px]"
+                        fill
+                          ? "my-1 min-h-[10px]"
+                          : strip
+                            ? "my-0.5 min-h-[6px]"
+                            : "my-1 min-h-[14px]"
                       } ${index <= maxSolved ? "bg-emerald-600/45" : "bg-zinc-700/55"}`}
                       aria-hidden
                     />
@@ -165,7 +200,7 @@ export default function RoomMap({
                 </div>
                 <div
                   className={`min-w-0 flex-1 border-b border-zinc-800/40 pl-0 pr-1 ${
-                    fill ? "py-1" : "py-1.5 sm:py-2"
+                    fill ? "py-2.5 sm:py-3" : strip ? "py-1.5" : "py-1.5 sm:py-2"
                   } ${
                     state === "current" ? "rounded-r-lg bg-amber-500/5 pr-2 ring-1 ring-amber-500/20" : ""
                   }`}
@@ -191,7 +226,7 @@ export default function RoomMap({
               <div
                 key={room.id}
                 role="listitem"
-                className={`flex w-full min-w-0 ${fill ? "gap-1" : "gap-1 sm:gap-2"}`}
+                className={`flex w-full min-w-0 ${fill || strip ? "gap-2" : "gap-1 sm:gap-2"}`}
               >
                 {rowInner}
               </div>
@@ -202,8 +237,8 @@ export default function RoomMap({
         <Link
           href={`/game/${slug}/hub`}
           className={
-            fill
-              ? "mt-2 flex w-full shrink-0 items-center justify-center rounded-lg border border-amber-700/50 bg-amber-950/30 px-2 py-2 text-center text-xs font-medium text-amber-200/90 transition-colors hover:bg-amber-900/40 hover:text-amber-100"
+            fill || strip
+              ? "mt-2 flex w-full shrink-0 items-center justify-center rounded-lg border border-amber-700/50 bg-amber-950/30 px-2 py-1.5 text-center text-xs font-medium text-amber-200/90 transition-colors hover:bg-amber-900/40 hover:text-amber-100 sm:py-2"
               : hubLinkClass
           }
         >

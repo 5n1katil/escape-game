@@ -63,6 +63,8 @@ interface HubClientProps {
   finalCode: string | undefined;
   t: Translations["hub"];
   timerAriaLabel: string;
+  /** Mobilde yapışkan sayaç çubuğu (Room ile aynı “Kalan zaman” etiketi). */
+  timerHudLabel: string;
   durationMinutes: number;
 }
 
@@ -75,6 +77,7 @@ export default function HubClient({
   finalCode,
   t,
   timerAriaLabel,
+  timerHudLabel,
   durationMinutes,
 }: HubClientProps) {
   const router = useRouter();
@@ -255,7 +258,24 @@ export default function HubClient({
           ref={leftColumnRef}
           className="flex min-h-0 w-full flex-1 flex-col gap-4 overflow-y-auto overscroll-y-contain px-4 pb-6 sm:gap-5 sm:px-6 sm:pb-8 md:min-w-0 md:flex-[1.4] md:pl-6 md:pr-4 lg:flex-[1.5] lg:pl-8 lg:pr-6"
         >
-          <section className="flex flex-row flex-wrap items-center justify-center gap-3 rounded-xl border border-amber-900/45 bg-zinc-900/50 px-4 py-3 sm:gap-4 sm:px-5 sm:py-3.5">
+          {/* Mobil: sayaç sol sütun scroll’unda yapışkan; masaüstü: mevcut kutu + başlık */}
+          <div className="sticky top-0 z-50 w-full shrink-0 md:static md:z-auto">
+            <div className="-mx-4 border-b border-amber-900/45 bg-zinc-950/95 shadow-[0_6px_20px_rgba(0,0,0,0.4)] backdrop-blur-md sm:-mx-6 md:mx-0 md:border-0 md:bg-transparent md:shadow-none md:backdrop-blur-none">
+              <div className="md:hidden">
+                <CountdownTimer
+                  slug={slug}
+                  initialMinutes={durationMinutes}
+                  ariaLabelTemplate={timerAriaLabel}
+                  variant="mobileBar"
+                  label={timerHudLabel}
+                />
+              </div>
+            </div>
+          </div>
+          <h1 className="px-2 pb-1 pt-2 text-center text-lg font-bold tracking-tight text-white drop-shadow-md sm:text-xl md:hidden">
+            {gameTitle}
+          </h1>
+          <section className="hidden flex-row flex-wrap items-center justify-center gap-3 rounded-xl border border-amber-900/45 bg-zinc-900/50 px-4 py-3 sm:gap-4 sm:px-5 sm:py-3.5 md:flex">
             <CountdownTimer
               slug={slug}
               initialMinutes={durationMinutes}

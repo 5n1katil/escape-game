@@ -38,7 +38,7 @@ export default async function RoomPage({ params }: RoomPageProps) {
           aria-hidden
         />
 
-        {/* Mobil: sayaç en üstte, yapışkan — hikâye kayarken görünür kalır */}
+        {/* Mobil: sayaç en üstte yapışkan; hemen altında kompakt ilerleme */}
         <div className="sticky top-0 z-[60] w-full md:hidden">
           <CountdownTimer
             slug={slug}
@@ -47,6 +47,15 @@ export default async function RoomPage({ params }: RoomPageProps) {
             variant="mobileBar"
             label={t.room.timerHudLabel}
           />
+          <div className="border-b border-amber-900/40 bg-zinc-950/95 px-2 pb-2 pt-1.5 shadow-[0_8px_24px_rgba(0,0,0,0.35)] backdrop-blur-md">
+            <RoomMap
+              slug={slug}
+              currentRoomIndex={roomIndex}
+              rooms={rooms}
+              density="sidebar"
+              compactStrip
+            />
+          </div>
         </div>
 
         <div className="relative z-10 flex min-w-0 flex-1 flex-col">

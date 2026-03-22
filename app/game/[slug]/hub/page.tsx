@@ -36,6 +36,7 @@ export default async function HubPage({ params }: HubPageProps) {
         finalCode={finalCode}
         t={t.hub}
         timerAriaLabel={t.room.timerAriaLabel}
+        timerHudLabel={t.room.timerHudLabel}
         durationMinutes={game.durationMinutes}
       />
     </GameStateGate>
