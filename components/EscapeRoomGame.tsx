@@ -22,6 +22,101 @@ import type { Translations } from "@/lib/i18n";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 
+function CopyIcon({ className }: { className?: string }) {
+  return (
+    <svg
+      className={className}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={2}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden
+    >
+      <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+      <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+    </svg>
+  );
+}
+
+function EscapePasswordBox({
+  code,
+  label,
+  hint,
+  copyLabel,
+  copiedLabel,
+  copyAriaLabel,
+}: {
+  code: string;
+  label: string;
+  hint: string;
+  copyLabel: string;
+  copiedLabel: string;
+  copyAriaLabel: string;
+}) {
+  const [copied, setCopied] = useState(false);
+  const resetTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (resetTimerRef.current) clearTimeout(resetTimerRef.current);
+    };
+  }, []);
+
+  async function handleCopy() {
+    try {
+      await navigator.clipboard.writeText(code);
+    } catch {
+      try {
+        const ta = document.createElement("textarea");
+        ta.value = code;
+        ta.setAttribute("readonly", "");
+        ta.style.position = "fixed";
+        ta.style.left = "-9999px";
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand("copy");
+        document.body.removeChild(ta);
+      } catch {
+        /* ignore */
+      }
+    }
+    setCopied(true);
+    if (resetTimerRef.current) clearTimeout(resetTimerRef.current);
+    resetTimerRef.current = setTimeout(() => setCopied(false), 2000);
+  }
+
+  return (
+    <div className="rounded-lg border border-amber-500/40 bg-amber-950/30 px-4 py-3 text-left">
+      <p className="text-sm font-semibold text-amber-400/90">{label}</p>
+      <div className="mt-2 flex min-w-0 flex-col items-stretch gap-3 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
+        <p className="min-w-0 flex-1 break-all font-mono text-base font-bold tracking-wide text-amber-200 sm:text-lg">
+          {code}
+        </p>
+        <button
+          type="button"
+          onClick={() => void handleCopy()}
+          aria-label={copyAriaLabel}
+          className="inline-flex shrink-0 touch-manipulation items-center justify-center gap-1.5 rounded-md border border-amber-500/30 bg-[#020617] px-3 py-2 text-sm font-medium text-amber-400 shadow-none transition-all duration-200 hover:border-amber-500/45 hover:bg-amber-500/10 hover:text-amber-300 hover:shadow-[0_0_14px_rgba(245,158,11,0.2)] active:scale-[0.97] sm:min-w-[7.5rem]"
+        >
+          {copied ? (
+            <span className="text-xs font-semibold tracking-tight text-amber-200 sm:text-sm">
+              {copiedLabel}
+            </span>
+          ) : (
+            <>
+              <CopyIcon className="h-4 w-4 shrink-0 opacity-90" />
+              <span>{copyLabel}</span>
+            </>
+          )}
+        </button>
+      </div>
+      <p className="mt-2 text-sm text-zinc-400">{hint}</p>
+    </div>
+  );
+}
+
 interface EscapeRoomGameProps {
   slug: string;
   roomIndex: number;
@@ -161,17 +256,14 @@ export default function EscapeRoomGame({
           {currentRoom.title} tamamlandı.
         </p>
         {isLastRoom && finalCode && (
-          <div className="rounded-lg border border-amber-500/40 bg-amber-950/30 px-4 py-3 text-left">
-            <p className="text-sm font-semibold text-amber-400/90">
-              {t.escapePasswordLabel}
-            </p>
-            <p className="mt-1 font-mono text-lg font-bold tracking-wide text-amber-200">
-              {finalCode}
-            </p>
-            <p className="mt-2 text-sm text-zinc-400">
-              {t.escapePasswordHint}
-            </p>
-          </div>
+          <EscapePasswordBox
+            code={finalCode}
+            label={t.escapePasswordLabel}
+            hint={t.escapePasswordHint}
+            copyLabel={t.copyEscapeCode}
+            copiedLabel={t.escapeCodeCopied}
+            copyAriaLabel={t.copyEscapeCodeAria}
+          />
         )}
         <p className="text-sm text-zinc-400">
           Hazır olduğunuzda aşağıdaki butonla ana ekrana dönüp diğer odalara geçebilirsiniz.
@@ -548,16 +640,15 @@ export default function EscapeRoomGame({
             {t.roomAlreadyCompleted}
           </p>
           {isLastRoom && finalCode && (
-            <div className="mt-4 rounded-lg border border-amber-500/40 bg-amber-950/30 px-4 py-3 text-left">
-              <p className="text-sm font-semibold text-amber-400/90">
-                {t.escapePasswordLabel}
-              </p>
-              <p className="mt-1 font-mono text-lg font-bold tracking-wide text-amber-200">
-                {finalCode}
-              </p>
-              <p className="mt-2 text-sm text-zinc-400">
-                {t.escapePasswordHint}
-              </p>
+            <div className="mt-4">
+              <EscapePasswordBox
+                code={finalCode}
+                label={t.escapePasswordLabel}
+                hint={t.escapePasswordHint}
+                copyLabel={t.copyEscapeCode}
+                copiedLabel={t.escapeCodeCopied}
+                copyAriaLabel={t.copyEscapeCodeAria}
+              />
             </div>
           )}
         </section>
