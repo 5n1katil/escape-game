@@ -105,7 +105,7 @@ export const zihinLabirentiRooms: Room[] = [
     title: "6. Oda: Final Çıkış Kodu Testi",
     description: "Zihin Labirenti — 6. modül: son doğrulama (önceki görsellerdeki fragmanları birleştir).",
     type: "text",
-    puzzleType: "constellation",
+    puzzleType: "triple-terminal",
     question: "Son çıkış şifresini girin.",
     answer: "ZİHİN",
     hint:

@@ -8,6 +8,7 @@ import type { Room } from "@/data/rooms";
 import { fetchUserAvatarFromRtdb } from "@/lib/firebase";
 import { calculateScore } from "@/lib/gameSession";
 import {
+  clearGameState,
   getActiveAvatarUrl,
   getActiveMemberId,
   getMemberIdFromUrl,
@@ -148,12 +149,16 @@ export default function HubClient({
         aria-hidden
       />
       <div className="absolute left-4 right-4 top-4 z-20 flex items-center justify-between sm:left-6 sm:right-6 sm:top-6">
-        <Link
-          href={`/game/${slug}/intro`}
-          className={`flex min-h-[44px] min-w-[44px] items-center justify-center rounded-lg text-sm text-zinc-500 transition-colors sm:px-2 ${h.backLink}`}
+        <button
+          type="button"
+          onClick={() => {
+            clearGameState(slug);
+            router.push(`/game/${slug}/intro`);
+          }}
+          className={`flex min-h-[44px] min-w-[44px] touch-manipulation items-center justify-center rounded-lg text-sm text-zinc-500 transition-colors sm:px-2 ${h.backLink}`}
         >
           {t.backToIntro}
-        </Link>
+        </button>
         <RestartButton slug={slug} label="Oyunu Yeniden Başlat" />
       </div>
 

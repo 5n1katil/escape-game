@@ -121,7 +121,7 @@ if (
   throw new Error("NeuralFlowPuzzle: INITIAL_GRID must be 5×5");
 }
 
-/** SVG paths — no url(#filter): feDropShadow-only filters hide strokes in some browsers. CSS glow instead. */
+/** SVG paths — plain cyan lines for stable performance. */
 function TileSvg({ kind, rot }: { kind: TileKind; rot: number }) {
   const dMap: Record<TileKind, string> = {
     straight: "M 50 0 L 50 100",
@@ -135,7 +135,7 @@ function TileSvg({ kind, rot }: { kind: TileKind; rot: number }) {
   return (
     <svg
       viewBox="0 0 100 100"
-      className="h-full w-full drop-shadow-[0_0_6px_rgba(34,211,238,0.95)] drop-shadow-[0_0_12px_rgba(6,182,212,0.5)]"
+      className="h-full w-full"
       aria-hidden
       preserveAspectRatio="xMidYMid meet"
     >
@@ -147,7 +147,7 @@ function TileSvg({ kind, rot }: { kind: TileKind; rot: number }) {
           d={d}
           fill="none"
           stroke="#22d3ee"
-          strokeWidth={11}
+          strokeWidth={10}
           strokeLinecap="round"
           strokeLinejoin="round"
         />
@@ -240,12 +240,6 @@ export default function NeuralFlowPuzzle({ onSolve, onWrong }: NeuralFlowPuzzleP
           role="grid"
           aria-label="Nöral akış ızgarası"
         >
-          <span
-            aria-hidden
-            className="pointer-events-none absolute right-1 top-1 font-mono text-[11px] tracking-[0.3em] text-cyan-400/45"
-          >
-            N
-          </span>
           {Array.from({ length: SIZE }, (_, r) =>
             Array.from({ length: SIZE }, (_, c) => {
               const cell = grid[r][c];

@@ -7,11 +7,8 @@ import { zihinLabirentiRooms } from "./zihinLabirenti";
 /** Wix promo page; intro "Geri" goes here. */
 export const WIX_LANDING_BASE = "https://www.5n1dedektif.com";
 
-/**
- * Bu slug'lar `app/game/{slug}/` altında kendi sayfalarına sahip;
- * `app/game/[slug]/` içindeki generateStaticParams bunları dışlar (çift rota önlenir).
- */
-export const GAME_SLUGS_WITH_DEDICATED_ROUTES: readonly string[] = ["zihin-labirenti"];
+/** Dedicated route exclusions for dynamic `[slug]` SSG list. */
+export const GAME_SLUGS_WITH_DEDICATED_ROUTES: readonly string[] = [];
 
 export type VisualThemeId = "temple" | "cyber";
 

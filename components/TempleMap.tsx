@@ -67,6 +67,10 @@ export interface TempleMapProps {
   containImgClassName?: string;
   /** Varsayılan: tapınak haritası */
   mapImageSrc?: string;
+  /** Mobil üst şerit için sade yatay ilerleme görünümü */
+  mobileStepper?: boolean;
+  /** Mobil stepper'da mevcut oda vurgusu */
+  currentRoomIndex?: number;
 }
 
 /**
@@ -81,6 +85,8 @@ export default function TempleMap({
   className = "",
   containImgClassName = "max-h-[min(72vh,560px)]",
   mapImageSrc = TEMPLE_MAP_IMAGE_PATH,
+  mobileStepper = false,
+  currentRoomIndex,
 }: TempleMapProps) {
   const { ui, themeId } = useGameUi();
   const tm = ui.templeMap;
@@ -129,6 +135,69 @@ export default function TempleMap({
 
   const maxSolved = getStoredMaxSolvedRoomIndex(slug, roomIds);
   const activeRoomId = roomIds[maxSolved + 1] ?? null;
+
+  if (mobileStepper) {
+    return (
+      <div
+        className={`w-full overflow-x-auto pb-1 ${className}`}
+        role="navigation"
+        aria-label="Oda ilerleme adımları"
+      >
+        <div className="mx-auto flex min-w-max items-center gap-1.5 px-1">
+          {rooms.map((room, index) => {
+            const roomId = room.id;
+            const unlocked = unlockedIds.includes(roomId);
+            const solved = index <= maxSolved;
+            const current = currentRoomIndex === index;
+            const available = unlocked && !solved;
+            const canNavigate = unlocked;
+
+            const circleClass = solved
+              ? `border-emerald-400/80 bg-emerald-500/20 text-emerald-300 ${solvedPulseClass}`
+              : current
+                ? `border-cyan-300 bg-cyan-500/25 text-cyan-100 ${openPulseClass}`
+                : available
+                  ? `border-cyan-500/70 bg-cyan-500/10 text-cyan-300`
+                  : "border-zinc-700 bg-zinc-800/70 text-zinc-500";
+
+            const node = (
+              <span
+                className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full border text-xs font-semibold ${circleClass}`}
+                title={room.title}
+              >
+                {solved ? "✓" : room.id}
+              </span>
+            );
+
+            return (
+              <div key={room.id} className="flex items-center gap-1.5">
+                {canNavigate ? (
+                  <Link
+                    href={`/game/${slug}/room/${room.id}`}
+                    aria-label={`${room.title} - ${goToRoomLabel}`}
+                    className="touch-manipulation"
+                    title={room.title}
+                  >
+                    {node}
+                  </Link>
+                ) : (
+                  <span aria-hidden>{node}</span>
+                )}
+                {index < rooms.length - 1 && (
+                  <span
+                    aria-hidden
+                    className={`h-[2px] w-4 rounded-full ${
+                      index <= maxSolved ? "bg-emerald-500/60" : "bg-zinc-700/70"
+                    }`}
+                  />
+                )}
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    );
+  }
 
   const lockedOverlayClass = tm.lockedOverlay;
   const lockedIconClass = tm.lockedIcon;

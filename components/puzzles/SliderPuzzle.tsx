@@ -17,6 +17,8 @@ export default function SliderPuzzle({ onSolve, onWrong }: SliderPuzzleProps) {
   const er = ui.escapeRoom;
   const [values, setValues] = useState([30, 25, 50, 45]);
   const [error, setError] = useState<string | null>(null);
+  const total = values.reduce((sum, n) => sum + n, 0);
+  const totalOk = total === TOTAL_MHZ;
 
   function handleSubmit() {
     setError(null);
@@ -41,13 +43,14 @@ export default function SliderPuzzle({ onSolve, onWrong }: SliderPuzzleProps) {
       <p className="text-center text-sm text-cyan-200/90">
         Nöral frekansları {TOTAL_MHZ} MHz toplam kapasiteye göre dengeleyin.
       </p>
-      <div className="relative mx-auto h-8 w-full max-w-sm overflow-hidden rounded-md border border-cyan-500/25 bg-slate-900/70">
-        <div className="absolute inset-y-1 left-[8%] w-[24%] rounded-full bg-cyan-500/15" />
-        <div className="absolute inset-y-1 left-[37%] w-[24%] rounded-full bg-cyan-500/20" />
-        <div className="absolute inset-y-1 left-[66%] w-[24%] rounded-full bg-cyan-500/15" />
-        <span className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 font-mono text-xs tracking-[0.25em] text-cyan-300/55">
-          İ
-        </span>
+      <div
+        className={`mx-auto w-full max-w-sm rounded-md border px-3 py-2 text-center font-mono text-sm tracking-wider ${
+          totalOk
+            ? "border-emerald-500/45 bg-emerald-500/10 text-emerald-300"
+            : "border-cyan-500/25 bg-slate-900/70 text-cyan-300"
+        }`}
+      >
+        Toplam: {total}/{TOTAL_MHZ}
       </div>
       <div className="space-y-5">
         {LABELS.map((label, i) => (

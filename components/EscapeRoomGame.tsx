@@ -19,11 +19,11 @@ import {
   isCorrectMultipleChoice,
 } from "@/lib/rooms";
 import MatrixPuzzle from "@/components/puzzles/MatrixPuzzle";
-import ConstellationPuzzle from "@/components/puzzles/ConstellationPuzzle";
 import NeuralFlowPuzzle from "@/components/puzzles/NeuralFlowPuzzle";
 import SliderPuzzle from "@/components/puzzles/SliderPuzzle";
 import TerminalPuzzle from "@/components/puzzles/TerminalPuzzle";
 import TextPuzzle from "@/components/puzzles/TextPuzzle";
+import TripleEncryptionTerminal from "@/components/puzzles/TripleEncryptionTerminal";
 import type { Room } from "@/data/rooms";
 import type { Translations } from "@/lib/i18n";
 import { useRouter } from "next/navigation";
@@ -445,10 +445,10 @@ export default function EscapeRoomGame({
       );
     }
 
-    if (pt === "constellation") {
+    if (pt === "triple-terminal") {
       return (
         <div className="space-y-4">
-          <ConstellationPuzzle
+          <TripleEncryptionTerminal
             onSolve={() => {
               setError(null);
               markRoomSolved();

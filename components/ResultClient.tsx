@@ -3,6 +3,7 @@
 import { useGameUi } from "@/components/GameVisualThemeProvider";
 import { fetchUserAvatarFromRtdb, saveScore } from "@/lib/firebase";
 import {
+  clearGameState,
   getCompletedGameResult,
   getPlayerKeyForSlug,
   getStoredEscaped,
@@ -452,6 +453,11 @@ export default function ResultClient({
     router.push(`/game/${slug}/hub`);
   }
 
+  function handleBackToMain() {
+    clearGameState(slug);
+    window.location.href = backUrl;
+  }
+
   return (
     <div className="min-h-screen bg-zinc-950 px-4 py-12 sm:py-16">
       <main className="mx-auto max-w-6xl space-y-8 lg:space-y-10">
@@ -661,12 +667,13 @@ export default function ResultClient({
           >
             {tResult.playAgain}
           </button>
-          <a
-            href={backUrl}
+          <button
+            type="button"
+            onClick={handleBackToMain}
             className={rt.btnPrimary}
           >
             {backLabel}
-          </a>
+          </button>
         </div>
       </main>
     </div>
