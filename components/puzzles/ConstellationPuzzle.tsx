@@ -1,6 +1,7 @@
 "use client";
 
 import { isCorrectFinalCode } from "@/lib/rooms";
+import { motion } from "framer-motion";
 import { useEffect, useMemo, useState } from "react";
 
 export interface ConstellationPuzzleProps {
@@ -13,26 +14,26 @@ type NodeDef = {
   id: string;
   letter: "Z" | "İ" | "H" | "N";
   roomId: number;
-  angle: number;
-  radius: number;
+  x: number;
+  y: number;
 };
 
 const SEQUENCE = ["Z", "İ", "H", "İ", "N"] as const;
 const TARGET_KEY = "ZİHİN";
 
 const MAIN_NODES: NodeDef[] = [
-  { id: "n1", letter: "Z", roomId: 1, angle: -1.4, radius: 34 },
-  { id: "n2", letter: "İ", roomId: 2, angle: -0.3, radius: 30 },
-  { id: "n3", letter: "H", roomId: 3, angle: 0.8, radius: 36 },
-  { id: "n4", letter: "İ", roomId: 4, angle: 2.1, radius: 31 },
-  { id: "n5", letter: "N", roomId: 5, angle: 3.2, radius: 35 },
+  { id: "n1", letter: "Z", roomId: 1, x: 14, y: 18 },
+  { id: "n2", letter: "İ", roomId: 2, x: 82, y: 14 },
+  { id: "n3", letter: "H", roomId: 3, x: 72, y: 52 },
+  { id: "n4", letter: "İ", roomId: 4, x: 24, y: 56 },
+  { id: "n5", letter: "N", roomId: 5, x: 50, y: 84 },
 ];
 
 const DECOYS = [
-  { id: "d1", x: 18, y: 28 },
-  { id: "d2", x: 78, y: 22 },
-  { id: "d3", x: 82, y: 74 },
-  { id: "d4", x: 22, y: 80 },
+  { id: "d1", x: 6, y: 72 },
+  { id: "d2", x: 92, y: 36 },
+  { id: "d3", x: 58, y: 6 },
+  { id: "d4", x: 88, y: 90 },
 ] as const;
 
 function roomImageFor(id: number): string {
@@ -41,7 +42,6 @@ function roomImageFor(id: number): string {
 
 export default function ConstellationPuzzle({ onSolve, onWrong }: ConstellationPuzzleProps) {
   const [stage, setStage] = useState<Stage>("constellation");
-  const [orbitalT, setOrbitalT] = useState(0);
   const [sequenceIdx, setSequenceIdx] = useState(0);
   const [connected, setConnected] = useState<number[]>([]);
   const [flashRoom, setFlashRoom] = useState<number | null>(null);
@@ -49,27 +49,7 @@ export default function ConstellationPuzzle({ onSolve, onWrong }: ConstellationP
   const [error, setError] = useState<string | null>(null);
   const [dissolve, setDissolve] = useState(false);
 
-  useEffect(() => {
-    if (stage !== "constellation") return;
-    let raf = 0;
-    let start = performance.now();
-    const tick = (now: number) => {
-      const sec = (now - start) / 1000;
-      setOrbitalT(sec);
-      raf = requestAnimationFrame(tick);
-    };
-    raf = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(raf);
-  }, [stage]);
-
-  const renderedNodes = useMemo(() => {
-    return MAIN_NODES.map((n, i) => {
-      const phase = orbitalT * 0.45 + i * 0.9;
-      const x = 50 + Math.cos(n.angle + phase) * n.radius * 0.9;
-      const y = 50 + Math.sin(n.angle + phase) * n.radius * 0.65;
-      return { ...n, x, y };
-    });
-  }, [orbitalT]);
+  const renderedNodes = MAIN_NODES;
 
   const orderedConnectedPoints = connected
     .map((idx) => renderedNodes[idx])
@@ -111,7 +91,7 @@ export default function ConstellationPuzzle({ onSolve, onWrong }: ConstellationP
 
   useEffect(() => {
     if (stage !== "collapse") return;
-    const t1 = setTimeout(() => setStage("terminal"), 1400);
+    const t1 = setTimeout(() => setStage("terminal"), 1500);
     return () => clearTimeout(t1);
   }, [stage]);
 
@@ -158,7 +138,7 @@ export default function ConstellationPuzzle({ onSolve, onWrong }: ConstellationP
             Bellek düğümlerini kronolojik sırayla senkronize edin:
             <span className="ml-2 font-mono tracking-widest text-cyan-300">Z İ H İ N</span>
           </p>
-          <div className="relative mx-auto aspect-square w-full max-w-[min(92vw,520px)] rounded-xl border border-cyan-500/30 bg-slate-900/70">
+          <div className="relative mx-auto min-h-[480px] w-full max-w-[min(96vw,900px)] overflow-hidden rounded-xl bg-transparent">
             <svg viewBox="0 0 100 100" className="absolute inset-0 h-full w-full">
               {orderedConnectedPoints.map((p, i) => {
                 const prev = orderedConnectedPoints[i - 1];
@@ -171,8 +151,8 @@ export default function ConstellationPuzzle({ onSolve, onWrong }: ConstellationP
                     x2={p.x}
                     y2={p.y}
                     stroke="#22d3ee"
-                    strokeWidth="1.2"
-                    className="drop-shadow-[0_0_6px_rgba(34,211,238,0.8)]"
+                    strokeWidth="2.2"
+                    className="drop-shadow-[0_0_10px_rgba(34,211,238,0.95)]"
                   />
                 );
               })}
@@ -183,7 +163,7 @@ export default function ConstellationPuzzle({ onSolve, onWrong }: ConstellationP
                 key={d.id}
                 type="button"
                 onClick={handleDecoyClick}
-                className="absolute h-3 w-3 -translate-x-1/2 -translate-y-1/2 rounded-full border border-rose-500/50 bg-rose-500/25 touch-manipulation"
+                className="absolute h-2.5 w-2.5 -translate-x-1/2 -translate-y-1/2 rounded-full border border-rose-500/50 bg-rose-500/25 touch-manipulation"
                 style={{ left: `${d.x}%`, top: `${d.y}%` }}
                 aria-label="Sahte düğüm"
               />
@@ -193,10 +173,12 @@ export default function ConstellationPuzzle({ onSolve, onWrong }: ConstellationP
               const isConnected = connected.includes(idx);
               const isNext = SEQUENCE[sequenceIdx] === n.letter;
               return (
-                <button
+                <motion.button
                   key={n.id}
                   type="button"
                   onClick={() => handleMainNodeClick(idx)}
+                  animate={{ y: [0, -6, 0, 5, 0] }}
+                  transition={{ duration: 8 + idx, repeat: Infinity, ease: "easeInOut" }}
                   className={`absolute h-10 w-10 -translate-x-1/2 -translate-y-1/2 touch-manipulation rounded-full border-2 text-xs font-bold transition-all ${
                     isConnected
                       ? "border-cyan-200 bg-cyan-500/40 text-cyan-50 shadow-[0_0_16px_rgba(34,211,238,0.85)]"
@@ -208,7 +190,7 @@ export default function ConstellationPuzzle({ onSolve, onWrong }: ConstellationP
                   aria-label={`Bellek düğümü ${idx + 1}`}
                 >
                   {n.letter}
-                </button>
+                </motion.button>
               );
             })}
           </div>
@@ -216,8 +198,22 @@ export default function ConstellationPuzzle({ onSolve, onWrong }: ConstellationP
       )}
 
       {stage === "collapse" && (
-        <div className="flex min-h-[240px] items-center justify-center">
-          <div className="h-20 w-20 animate-ping rounded-full border-2 border-cyan-300 bg-cyan-500/30 shadow-[0_0_40px_rgba(34,211,238,0.65)]" />
+        <div className="relative flex min-h-[360px] items-center justify-center overflow-hidden rounded-xl">
+          {MAIN_NODES.map((n, i) => (
+            <motion.div
+              key={n.id}
+              className="absolute h-3 w-3 rounded-full bg-cyan-300"
+              initial={{ left: `${n.x}%`, top: `${n.y}%`, opacity: 0.9 }}
+              animate={{ left: "50%", top: "50%", opacity: 0.2, scale: 0.2 }}
+              transition={{ duration: 1.1, delay: i * 0.08, ease: "easeInOut" }}
+            />
+          ))}
+          <motion.div
+            className="h-24 w-24 rounded-full border border-cyan-300/70 bg-cyan-500/25 shadow-[0_0_40px_rgba(34,211,238,0.7)]"
+            initial={{ scale: 0.6, opacity: 0.3 }}
+            animate={{ scale: [0.6, 1.25, 1], opacity: [0.3, 1, 0.85] }}
+            transition={{ duration: 1.2, ease: "easeOut" }}
+          />
         </div>
       )}
 

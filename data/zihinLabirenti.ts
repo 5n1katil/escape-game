@@ -111,9 +111,9 @@ export const zihinLabirentiRooms: Room[] = [
     hint:
       "Odaların görsellerindeki saklı harfleri sıraya koy: Z, İ, H, İ, N.",
     story:
-      "Thegateway to the Cortex. It doesn't see a user; it sees patterns of consciousness. I must retrace my steps, harmonize the neural orbs of my past, and reconstruct the geometry of my own mind. The final answer lies in who I am at my core. I am ZİHİN.",
+      "Ebedi Korteks'in kapısındayım. Zihnimin anı parçaları (küreler) boşlukta süzülüyor. Onları kronolojik sırayla (Z-İ-H-İ-N) birleştirerek bilincimin geometrisini yeniden kurmalıyım. Her şey tek bir kelimede gizli.",
     puzzlePrompt:
-      "Sequence established. Harmonize the memory orbs in chronological order. Each orb reveals a hidden letter from its room visual. Combine them in order to form the final access key and enter it into the terminal.",
+      "Nöral düğümleri doğru sırayla birleştirerek takımyıldızı tamamlayın.",
     storyImages: [
       { url: "/games/zihin-labirenti/images/oda-6.png", alt: "6. oda görseli" },
     ],

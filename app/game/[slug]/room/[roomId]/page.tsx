@@ -8,6 +8,7 @@ import {
   GameRoomSidebar,
 } from "@/components/game-room";
 import TempleMap from "@/components/TempleMap";
+import NeuralOrb from "@/components/visuals/NeuralOrb";
 import SessionSync from "@/components/SessionSync";
 import { getGameBySlug, getRoomsForGame, type GameConfig } from "@/data/games";
 import { getThemeUi } from "@/lib/gameVisualTheme";
@@ -33,6 +34,8 @@ export default async function RoomPage({ params }: RoomPageProps) {
   if (roomIndex < 0 || roomIdNum < 1) notFound();
 
   const rp = getThemeUi(g.visualTheme).roomPage;
+  const roomLetters = ["Z", "İ", "H", "İ", "N"] as const;
+  const orbLetter = roomLetters[roomIndex] ?? null;
 
   return (
     <GameStateGate slug={slug}>
@@ -68,6 +71,12 @@ export default async function RoomPage({ params }: RoomPageProps) {
         </div>
 
         <div className="custom-scrollbar relative z-10 flex min-w-0 flex-1 flex-col overflow-y-auto p-4 md:p-8">
+          {orbLetter && (
+            <NeuralOrb
+              letter={orbLetter}
+              className="left-4 top-24 z-0 md:left-8 md:top-28"
+            />
+          )}
           <GameRoomLayout
             header={
               <header className="mb-4 flex w-full min-w-0 shrink-0 items-center justify-between gap-4 border-b border-zinc-800/70 bg-zinc-950/92 py-3 backdrop-blur-md sm:mb-5 sm:py-3.5 xl:sticky xl:top-0 xl:z-40">
