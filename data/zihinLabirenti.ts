@@ -7,7 +7,7 @@ export const zihinLabirentiRooms: Room[] = [
   {
     id: 1,
     title: "1. Oda: Sisteme Giriş (Nöro-Boot)",
-    description: "Zihin Labirenti — 1. modül: Kurucu Protokol",
+    description: "Zihin Labirenti — 1. modül: Kurucu Protokol (görselde gizli bir fragman saklı).",
     type: "multipleChoice",
     puzzleType: "multiple-choice",
     question:
@@ -31,7 +31,7 @@ export const zihinLabirentiRooms: Room[] = [
   {
     id: 2,
     title: "2. Oda: Parçalanmış Anılar",
-    description: "Zihin Labirenti — 2. modül: Hafıza Kurtarma",
+    description: "Zihin Labirenti — 2. modül: Hafıza Kurtarma (görsel katmanda sönük bir örüntü gizli).",
     type: "multipleChoice",
     puzzleType: "multiple-choice",
     question:
@@ -51,7 +51,7 @@ export const zihinLabirentiRooms: Room[] = [
   {
     id: 3,
     title: "3. Oda: Terminal Hack Testi",
-    description: "Zihin Labirenti — 3. modül: terminal müdahalesi",
+    description: "Zihin Labirenti — 3. modül: terminal müdahalesi (log akışında gizli bir parça var).",
     type: "text",
     puzzleType: "terminal",
     question: "Güvenlik terminalini aşın.",
@@ -67,7 +67,7 @@ export const zihinLabirentiRooms: Room[] = [
   {
     id: 4,
     title: "4. Oda: Nöral Frekans Testi",
-    description: "Zihin Labirenti — 4. modül: frekans hizalama",
+    description: "Zihin Labirenti — 4. modül: frekans hizalama (dalga formunda saklı bir işaret bulunuyor).",
     type: "text",
     puzzleType: "slider",
     question: "Dört kanalı hedef frekansa kilitleyin.",
@@ -85,7 +85,7 @@ export const zihinLabirentiRooms: Room[] = [
   {
     id: 5,
     title: "5. Oda: Sinaps Matrisi Testi",
-    description: "Zihin Labirenti — 5. modül: sinaps ağı",
+    description: "Zihin Labirenti — 5. modül: sinaps ağı (çerçeve deseninde gizli bir iz var).",
     type: "text",
     puzzleType: "neural-flow",
     question: "Nöral akış ağını senkronize edin.",
@@ -103,17 +103,17 @@ export const zihinLabirentiRooms: Room[] = [
   {
     id: 6,
     title: "6. Oda: Final Çıkış Kodu Testi",
-    description: "Zihin Labirenti — 6. modül: son doğrulama",
+    description: "Zihin Labirenti — 6. modül: son doğrulama (önceki görsellerdeki fragmanları birleştir).",
     type: "text",
-    puzzleType: "text",
+    puzzleType: "constellation",
     question: "Son çıkış şifresini girin.",
-    answer: "ebedi",
+    answer: "ZİHİN",
     hint:
-      "1. Oda'da (Sisteme Giriş) aklında kalan o kritik şifreyi hatırla. Amacının ne olduğunu anlatan o kelime...",
+      "Odaların görsellerindeki saklı harfleri sıraya koy: Z, İ, H, İ, N.",
     story:
-      "Bütün nöral ağlar senkronize edildi. Önümde Ebedi Korteks'in devasa, ışıldayan ana kapısı duruyor. Sistem bilincimi tamamen dijitalleştirmek için son şifreyi, her şeyin başladığı o parolayı istiyor.\n\nEğer yanlış kodu girersem, sistem beni bir virüs olarak algılayıp kalıcı olarak silecek. Fiziksel bedenim çoktan öldü. Dönüş yok.",
+      "Thegateway to the Cortex. It doesn't see a user; it sees patterns of consciousness. I must retrace my steps, harmonize the neural orbs of my past, and reconstruct the geometry of my own mind. The final answer lies in who I am at my core. I am ZİHİN.",
     puzzlePrompt:
-      "Son Çıkış Kodu Protokolü: Ebedi Korteks'e geçiş yapmak için doğru şifreyi girin:",
+      "Sequence established. Harmonize the memory orbs in chronological order. Each orb reveals a hidden letter from its room visual. Combine them in order to form the final access key and enter it into the terminal.",
     storyImages: [
       { url: "/games/zihin-labirenti/images/oda-6.png", alt: "6. oda görseli" },
     ],

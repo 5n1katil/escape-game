@@ -41,6 +41,14 @@ export default function SliderPuzzle({ onSolve, onWrong }: SliderPuzzleProps) {
       <p className="text-center text-sm text-cyan-200/90">
         Nöral frekansları {TOTAL_MHZ} MHz toplam kapasiteye göre dengeleyin.
       </p>
+      <div className="relative mx-auto h-8 w-full max-w-sm overflow-hidden rounded-md border border-cyan-500/25 bg-slate-900/70">
+        <div className="absolute inset-y-1 left-[8%] w-[24%] rounded-full bg-cyan-500/15" />
+        <div className="absolute inset-y-1 left-[37%] w-[24%] rounded-full bg-cyan-500/20" />
+        <div className="absolute inset-y-1 left-[66%] w-[24%] rounded-full bg-cyan-500/15" />
+        <span className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 font-mono text-xs tracking-[0.25em] text-cyan-300/55">
+          İ
+        </span>
+      </div>
       <div className="space-y-5">
         {LABELS.map((label, i) => (
           <div key={label} className="space-y-2">

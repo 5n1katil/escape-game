@@ -236,10 +236,16 @@ export default function NeuralFlowPuzzle({ onSolve, onWrong }: NeuralFlowPuzzleP
         </div>
 
         <div
-          className="grid aspect-square w-full grid-cols-5 gap-1 rounded-lg border border-cyan-500/25 bg-slate-900/90 p-1.5 sm:gap-2 sm:p-2"
+          className="relative grid aspect-square w-full grid-cols-5 gap-1 rounded-lg border border-cyan-500/25 bg-slate-900/90 p-1.5 sm:gap-2 sm:p-2"
           role="grid"
           aria-label="Nöral akış ızgarası"
         >
+          <span
+            aria-hidden
+            className="pointer-events-none absolute right-1 top-1 font-mono text-[11px] tracking-[0.3em] text-cyan-400/45"
+          >
+            N
+          </span>
           {Array.from({ length: SIZE }, (_, r) =>
             Array.from({ length: SIZE }, (_, c) => {
               const cell = grid[r][c];

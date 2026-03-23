@@ -31,6 +31,9 @@ export default function TerminalPuzzle({ onSolve, onWrong }: TerminalPuzzleProps
         role="region"
         aria-label="Terminal"
       >
+        <p className="mb-1 text-[10px] tracking-[0.25em] text-emerald-500/35">
+          [MEM.FRAG] H
+        </p>
         <p className="mb-4 text-emerald-400/95 drop-shadow-[0_0_8px_rgba(52,211,153,0.5)]">
           Sistem kilitli. Yetki kodunu girin:
         </p>

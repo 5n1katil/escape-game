@@ -19,6 +19,7 @@ import {
   isCorrectMultipleChoice,
 } from "@/lib/rooms";
 import MatrixPuzzle from "@/components/puzzles/MatrixPuzzle";
+import ConstellationPuzzle from "@/components/puzzles/ConstellationPuzzle";
 import NeuralFlowPuzzle from "@/components/puzzles/NeuralFlowPuzzle";
 import SliderPuzzle from "@/components/puzzles/SliderPuzzle";
 import TerminalPuzzle from "@/components/puzzles/TerminalPuzzle";
@@ -444,6 +445,25 @@ export default function EscapeRoomGame({
       );
     }
 
+    if (pt === "constellation") {
+      return (
+        <div className="space-y-4">
+          <ConstellationPuzzle
+            onSolve={() => {
+              setError(null);
+              markRoomSolved();
+            }}
+            onWrong={handleWrongAnswer}
+          />
+          {error && (
+            <p role="alert" className="text-sm text-red-400">
+              {error}
+            </p>
+          )}
+        </div>
+      );
+    }
+
     if (pt === "text" && currentRoom.answer) {
       return (
         <div className="space-y-4">
@@ -508,6 +528,16 @@ export default function EscapeRoomGame({
         const options = currentRoom.options ?? [];
         return (
           <div className="space-y-4">
+            {slug === "zihin-labirenti" && currentRoom.id === 1 && (
+              <div className="pointer-events-none text-right font-mono text-[11px] tracking-[0.28em] text-cyan-500/35">
+                Z
+              </div>
+            )}
+            {slug === "zihin-labirenti" && currentRoom.id === 2 && (
+              <div className="pointer-events-none text-left font-mono text-[11px] tracking-[0.28em] text-cyan-500/35">
+                İ
+              </div>
+            )}
             <div className="grid gap-2 sm:grid-cols-2">
               {options.map((option, idx) => (
                 <button
