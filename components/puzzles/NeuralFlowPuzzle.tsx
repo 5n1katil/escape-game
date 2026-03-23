@@ -208,7 +208,7 @@ export default function NeuralFlowPuzzle({ onSolve, onWrong }: NeuralFlowPuzzleP
 
   return (
     <div className="space-y-5 rounded-xl border border-cyan-500/35 bg-slate-950/90 p-3 shadow-[0_0_40px_rgba(6,182,212,0.08)] sm:p-5">
-      <div className="relative mx-auto w-full max-w-md">
+      <div className="relative mx-auto w-full max-w-[min(90vw,400px)]">
         {/* GİRİŞ — North edge of (0,0), chevron down into grid. Centered over col 0. */}
         <div
           className="pointer-events-none absolute left-0 top-0 z-10 flex w-[20%] flex-col items-center"

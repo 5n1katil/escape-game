@@ -2,7 +2,6 @@ import CountdownTimer from "@/components/CountdownTimer";
 import EscapeRoomGame from "@/components/EscapeRoomGame";
 import GameStateGate from "@/components/GameStateGate";
 import RestartButton from "@/components/RestartButton";
-import RoomMap from "@/components/RoomMap";
 import {
   GameRoomContentCard,
   GameRoomLayout,
@@ -42,13 +41,13 @@ export default async function ZihinLabirentiRoomPage({
   return (
     <GameStateGate slug={slug}>
       <SessionSync slug={slug} roomId={roomIdNum} />
-      <div className="relative flex min-h-screen flex-col bg-zinc-950">
+      <div className="relative flex h-screen w-full flex-col overflow-hidden bg-zinc-950 md:flex-row">
         <div
           className="pointer-events-none fixed inset-0 bg-gradient-to-b from-zinc-900/50 via-transparent to-zinc-950/80"
           aria-hidden
         />
 
-        <div className="sticky top-0 z-[60] w-full min-w-0 md:hidden">
+        <div className="sticky top-0 z-50 h-32 w-full border-b border-cyan-500/30 bg-slate-950/90 backdrop-blur-md md:relative md:h-full md:w-1/3 md:border-b-0 md:border-l md:hidden">
           <CountdownTimer
             slug={slug}
             initialMinutes={g.durationMinutes}
@@ -56,33 +55,20 @@ export default async function ZihinLabirentiRoomPage({
             variant="mobileBar"
             label={t.room.timerHudLabel}
           />
-          <div
-            className={`border-b ${rp.mapStripBorder} bg-zinc-950/95 px-3 pb-2 pt-2 shadow-[0_8px_24px_rgba(0,0,0,0.35)] backdrop-blur-md sm:px-4`}
-          >
-            <p className={`mb-1.5 text-center ${rp.mapTitle}`}>{t.hub.map}</p>
+          <div className="h-[calc(100%-44px)] px-3 py-2 sm:px-4">
+            <p className={`mb-1 text-center ${rp.mapTitle}`}>{t.hub.map}</p>
             <TempleMap
               slug={slug}
               rooms={rooms}
               goToRoomLabel={t.hub.goToRoom}
               imageFit="contain"
-              containImgClassName="h-auto w-full max-h-[min(65vh,560px)] object-contain"
+              containImgClassName="h-auto w-full max-h-16 object-contain"
               mapImageSrc={g.mapImagePath}
-            />
-          </div>
-          <div
-            className={`border-b ${rp.mapStripBorder} bg-zinc-950/95 px-3 pb-2 pt-1.5 backdrop-blur-md sm:px-4`}
-          >
-            <RoomMap
-              slug={slug}
-              currentRoomIndex={roomIndex}
-              rooms={rooms}
-              density="sidebar"
-              compactStrip
             />
           </div>
         </div>
 
-        <div className="relative z-10 flex min-w-0 flex-1 flex-col">
+        <div className="custom-scrollbar relative z-10 flex min-w-0 flex-1 flex-col overflow-y-auto p-4 md:p-8">
           <GameRoomLayout
             header={
               <header className="mb-4 flex w-full min-w-0 shrink-0 items-center justify-between gap-4 border-b border-zinc-800/70 bg-zinc-950/92 py-3 backdrop-blur-md sm:mb-5 sm:py-3.5 xl:sticky xl:top-0 xl:z-40">
