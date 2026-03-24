@@ -7,7 +7,6 @@ import {
   GameRoomLayout,
   GameRoomSidebar,
 } from "@/components/game-room";
-import TempleMap from "@/components/TempleMap";
 import SessionSync from "@/components/SessionSync";
 import { getGameBySlug, getRoomsForGame, type GameConfig } from "@/data/games";
 import { getThemeUi } from "@/lib/gameVisualTheme";
@@ -43,37 +42,13 @@ export default async function RoomPage({ params }: RoomPageProps) {
           aria-hidden
         />
 
-        {/* Mobil: sticky üst harita barı */}
-        <div className="sticky top-0 z-50 h-32 w-full border-b border-cyan-500/30 bg-slate-950/90 backdrop-blur-md md:relative md:h-full md:w-1/3 md:border-b-0 md:border-l md:hidden">
-          <CountdownTimer
-            slug={slug}
-            initialMinutes={g.durationMinutes}
-            ariaLabelTemplate={t.room.timerAriaLabel}
-            variant="mobileBar"
-            label={t.room.timerHudLabel}
-          />
-          <div className="h-[calc(100%-44px)] px-3 py-2 sm:px-4">
-            <p className={`mb-1 text-center ${rp.mapTitle}`}>
-              {t.hub.map}
-            </p>
-            <TempleMap
-              slug={slug}
-              rooms={rooms}
-              goToRoomLabel={t.hub.goToRoom}
-              imageFit="contain"
-              containImgClassName="h-auto w-full max-h-16 object-contain"
-              mapImageSrc={g.mapImagePath}
-            />
-          </div>
-        </div>
-
         <div className="custom-scrollbar relative z-10 flex min-w-0 flex-1 flex-col overflow-y-auto p-4 md:p-8">
           <GameRoomLayout
             header={
-              <header className="mb-4 flex w-full min-w-0 shrink-0 items-center justify-between gap-4 border-b border-zinc-800/70 bg-zinc-950/92 py-3 backdrop-blur-md sm:mb-5 sm:py-3.5 xl:sticky xl:top-0 xl:z-40">
+              <header className="sticky top-0 z-50 -mx-4 mb-4 flex w-auto min-w-0 shrink-0 items-center justify-between gap-3 border-b border-zinc-800/70 bg-zinc-950/95 px-4 py-3 shadow-[0_8px_20px_rgba(0,0,0,0.45)] backdrop-blur-md sm:-mx-6 sm:mb-5 sm:px-6 sm:py-3.5 md:mx-0 md:w-full md:rounded-t-lg md:px-0 md:shadow-none">
                 <Link
                   href={`/game/${slug}/hub`}
-                  className={`flex min-h-[44px] min-w-[44px] shrink-0 touch-manipulation items-center justify-center rounded-lg text-sm text-zinc-500 transition-colors active:bg-zinc-800/50 sm:justify-start sm:px-3 ${rp.headerLinkHover}`}
+                  className={`flex min-h-[50px] min-w-[50px] shrink-0 touch-manipulation items-center justify-center rounded-xl border border-zinc-700/70 bg-zinc-900/70 px-3 text-sm font-medium text-zinc-300 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-cyan-400/70 hover:bg-cyan-500/10 hover:text-cyan-100 active:translate-y-0 active:scale-[0.98] sm:justify-start sm:px-4 md:text-base ${rp.headerLinkHover}`}
                 >
                   {t.room.back}
                 </Link>

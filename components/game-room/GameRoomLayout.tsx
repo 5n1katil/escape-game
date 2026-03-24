@@ -23,7 +23,7 @@ export default function GameRoomLayout({
   return (
     <GameRoomPageShell className={`flex flex-1 flex-col pt-2 sm:pt-3 ${shellClassName}`}>
       {header}
-      <div className="grid w-full min-w-0 overflow-hidden grid-cols-1 items-start gap-8 xl:grid-cols-[minmax(0,1fr)_minmax(320px,400px)] xl:gap-10">
+      <div className="grid w-full min-w-0 grid-cols-1 items-start gap-6 overflow-hidden xl:grid-cols-[minmax(0,1fr)_minmax(320px,400px)] xl:gap-10">
         {titleWide}
         {mainColumn}
         {sidebar}

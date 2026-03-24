@@ -19,7 +19,7 @@ export default function RestartButton({ slug, label }: RestartButtonProps) {
     <button
       type="button"
       onClick={handleClick}
-      className={`min-h-[44px] min-w-[44px] touch-manipulation rounded-lg text-sm text-zinc-500 transition-colors hover:bg-zinc-800/50 active:bg-zinc-800/70 sm:px-3 ${ui.linkMutedHover}`}
+      className={`min-h-[50px] min-w-[50px] touch-manipulation rounded-xl border border-zinc-700/70 bg-zinc-900/70 px-3 text-sm font-medium text-zinc-300 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-cyan-400/70 hover:bg-cyan-500/10 hover:text-cyan-100 active:translate-y-0 active:scale-[0.98] sm:px-4 md:text-base ${ui.linkMutedHover}`}
     >
       {label}
     </button>

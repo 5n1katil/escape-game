@@ -30,7 +30,7 @@ export default function GameRoomSidebar({
   const { ui } = useGameUi();
   return (
     <aside
-      className="game-room-sidebar relative min-h-px min-w-0 w-full max-w-full xl:w-[400px] xl:max-w-[400px] xl:shrink-0"
+      className="game-room-sidebar relative min-h-px min-w-0 w-full max-w-full overflow-hidden xl:w-[400px] xl:max-w-[400px] xl:shrink-0"
       aria-label="Sayaç ve ilerleme"
     >
       <div className={ui.gameRoom.sidebar}>
