@@ -11,6 +11,13 @@ export const WIX_LANDING_BASE = "https://www.5n1dedektif.com";
 export const GAME_SLUGS_WITH_DEDICATED_ROUTES: readonly string[] = [];
 
 export type VisualThemeId = "temple" | "cyber";
+export type GameMapSegment = {
+  id: number;
+  top: number;
+  left: number;
+  width: number;
+  height: number;
+};
 
 export type GameConfig = {
   slug: string;
@@ -33,9 +40,29 @@ export type GameConfig = {
   visualTheme: VisualThemeId;
   /** Hub + oda ekranı harita görseli */
   mapImagePath: string;
+  /** Hub haritasında oda tıklama segmentleri */
+  mapSegments?: readonly GameMapSegment[];
   /** Intro sol panel kapak görseli; yoksa placeholder */
   introCoverImagePath?: string | null;
 };
+
+const TAPINAK_MAP_SEGMENTS: readonly GameMapSegment[] = [
+  { id: 1, top: 8, left: 4, width: 26, height: 40 },
+  { id: 2, top: 8, left: 36, width: 26, height: 40 },
+  { id: 3, top: 8, left: 69, width: 26, height: 40 },
+  { id: 4, top: 55, left: 4, width: 26, height: 40 },
+  { id: 5, top: 55, left: 36, width: 26, height: 40 },
+  { id: 6, top: 55, left: 69, width: 26, height: 40 },
+];
+
+const ZIHIN_MAP_SEGMENTS: readonly GameMapSegment[] = [
+  { id: 1, top: 10, left: 4, width: 26, height: 38 },
+  { id: 2, top: 10, left: 36, width: 26, height: 38 },
+  { id: 3, top: 10, left: 69, width: 26, height: 38 },
+  { id: 4, top: 55, left: 4, width: 26, height: 38 },
+  { id: 5, top: 55, left: 36, width: 26, height: 38 },
+  { id: 6, top: 55, left: 69, width: 26, height: 38 },
+];
 
 export const games = [
   {
@@ -67,6 +94,7 @@ export const games = [
     hubStoryAudioUrl: "/games/tapinagin-laneti/audio/2-Tapınağın Laneti Giriş Seslendirme.mp3",
     visualTheme: "temple",
     mapImagePath: "/games/tapinagin-laneti/images/temple-map.jpg",
+    mapSegments: TAPINAK_MAP_SEGMENTS,
     introCoverImagePath:
       "/games/tapinagin-laneti/images/" + encodeURIComponent("Tapınağın Laneti.png"),
   },
@@ -93,6 +121,7 @@ export const games = [
       "Koyu lacivert bir koridor, tavanda akan cyan veri hatları. Bu yer nörobilim laboratuvarı ile siber uzayın arasında; Sivrizeka’nın zihninin haritası gibi.\n\nAltı modül sıralı görünüyor. Yanlış dallanma beni izole edebilir; doğru sıra ve yanıtlarla ilerlemeliyim.\n\nGeri dönüş kapısı kilitlendi. Tek çıkış: tüm modülleri çözmek.",
     visualTheme: "cyber",
     mapImagePath: "/games/zihin-labirenti/images/zihin-map.jpg",
+    mapSegments: ZIHIN_MAP_SEGMENTS,
     introCoverImagePath: "/games/zihin-labirenti/images/cover.jpg",
   },
 ] as const satisfies readonly GameConfig[];

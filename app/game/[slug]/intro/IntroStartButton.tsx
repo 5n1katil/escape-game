@@ -93,11 +93,11 @@ export default function IntroStartButton({
     if (!showRankingModal) return null;
     return (
       <div
-        className="intro-ranking-overlay fixed inset-0 z-50 flex items-center justify-center bg-black/82 px-3 py-6 backdrop-blur-md sm:px-6 sm:py-10 lg:backdrop-blur-xl"
+        className="intro-ranking-overlay fixed inset-0 z-[130] flex items-center justify-center bg-black/82 px-3 py-6 backdrop-blur-md sm:px-6 sm:py-10 lg:backdrop-blur-xl"
         role="presentation"
       >
         <div
-          className="intro-ranking-modal-pop relative w-full max-w-[min(96vw,52rem)] lg:max-w-[min(94vw,64rem)] xl:max-w-[72rem]"
+          className="intro-ranking-modal-pop relative z-[131] w-full max-w-[min(96vw,52rem)] lg:max-w-[min(94vw,64rem)] xl:max-w-[72rem]"
           role="dialog"
           aria-modal="true"
           aria-labelledby="intro-ranking-title"

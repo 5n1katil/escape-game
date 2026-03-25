@@ -3,7 +3,7 @@
 import CountdownTimer from "@/components/CountdownTimer";
 import { useGameUi } from "@/components/GameVisualThemeProvider";
 import RestartButton from "@/components/RestartButton";
-import TempleMap from "@/components/TempleMap";
+import TempleMap, { type MapSegment } from "@/components/TempleMap";
 import type { Room } from "@/data/rooms";
 import { fetchUserAvatarFromRtdb } from "@/lib/firebase";
 import { calculateScore } from "@/lib/gameSession";
@@ -39,6 +39,7 @@ interface HubClientProps {
   timerHudLabel: string;
   durationMinutes: number;
   mapImageSrc: string;
+  mapSegments?: readonly MapSegment[];
 }
 
 export default function HubClient({
@@ -53,6 +54,7 @@ export default function HubClient({
   timerHudLabel,
   durationMinutes,
   mapImageSrc,
+  mapSegments,
 }: HubClientProps) {
   const { ui } = useGameUi();
   const h = ui.hub;
@@ -208,8 +210,8 @@ export default function HubClient({
                 rooms={rooms}
                 goToRoomLabel={t.goToRoom}
                 imageFit="contain"
-                containImgClassName="max-h-[min(50vh,420px)]"
                 mapImageSrc={mapImageSrc}
+                mapSegments={mapSegments}
               />
             </div>
           </section>
@@ -356,6 +358,7 @@ export default function HubClient({
                 imageFit="cover"
                 className="min-h-0 flex-1 rounded-md"
                 mapImageSrc={mapImageSrc}
+                mapSegments={mapSegments}
               />
             </div>
           </div>

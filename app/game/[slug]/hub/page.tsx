@@ -38,6 +38,7 @@ export default async function HubPage({ params }: HubPageProps) {
         timerHudLabel={t.room.timerHudLabel}
         durationMinutes={game.durationMinutes}
         mapImageSrc={game.mapImagePath}
+        mapSegments={game.mapSegments}
       />
     </GameStateGate>
   );

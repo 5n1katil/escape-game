@@ -28,6 +28,7 @@ export const TEMPLE_MAP_SEGMENTS: {
   { id: 5, top: 55, left: 36, width: 26, height: 40 },
   { id: 6, top: 55, left: 69, width: 26, height: 40 },
 ];
+export type MapSegment = (typeof TEMPLE_MAP_SEGMENTS)[number];
 
 function MapLockIcon({ className }: { className?: string }) {
   return (
@@ -67,6 +68,8 @@ export interface TempleMapProps {
   containImgClassName?: string;
   /** Varsayılan: tapınak haritası */
   mapImageSrc?: string;
+  /** Harita segmentleri (verilmezse varsayılan segmentler kullanılır) */
+  mapSegments?: readonly MapSegment[];
   /** Mobil üst şerit için sade yatay ilerleme görünümü */
   mobileStepper?: boolean;
   /** Mobil stepper'da mevcut oda vurgusu */
@@ -83,8 +86,9 @@ export default function TempleMap({
   goToRoomLabel,
   imageFit,
   className = "",
-  containImgClassName = "max-h-[min(72vh,560px)]",
+  containImgClassName = "",
   mapImageSrc = TEMPLE_MAP_IMAGE_PATH,
+  mapSegments = TEMPLE_MAP_SEGMENTS,
   mobileStepper = false,
   currentRoomIndex,
 }: TempleMapProps) {
@@ -97,6 +101,7 @@ export default function TempleMap({
   const [unlockedIds, setUnlockedIds] = useState<number[]>([]);
   const [mounted, setMounted] = useState(false);
   const [mapError, setMapError] = useState(false);
+  const [containAspectRatio, setContainAspectRatio] = useState(16 / 9);
 
   const roomIds = rooms.map((r) => r.id);
 
@@ -218,7 +223,7 @@ export default function TempleMap({
     );
   }
 
-  const segments = TEMPLE_MAP_SEGMENTS.map((seg) => {
+  const segments = mapSegments.map((seg) => {
     const roomId = seg.id;
     const room = rooms.find((r) => r.id === roomId);
     const unlocked = unlockedIds.includes(roomId);
@@ -265,14 +270,22 @@ export default function TempleMap({
         role="img"
         aria-label="Oyun haritası - odalara tıklayarak gidebilirsiniz"
       >
-        <img
-          src={mapImageSrc}
-          alt=""
-          className={`relative z-0 mx-auto block h-auto w-full object-contain object-center ${containImgClassName}`}
-          onError={() => setMapError(true)}
-        />
-        <div className="pointer-events-none absolute inset-0 z-10 [&>a]:pointer-events-auto [&>div]:pointer-events-none">
-          {segments}
+        <div className="relative w-full" style={{ aspectRatio: `${containAspectRatio}` }}>
+          <img
+            src={mapImageSrc}
+            alt=""
+            className={`absolute inset-0 z-0 h-full w-full object-contain object-center ${containImgClassName}`}
+            onLoad={(e) => {
+              const img = e.currentTarget;
+              if (img.naturalWidth > 0 && img.naturalHeight > 0) {
+                setContainAspectRatio(img.naturalWidth / img.naturalHeight);
+              }
+            }}
+            onError={() => setMapError(true)}
+          />
+          <div className="pointer-events-none absolute inset-0 z-10 [&>a]:pointer-events-auto [&>div]:pointer-events-none">
+            {segments}
+          </div>
         </div>
       </div>
     );
