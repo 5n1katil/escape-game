@@ -20,6 +20,7 @@ import {
 import { getTranslations } from "@/lib/i18n";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 
 interface IntroStartButtonProps {
   slug: string;
@@ -43,8 +44,15 @@ export default function IntroStartButton({
   const searchParams = useSearchParams();
   const [hasSession, setHasSession] = useState(false);
   const [isCompleted, setIsCompleted] = useState(false);
-  const [showRankingModal, setShowRankingModal] = useState(true);
+  const [showRankingModal, setShowRankingModal] = useState(false);
   const [mounted, setMounted] = useState(false);
+
+  function getRankingModalSeenKey() {
+    const session = getPlayerSession(slug);
+    const playerKey = getPlayerKeyForSlug(slug);
+    const sessionMarker = session?.startedAt ?? "pre-session";
+    return `introRankingModalSeen:${playerKey}:${slug}:${sessionMarker}`;
+  }
 
   useEffect(() => {
     const fromQuery = searchParams.get("player");
@@ -67,9 +75,13 @@ export default function IntroStartButton({
     const playerKey = getPlayerKeyForSlug(slug);
     const completedSnapshot = getCompletedGameResult(playerKey, slug);
     const escapedState = getStoredEscaped(slug) === true || session?.escaped === true;
+    const modalSeenKey = getRankingModalSeenKey();
+    const alreadySeenModal =
+      typeof window !== "undefined" && localStorage.getItem(modalSeenKey) === "1";
 
     setHasSession(hasPlayerSession(slug));
     setIsCompleted(Boolean(completedSnapshot) || escapedState);
+    setShowRankingModal(!alreadySeenModal);
     setMounted(true);
   }, [slug, searchParams]);
 
@@ -91,13 +103,13 @@ export default function IntroStartButton({
 
   function renderRankingModal() {
     if (!showRankingModal) return null;
-    return (
+    const modal = (
       <div
-        className="intro-ranking-overlay fixed inset-0 z-[130] flex items-center justify-center bg-black/82 px-3 py-6 backdrop-blur-md sm:px-6 sm:py-10 lg:backdrop-blur-xl"
+        className="intro-ranking-overlay fixed inset-0 z-[200] flex overflow-y-auto bg-black/82 px-3 py-6 backdrop-blur-md sm:items-center sm:justify-center sm:px-6 sm:py-10 lg:backdrop-blur-xl"
         role="presentation"
       >
         <div
-          className="intro-ranking-modal-pop relative z-[131] w-full max-w-[min(96vw,52rem)] lg:max-w-[min(94vw,64rem)] xl:max-w-[72rem]"
+          className="intro-ranking-modal-pop relative z-[201] my-auto max-h-[90dvh] w-full max-w-[min(96vw,52rem)] overflow-y-auto lg:max-w-[min(94vw,64rem)] xl:max-w-[72rem]"
           role="dialog"
           aria-modal="true"
           aria-labelledby="intro-ranking-title"
@@ -140,7 +152,12 @@ export default function IntroStartButton({
               </p>
               <button
                 type="button"
-                onClick={() => setShowRankingModal(false)}
+                onClick={() => {
+                  if (typeof window !== "undefined") {
+                    localStorage.setItem(getRankingModalSeenKey(), "1");
+                  }
+                  setShowRankingModal(false);
+                }}
                 className={im.modalCta}
               >
                 {t.intro.rankingModalCta}
@@ -150,6 +167,9 @@ export default function IntroStartButton({
         </div>
       </div>
     );
+
+    if (typeof document === "undefined") return modal;
+    return createPortal(modal, document.body);
   }
 
   if (!mounted) {
