@@ -42,10 +42,10 @@ export default async function RoomPage({ params }: RoomPageProps) {
           aria-hidden
         />
 
-        <div className="custom-scrollbar relative z-10 flex min-w-0 flex-1 flex-col overflow-y-auto p-4 md:p-8">
+        <div className="custom-scrollbar relative z-10 flex min-w-0 flex-1 flex-col overflow-y-auto p-4 pt-24 md:p-8 md:pt-28">
           <GameRoomLayout
             header={
-              <header className="sticky top-0 z-50 -mx-4 mb-4 flex w-auto min-w-0 shrink-0 items-center justify-between gap-3 border-b border-zinc-800/70 bg-zinc-950/95 px-4 py-3 shadow-[0_8px_20px_rgba(0,0,0,0.45)] backdrop-blur-md sm:-mx-6 sm:mb-5 sm:px-6 sm:py-3.5 md:mx-0 md:w-full md:rounded-t-lg md:px-0 md:shadow-none">
+              <header className="fixed inset-x-0 top-0 z-[70] mx-auto flex w-full min-w-0 shrink-0 items-center justify-between gap-3 border-b border-zinc-800/70 bg-zinc-950/95 px-4 py-3 shadow-[0_8px_20px_rgba(0,0,0,0.45)] backdrop-blur-md sm:px-6 sm:py-3.5 md:px-8">
                 <Link
                   href={`/game/${slug}/hub`}
                   className={`flex min-h-[50px] min-w-[50px] shrink-0 touch-manipulation items-center justify-center rounded-xl border border-zinc-700/70 bg-zinc-900/70 px-3 text-sm font-medium text-zinc-300 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-cyan-400/70 hover:bg-cyan-500/10 hover:text-cyan-100 active:translate-y-0 active:scale-[0.98] sm:justify-start sm:px-4 md:text-base ${rp.headerLinkHover}`}
